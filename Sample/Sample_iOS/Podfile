@@ -1,0 +1,10 @@
+platform :ios, '8.0'
+
+use_frameworks!
+
+
+target 'Sample_iOS' do
+
+	pod 'Dopamine', :path => '../..'
+
+end
