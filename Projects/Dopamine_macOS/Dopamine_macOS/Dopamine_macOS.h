@@ -17,4 +17,5 @@ FOUNDATION_EXPORT const unsigned char Dopamine_macOSVersionString[];
 // In this header, you should import all the public headers of your framework using statements like #import <Dopamine_macOS/PublicHeader.h>
 
 #import "FloatBufferCpp.hpp"
+#import "LayersCpp.hpp"
 

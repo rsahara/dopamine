@@ -64,7 +64,7 @@ public class FloatBuffer {
 		_buffer.deallocate(capacity: _allocationSize)
 	}
 
-	subscript(index: Int) -> Float {
+	public subscript(index: Int) -> Float {
 		get {
 			return _buffer[index]
 		}
@@ -411,15 +411,15 @@ public class FloatBuffer {
 
 	// MARK: プロパティ
 
-	var capacity: Int {
+	public var capacity: Int {
 		return _capacity
 	}
 	
-	var contents: Pointer {
+	public var contents: Pointer {
 		return _buffer
 	}
 	
-	var shape: Array<Int> {
+	public var shape: Array<Int> {
 		return _shape
 	}
 	

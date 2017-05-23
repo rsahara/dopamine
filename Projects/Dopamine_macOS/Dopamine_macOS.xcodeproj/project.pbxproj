@@ -7,6 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F2A4A5E01ED3EA7700682105 /* PerfCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5DF1ED3EA7700682105 /* PerfCheck.swift */; };
+		F2A4A5E61ED3EBFA00682105 /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5E51ED3EBFA00682105 /* Layer.swift */; };
+		F2A4A5E91ED3ECF200682105 /* Optimizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5E81ED3ECF200682105 /* Optimizer.swift */; };
+		F2A4A5ED1ED3ED1A00682105 /* OptimizerAdam.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5EA1ED3ED1A00682105 /* OptimizerAdam.swift */; };
+		F2A4A5EE1ED3ED1A00682105 /* OptimizerDescent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5EB1ED3ED1A00682105 /* OptimizerDescent.swift */; };
+		F2A4A5EF1ED3ED1A00682105 /* OptimizerRmsProp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5EC1ED3ED1A00682105 /* OptimizerRmsProp.swift */; };
+		F2A4A5F71ED3EDCB00682105 /* AffineLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5F01ED3EDCB00682105 /* AffineLayer.swift */; };
+		F2A4A5F81ED3EDCB00682105 /* LayersCpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5F11ED3EDCB00682105 /* LayersCpp.cpp */; };
+		F2A4A5F91ED3EDCB00682105 /* LayersCpp.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F2A4A5F21ED3EDCB00682105 /* LayersCpp.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		F2A4A5FA1ED3EDCB00682105 /* ReluLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5F31ED3EDCB00682105 /* ReluLayer.swift */; };
+		F2A4A5FB1ED3EDCB00682105 /* SigmoidLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5F41ED3EDCB00682105 /* SigmoidLayer.swift */; };
+		F2A4A5FC1ED3EDCB00682105 /* SoftmaxWithLoss.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5F51ED3EDCB00682105 /* SoftmaxWithLoss.swift */; };
+		F2A4A5FD1ED3EDCB00682105 /* TanhLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5F61ED3EDCB00682105 /* TanhLayer.swift */; };
+		F2A4A6001ED3EE3C00682105 /* GruCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5FE1ED3EE3C00682105 /* GruCell.swift */; };
+		F2A4A6011ED3EE3C00682105 /* GruNet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A5FF1ED3EE3C00682105 /* GruNet.swift */; };
+		F2A4A6051ED3EE5F00682105 /* LayerNet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A4A6041ED3EE5F00682105 /* LayerNet.swift */; };
 		F2AB5A691ED2C38A00DAA2F3 /* Dopamine_macOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2AB5A5F1ED2C38A00DAA2F3 /* Dopamine_macOS.framework */; };
 		F2AB5A6E1ED2C38A00DAA2F3 /* Dopamine_macOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2AB5A6D1ED2C38A00DAA2F3 /* Dopamine_macOSTests.swift */; };
 		F2AB5A701ED2C38A00DAA2F3 /* Dopamine_macOS.h in Headers */ = {isa = PBXBuildFile; fileRef = F2AB5A621ED2C38A00DAA2F3 /* Dopamine_macOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -29,6 +45,22 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F2A4A5DF1ED3EA7700682105 /* PerfCheck.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PerfCheck.swift; sourceTree = "<group>"; };
+		F2A4A5E51ED3EBFA00682105 /* Layer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
+		F2A4A5E81ED3ECF200682105 /* Optimizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Optimizer.swift; sourceTree = "<group>"; };
+		F2A4A5EA1ED3ED1A00682105 /* OptimizerAdam.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimizerAdam.swift; sourceTree = "<group>"; };
+		F2A4A5EB1ED3ED1A00682105 /* OptimizerDescent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimizerDescent.swift; sourceTree = "<group>"; };
+		F2A4A5EC1ED3ED1A00682105 /* OptimizerRmsProp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptimizerRmsProp.swift; sourceTree = "<group>"; };
+		F2A4A5F01ED3EDCB00682105 /* AffineLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AffineLayer.swift; sourceTree = "<group>"; };
+		F2A4A5F11ED3EDCB00682105 /* LayersCpp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LayersCpp.cpp; sourceTree = "<group>"; };
+		F2A4A5F21ED3EDCB00682105 /* LayersCpp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LayersCpp.hpp; sourceTree = "<group>"; };
+		F2A4A5F31ED3EDCB00682105 /* ReluLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReluLayer.swift; sourceTree = "<group>"; };
+		F2A4A5F41ED3EDCB00682105 /* SigmoidLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SigmoidLayer.swift; sourceTree = "<group>"; };
+		F2A4A5F51ED3EDCB00682105 /* SoftmaxWithLoss.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoftmaxWithLoss.swift; sourceTree = "<group>"; };
+		F2A4A5F61ED3EDCB00682105 /* TanhLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TanhLayer.swift; sourceTree = "<group>"; };
+		F2A4A5FE1ED3EE3C00682105 /* GruCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GruCell.swift; sourceTree = "<group>"; };
+		F2A4A5FF1ED3EE3C00682105 /* GruNet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GruNet.swift; sourceTree = "<group>"; };
+		F2A4A6041ED3EE5F00682105 /* LayerNet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayerNet.swift; sourceTree = "<group>"; };
 		F2AB5A5F1ED2C38A00DAA2F3 /* Dopamine_macOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Dopamine_macOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2AB5A621ED2C38A00DAA2F3 /* Dopamine_macOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Dopamine_macOS.h; sourceTree = "<group>"; };
 		F2AB5A631ED2C38A00DAA2F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -61,6 +93,50 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F2A4A5DE1ED3EA7700682105 /* Diagnostics */ = {
+			isa = PBXGroup;
+			children = (
+				F2A4A5DF1ED3EA7700682105 /* PerfCheck.swift */,
+			);
+			path = Diagnostics;
+			sourceTree = "<group>";
+		};
+		F2A4A5E11ED3EAD100682105 /* Layer */ = {
+			isa = PBXGroup;
+			children = (
+				F2A4A5E51ED3EBFA00682105 /* Layer.swift */,
+				F2A4A5F01ED3EDCB00682105 /* AffineLayer.swift */,
+				F2A4A5F11ED3EDCB00682105 /* LayersCpp.cpp */,
+				F2A4A5F21ED3EDCB00682105 /* LayersCpp.hpp */,
+				F2A4A5F31ED3EDCB00682105 /* ReluLayer.swift */,
+				F2A4A5F41ED3EDCB00682105 /* SigmoidLayer.swift */,
+				F2A4A5F51ED3EDCB00682105 /* SoftmaxWithLoss.swift */,
+				F2A4A5F61ED3EDCB00682105 /* TanhLayer.swift */,
+			);
+			path = Layer;
+			sourceTree = "<group>";
+		};
+		F2A4A5E21ED3EAE900682105 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				F2A4A6041ED3EE5F00682105 /* LayerNet.swift */,
+				F2A4A5FE1ED3EE3C00682105 /* GruCell.swift */,
+				F2A4A5FF1ED3EE3C00682105 /* GruNet.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		F2A4A5E71ED3ECDD00682105 /* Optimizer */ = {
+			isa = PBXGroup;
+			children = (
+				F2A4A5E81ED3ECF200682105 /* Optimizer.swift */,
+				F2A4A5EA1ED3ED1A00682105 /* OptimizerAdam.swift */,
+				F2A4A5EB1ED3ED1A00682105 /* OptimizerDescent.swift */,
+				F2A4A5EC1ED3ED1A00682105 /* OptimizerRmsProp.swift */,
+			);
+			path = Optimizer;
+			sourceTree = "<group>";
+		};
 		F2AB5A551ED2C38A00DAA2F3 = {
 			isa = PBXGroup;
 			children = (
@@ -102,7 +178,11 @@
 		F2AB5A7C1ED2C3D400DAA2F3 /* Dopamine */ = {
 			isa = PBXGroup;
 			children = (
+				F2A4A5DE1ED3EA7700682105 /* Diagnostics */,
 				F2AB5A7D1ED2C3D400DAA2F3 /* FloatBuffer */,
+				F2A4A5E11ED3EAD100682105 /* Layer */,
+				F2A4A5E71ED3ECDD00682105 /* Optimizer */,
+				F2A4A5E21ED3EAE900682105 /* Network */,
 			);
 			name = Dopamine;
 			path = ../../Dopamine;
@@ -135,6 +215,7 @@
 			files = (
 				F2AB5A701ED2C38A00DAA2F3 /* Dopamine_macOS.h in Headers */,
 				F2AB5A881ED2C4A400DAA2F3 /* FloatBufferCpp.hpp in Headers */,
+				F2A4A5F91ED3EDCB00682105 /* LayersCpp.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,8 +318,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2A4A5E01ED3EA7700682105 /* PerfCheck.swift in Sources */,
+				F2A4A5E91ED3ECF200682105 /* Optimizer.swift in Sources */,
+				F2A4A5F71ED3EDCB00682105 /* AffineLayer.swift in Sources */,
+				F2A4A6051ED3EE5F00682105 /* LayerNet.swift in Sources */,
+				F2A4A5FA1ED3EDCB00682105 /* ReluLayer.swift in Sources */,
+				F2A4A5EE1ED3ED1A00682105 /* OptimizerDescent.swift in Sources */,
+				F2A4A5FB1ED3EDCB00682105 /* SigmoidLayer.swift in Sources */,
+				F2A4A6001ED3EE3C00682105 /* GruCell.swift in Sources */,
+				F2A4A6011ED3EE3C00682105 /* GruNet.swift in Sources */,
+				F2A4A5EF1ED3ED1A00682105 /* OptimizerRmsProp.swift in Sources */,
+				F2A4A5E61ED3EBFA00682105 /* Layer.swift in Sources */,
+				F2A4A5F81ED3EDCB00682105 /* LayersCpp.cpp in Sources */,
 				F2AB5A831ED2C3D400DAA2F3 /* FloatBufferCpp.cpp in Sources */,
+				F2A4A5ED1ED3ED1A00682105 /* OptimizerAdam.swift in Sources */,
 				F2AB5A811ED2C3D400DAA2F3 /* FloatBuffer.swift in Sources */,
+				F2A4A5FD1ED3EDCB00682105 /* TanhLayer.swift in Sources */,
+				F2A4A5FC1ED3EDCB00682105 /* SoftmaxWithLoss.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
