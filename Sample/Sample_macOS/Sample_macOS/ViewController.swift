@@ -15,9 +15,9 @@ class ViewController: NSViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		testMNIST()
-		//testGRU()
-		
+//		testMNIST()
+//		testGRU()
+		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -417,4 +417,10 @@ class ViewController: NSViewController {
 		
 	}
 	
+	// MARK: - SkipGram test
+
+	func testSkipGram() {
+		
+	}
+
 }
