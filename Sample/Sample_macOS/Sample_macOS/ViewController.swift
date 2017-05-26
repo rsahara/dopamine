@@ -418,9 +418,81 @@ class ViewController: NSViewController {
 	}
 	
 	// MARK: - SkipGram test
+	
+	struct CategoryModel {
+		public var id: Int
+		public var text: String
+		public var parentId: Int
+		
+	}
 
 	func testSkipGram() {
 		
+		// データをロード
+		let categoryModelDict: Dictionary<Int, CategoryModel> = loadCategoryModels()
+		var outputArrayDict = Dictionary<Int, Array<Int>>()
+		for (_, categoryModel) in categoryModelDict {
+			if categoryModel.parentId != -1 {
+				
+				if var array = outputArrayDict[categoryModel.parentId] {
+					array.append(categoryModel.id)
+					outputArrayDict[categoryModel.parentId] = array
+				} else {
+					outputArrayDict[categoryModel.parentId] = Array<Int>(arrayLiteral: categoryModel.id)
+				}
+
+				if var array = outputArrayDict[categoryModel.id] {
+					array.append(categoryModel.parentId)
+					outputArrayDict[categoryModel.parentId] = array
+				} else {
+					outputArrayDict[categoryModel.id] = Array<Int>(arrayLiteral: categoryModel.parentId)
+				}
+
+			}
+		}
+
+		Swift.print(outputArrayDict)
+
 	}
+	
+	func loadCategoryModels() -> Dictionary<Int, CategoryModel> {
+		let sampleMasterUrl = Bundle.main.url(forResource: "samplemaster", withExtension: "json")!
+		let sampleMasterData = try! Data(contentsOf: sampleMasterUrl)
+		let sampleMasterObj = (try! JSONSerialization.jsonObject(with: sampleMasterData, options: JSONSerialization.ReadingOptions())) as! Dictionary<String, Any>
+		
+		let categoryObjArray = sampleMasterObj["genre_m"] as! Array<Dictionary<String, Any>>
+		var categoryModelDict = Dictionary<Int, CategoryModel>()
+		var translateIdDict = Dictionary<Int, Int>()
+		translateIdDict[0] = -1
+		var currentId = 0
+
+		for categoryObj in categoryObjArray {
+			var categoryModel = CategoryModel(id: Int(categoryObj["genre_id"] as! String)!,
+			                                  text: categoryObj["genre_name"] as! String,
+			                                  parentId: Int(categoryObj["parent_genre_id"] as! String)!)
+
+			if let newId = translateIdDict[categoryModel.id] {
+				categoryModel.id = newId
+			} else {
+				translateIdDict[categoryModel.id] = currentId
+				categoryModel.id = currentId
+				currentId += 1
+			}
+
+			if let newId = translateIdDict[categoryModel.parentId] {
+				categoryModel.parentId = newId
+			} else {
+				translateIdDict[categoryModel.parentId] = currentId
+				categoryModel.parentId = currentId
+				currentId += 1
+			}
+
+			categoryModelDict.updateValue(categoryModel, forKey: categoryModel.id)
+		}
+
+		return categoryModelDict
+	}
+	
+	
 
 }
