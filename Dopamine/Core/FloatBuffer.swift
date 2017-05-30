@@ -191,6 +191,7 @@ public class FloatBuffer {
 	
 	public func copyConcatRows(left: FloatBuffer, right: FloatBuffer) {
 		assert(left._rows == right._rows)
+		// TODO: C++
 
 		let resColumns = left._columns + right._columns
 

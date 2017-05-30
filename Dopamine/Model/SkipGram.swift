@@ -24,6 +24,7 @@ public class SkipGram {
 	}
 
 	public func trainWithSequences(itemSequenceArray: [[Int]]) {
+		
 		// TODO: C++化
 
 		// 数をカウントする
@@ -114,7 +115,6 @@ public class SkipGram {
 	}
 
 	func selectRandomNegativeItemIndex() -> Int {
-//		return Int(arc4random_uniform(UInt32(itemCount)))
 		let randMax = itemSelectBuffer.contents[itemCount - 1]
 		let randVal = Float(arc4random()) * (1.0 / Float(UINT32_MAX)) * randMax
 		

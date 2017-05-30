@@ -21,13 +21,13 @@ void _FloatBuffer_FillZero(float* res, int length) {
 }
 
 void _FloatBuffer_FillRandomGaussian(float* res, int length) {
-	std::random_device device;
-	std::mt19937 generator(device());
+	std::random_device dev;
+	std::mt19937 gen(dev());
 	std::normal_distribution<float> dist;
 
 	float* resEnd = res + length;
 	for (; res < resEnd; res++) {
-		*res = dist(generator);
+		*res = dist(gen);
 	}
 }
 
