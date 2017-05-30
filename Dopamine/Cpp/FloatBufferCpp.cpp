@@ -8,6 +8,8 @@
 
 #include <cmath>
 #include <cstring>
+#include <random>
+
 #include <Accelerate/Accelerate.h>
 
 extern "C" {
@@ -16,6 +18,17 @@ extern "C" {
 
 void _FloatBuffer_FillZero(float* res, int length) {
 	memset(res, 0, length * sizeof (float));
+}
+
+void _FloatBuffer_FillRandomGaussian(float* res, int length) {
+	std::random_device device;
+	std::mt19937 generator(device());
+	std::normal_distribution<float> dist;
+
+	float* resEnd = res + length;
+	for (; res < resEnd; res++) {
+		*res = dist(generator);
+	}
 }
 
 void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {

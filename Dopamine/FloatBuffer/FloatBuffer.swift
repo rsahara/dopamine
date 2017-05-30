@@ -14,22 +14,13 @@ public class FloatBuffer {
 
 	public typealias Pointer = UnsafeMutablePointer<Float>
 	
-	public convenience init(_ shape: Int...) {
-		self.init(shape: shape)
-	}
-
-	public init(shape: Array<Int>) {
-		assert(!shape.isEmpty)
+	public init(_ rows: Int, _ columns: Int) {
 		
-		var capacity = 1
-		for size in shape {
-			capacity *= size
-		}
-		
-		_allocationSize = capacity
-		_capacity = capacity
-		_shape = shape
+		_rows = rows
+		_columns = columns
+		_capacity = rows * columns
 
+		_allocationSize = _capacity
 		_buffer = Pointer.allocate(capacity: _allocationSize)
 		
 		if DEBUG_BUFFERINITIALIZATION {
@@ -40,7 +31,7 @@ public class FloatBuffer {
 	}
 
 	public convenience init(like src: FloatBuffer) {
-		self.init(shape: src._shape)
+		self.init(src._rows, src._columns)
 	}
 
 	deinit {
@@ -54,13 +45,7 @@ public class FloatBuffer {
 	}
 	
 	public func fillRandom() {
-		for index in 0 ..< _capacity {
-			let u1 = Float(arc4random()) * (1.0 / Float(UINT32_MAX))
-			let u2 = Float(arc4random()) * (1.0 / Float(UINT32_MAX))
-			let f1 = sqrtf(-2.0 * logf(u1))
-			let f2 = u2 * (2.0 * Float.pi)
-			_buffer[index] = f1 * cosf(f2)
-		}
+		_FloatBuffer_FillRandomGaussian(_buffer, Int32(capacity))
 	}
 	
 	public func printDistributionAuto(title: String = "notitle", desiredDivisions: Int = 50) {
@@ -116,22 +101,9 @@ public class FloatBuffer {
 	}
 	
 	public func matmul(by right: FloatBuffer, to res: FloatBuffer) {
-		
-		// TODO: shape 対応
-		assert(_shape.count == 2)
-		assert(right._shape.count == 2)
-		assert(res._shape.count == 2)
-		
-		let width = _shape.last!
-		let height = _shape.first!
-		let rightWidth = right._shape.last!
-		let rightHeight = right._shape.first!
-		assert(width == rightHeight)
-		
-		res.resetLazy(height, rightWidth)
-
-		FloatBuffer_MatMul(res._buffer, _buffer, right._buffer, Int32(height), Int32(width), Int32(rightWidth))
-
+		assert(_columns == right._rows)
+		res.resetLazy(_rows, right._columns)
+		FloatBuffer_MatMul(res._buffer, _buffer, right._buffer, Int32(_rows), Int32(_columns), Int32(right._columns))
 	}
 
 	public func add(_ right: FloatBuffer) {
@@ -159,7 +131,6 @@ public class FloatBuffer {
 	public func mul(_ right: FloatBuffer) {
 		let rightCapacity = right._capacity
 		assert(_capacity % rightCapacity == 0)
-		
 		FloatBuffer_Mul(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
@@ -170,35 +141,22 @@ public class FloatBuffer {
 	public func div(_ right: FloatBuffer) {
 		let rightCapacity = right._capacity
 		assert(_capacity % rightCapacity == 0)
-		
 		FloatBuffer_Div(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 
 	public func transpose(result: FloatBuffer) {
-		
-		// TODO: shapeに対応
-		
-		assert(_shape.count >= 2)
-
-		let width = _shape.last!
-		let height = _shape[_shape.count - 2]
-
-		result.resetLazy(width, height)
-		
-		FloatBuffer_Transpose(result._buffer, _buffer, Int32(height), Int32(width))
+		result.resetLazy(_columns, _rows)
+		FloatBuffer_Transpose(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 	
 	public func softmax(result: FloatBuffer) {
-		
 		result.resetLazy(like: self)
-
-		assert(_shape.count > 1)
-		FloatBuffer_SoftMax(result._buffer, _buffer, Int32(_shape.first!), Int32(_shape.last!))
+		FloatBuffer_SoftMax(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 	
 	public func maxPosition() -> Array<Int> {
 		
-		let length = _shape.last!
+		let length = _columns
 		assert(_capacity % length == 0)
 		var result = Array<Int>()
 		
@@ -259,34 +217,30 @@ public class FloatBuffer {
 	public func print() {
 		var valuesStr = ""
 		
-		let vectSize = _shape.last!
-		for vectIndex in stride(from: 0, to: _capacity, by: vectSize) {
-			for valIndex in vectIndex ..< vectIndex + vectSize {
+		for vectIndex in stride(from: 0, to: _capacity, by: _columns) {
+			for valIndex in vectIndex ..< vectIndex + _columns {
 				valuesStr += "\(_buffer[valIndex]),"
 			}
 			valuesStr += "|"
 		}
-		Swift.print("Buffer[\(_shape)] \(valuesStr)")
+		Swift.print("Buffer[\(_rows)x\(_columns)] \(valuesStr)")
 	}
 	
 	public func copy(_ src: FloatBuffer) {
 		
-		resetLazy(shape: src._shape)
+		resetLazy(like: src)
 
 		memcpy(_buffer, src._buffer, _capacity * 4)
 	}
 
-	public func subcopy(_ src: FloatBuffer, startingPosition: [Int]) {
-		
-		assert(src._shape.count == 2) // 未対応
-		assert(startingPosition.count == 2) // 未対応
-		assert(startingPosition.first! + _shape.first! <= src._shape.first!)
-		assert(startingPosition.last! + _shape.last! <= src._shape.last!)
+	public func subcopy(_ src: FloatBuffer, startRow: Int, startColumn: Int) {
+		assert(startRow + _rows <= src._rows)
+		assert(startColumn + _columns <= src._columns)
 
-		for y in 0 ..< _shape.first! {
-			memcpy(_buffer + (y * _shape.last!),
-			       src._buffer + ((y + startingPosition.first!) * src._shape.last! + startingPosition.last!),
-			       _shape.last! * 4)
+		for y in 0 ..< _rows {
+			memcpy(_buffer + (y * _columns),
+			       src._buffer + ((y + startRow) * src._columns + startColumn),
+			       _columns * 4)
 		}
 	}
 
@@ -296,16 +250,14 @@ public class FloatBuffer {
 	
 	// TODO: これはレイヤーに特化しすぎ
 	public func maskZeroOrNegative(result: FloatBuffer, mask: FloatBuffer) {
-
 		FloatBuffer_ResetZeroOrNegativeAndMakeMask(result._buffer, mask._buffer, _buffer, Int32(_capacity))
-
 	}
+	
 	// TODO: これはレイヤーに特化しすぎ
 	public func resetZeroOrNegative(result: FloatBuffer) {
-		
 		FloatBuffer_ResetZeroOrNegative(result._buffer, _buffer, Int32(_capacity))
-		
 	}
+
 	// TODO: これはレイヤーに特化しすぎ
 	public func applyMask(_ mask: FloatBuffer) {
 		assert(_capacity == mask._capacity)
@@ -313,57 +265,39 @@ public class FloatBuffer {
 	}
 	
 	public func sumFirstAxis(to result: FloatBuffer) {
-
-		// TODO: shapeに対応
-		
-		assert(_shape.count >= 2)
-
-		let width = _shape.last!
-		let height = _shape[_shape.count - 2]
-		
-		result.resetLazy(1, width)
-
-		FloatBuffer_SumToFirstAxis(result._buffer, _buffer, Int32(height), Int32(width))
+		result.resetLazy(1, _columns)
+		FloatBuffer_SumToFirstAxis(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 
 	}
 	
 	public func copyConcatRows(left: FloatBuffer, right: FloatBuffer) {
-		
-		// TODO: shapeに対応
-		assert(left._shape.first! == right._shape.first!)
+		assert(left._rows == right._rows)
 
-		let height = left._shape.first!
-		let leftWidth = left._shape.last!
-		let rightWidth = right._shape.last!
-		let resWidth = leftWidth + rightWidth
+		let resColumns = left._columns + right._columns
 
-		resetLazy(height, resWidth)
+		resetLazy(left._rows, resColumns)
 		assert(_capacity == left._capacity + right._capacity)
 
-		for y in 0 ..< height {
-			let headRes = _buffer + (y * resWidth)
-			let headLeft = left._buffer + (y * leftWidth)
-			let headRight = right._buffer + (y * rightWidth)
+		for y in 0 ..< left._rows {
+			let headRes = _buffer + (y * resColumns)
+			let headLeft = left._buffer + (y * left._columns)
+			let headRight = right._buffer + (y * right._columns)
 			
-			memcpy(headRes, headLeft, leftWidth * 4)
-			memcpy(headRes + leftWidth, headRight, rightWidth * 4)
+			memcpy(headRes, headLeft, left._columns * 4)
+			memcpy(headRes + left._columns, headRight, right._columns * 4)
 		}
 	}
 
-	public func resetLazy(shape: Array<Int>) {
-
-		var capacity = 1
-		for size in shape {
-			capacity *= size
-		}
-		
+	public func resetLazy(_ rows: Int, _ columns: Int) {
+		let capacity = rows * columns
 		if (capacity > _allocationSize) {
 			_buffer.deallocate(capacity: _allocationSize)
 			_allocationSize = capacity
 			_buffer = Pointer.allocate(capacity: _allocationSize)
 		}
 
-		_shape = shape
+		_rows = rows
+		_columns = columns
 		_capacity = capacity
 
 		if DEBUG_BUFFERINITIALIZATION {
@@ -373,12 +307,8 @@ public class FloatBuffer {
 		}
 	}
 
-	public func resetLazy(_ shape: Int...) {
-		resetLazy(shape: shape)
-	}
-	
 	public func resetLazy(like src: FloatBuffer) {
-		resetLazy(shape: src._shape)
+		resetLazy(src._rows, src._columns)
 	}
 
 	// MARK: プロパティ
@@ -390,15 +320,20 @@ public class FloatBuffer {
 	public var contents: Pointer {
 		return _buffer
 	}
-	
-	public var shape: Array<Int> {
-		return _shape
+
+	public var rows: Int {
+		return _rows
 	}
 	
+	public var columns: Int {
+		return _columns
+	}
+
 	// MARK: プライベート
 
 	private var _buffer: Pointer
-	private var _shape: Array<Int>
+	private var _rows: Int
+	private var _columns: Int
 	private var _capacity: Int
 	private var _allocationSize: Int
 }

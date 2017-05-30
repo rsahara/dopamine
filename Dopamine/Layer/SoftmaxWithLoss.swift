@@ -33,7 +33,7 @@ class SoftmaxWithLoss {
 	func backward(result: FloatBuffer) {
 		result.copy(_lastOutput)
 		result.sub(_lastTrainOutput)
-		result.mul(1.0 / Float(_lastTrainOutput.shape.first!))
+		result.mul(1.0 / Float(_lastTrainOutput.rows))
 	}
 	
 	public var lastOutput: FloatBuffer {

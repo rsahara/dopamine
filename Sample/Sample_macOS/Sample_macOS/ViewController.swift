@@ -16,8 +16,8 @@ class ViewController: NSViewController {
 		super.viewDidLoad()
 		
 //		testMNIST()
-		testGRU()
-//		testSkipGram()
+//		testGRU()
+		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -37,7 +37,7 @@ class ViewController: NSViewController {
 		let net = LayerNet(inputSize: 784, hiddenSize: 50, outputSize: 10)
 		let numIterations: Int = 10000
 		let batchSize: Int = 100
-		let epochBatchCount: Int = max(1, trainImagesBuffer.shape.first! / batchSize)
+		let epochBatchCount: Int = max(1, trainImagesBuffer.rows / batchSize)
 		
 		let batchInput = FloatBuffer(batchSize, 784)
 		let batchOutput = FloatBuffer(batchSize, 10)
@@ -51,7 +51,7 @@ class ViewController: NSViewController {
 			
 			if (iterationIndex % epochBatchCount == epochBatchCount - 1) {
 				
-				let testSize = testImagesBuffer.shape.first!
+				let testSize = testImagesBuffer.rows
 				let testInput = testImagesBuffer! //FloatBuffer(testSize, 784)
 				let testOutput = testLabelsBuffer!
 				let resultBuffer = FloatBuffer(testSize, 10)
@@ -60,7 +60,7 @@ class ViewController: NSViewController {
 				
 				net.predict(input: testInput, result: resultBuffer)
 				let maxPositionArray = resultBuffer.maxPosition()
-				let resCount = resultBuffer.shape.first!
+				let resCount = resultBuffer.rows
 				var correctCount: Int = 0
 				for sampleIndex in 0 ..< resCount {
 					let correct = testOutput.contents[sampleIndex * 10 + maxPositionArray[sampleIndex]] == 1.0
@@ -263,7 +263,7 @@ class ViewController: NSViewController {
 		trainLabelsFileData.withUnsafeBytes { (pointer: UnsafePointer<UInt8>) in
 			let fileHead = pointer + 8
 			let bufferHead = trainLabelsBuffer.contents
-			for imageIndex in 0 ..< trainLabelsBuffer.shape.first! {
+			for imageIndex in 0 ..< trainLabelsBuffer.rows {
 				let label = Int(fileHead[imageIndex])
 				bufferHead[imageIndex * 10 + label] = 1.0
 			}
@@ -287,7 +287,7 @@ class ViewController: NSViewController {
 		testLabelsFileData.withUnsafeBytes { (pointer: UnsafePointer<UInt8>) in
 			let fileHead = pointer + 8
 			let bufferHead = testLabelsBuffer.contents
-			for imageIndex in 0 ..< testLabelsBuffer.shape.first! {
+			for imageIndex in 0 ..< testLabelsBuffer.rows {
 				let label = Int(fileHead[imageIndex])
 				bufferHead[imageIndex * 10 + label] = 1.0
 			}
@@ -309,14 +309,14 @@ class ViewController: NSViewController {
 	
 	func loadTrainRandomSamples(maxSamples: Int, input: FloatBuffer, output: FloatBuffer) {
 		
-		let totalSamples = trainImagesBuffer.shape.first!
+		let totalSamples = trainImagesBuffer.rows
 		var numSamples = maxSamples
 		if (numSamples > totalSamples) {
 			numSamples = totalSamples
 		}
 		
-		let imageSize = trainImagesBuffer.shape.last!
-		let labelSize = trainLabelsBuffer.shape.last!
+		let imageSize = trainImagesBuffer.columns
+		let labelSize = trainLabelsBuffer.columns
 		
 		var remainingIndexArray = [Int]()
 		for imageIndex in 0 ..< totalSamples {
