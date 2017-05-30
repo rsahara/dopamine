@@ -16,8 +16,8 @@ class ViewController: NSViewController {
 		super.viewDidLoad()
 		
 //		testMNIST()
-//		testGRU()
-		testSkipGram()
+		testGRU()
+//		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -63,7 +63,7 @@ class ViewController: NSViewController {
 				let resCount = resultBuffer.shape.first!
 				var correctCount: Int = 0
 				for sampleIndex in 0 ..< resCount {
-					let correct = testOutput[sampleIndex * 10 + maxPositionArray[sampleIndex]] == 1.0
+					let correct = testOutput.contents[sampleIndex * 10 + maxPositionArray[sampleIndex]] == 1.0
 					if correct {
 						correctCount += 1
 					}
@@ -227,7 +227,7 @@ class ViewController: NSViewController {
 		assert(size <= buffer.capacity)
 		
 		buffer.fillZero()
-		buffer[value] = 1.0
+		buffer.contents[value] = 1.0
 	}
 	
 	func loadOneHotArray(valueArray: [Int], size: Int, to buffer: FloatBuffer) {
@@ -237,7 +237,7 @@ class ViewController: NSViewController {
 		for valueIndex in 0 ..< valueArray.count {
 			let value = valueArray[valueIndex]
 			assert(value < size)
-			buffer[size * valueIndex + value] = 1.0
+			buffer.contents[size * valueIndex + value] = 1.0
 		}
 	}
 	

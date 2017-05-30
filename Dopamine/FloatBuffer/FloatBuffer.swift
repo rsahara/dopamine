@@ -39,46 +39,18 @@ public class FloatBuffer {
 		}
 	}
 
-	public convenience init(copyFrom buffer: Pointer, shape: Int...) {
-
-		self.init(shape: shape)
-		
-		for index in 0 ..< _capacity {
-			_buffer[index] = buffer[index]
-		}
-	}
-
 	public convenience init(like src: FloatBuffer) {
 		self.init(shape: src._shape)
-	}
-
-	public convenience init(copyOf src: FloatBuffer) {
-		self.init(shape: src._shape)
-
-		for index in 0 ..< _capacity {
-			_buffer[index] = src._buffer[index]
-		}
 	}
 
 	deinit {
 		_buffer.deallocate(capacity: _allocationSize)
 	}
 
-	public subscript(index: Int) -> Float {
-		get {
-			return _buffer[index]
-		}
-		set(val) {
-			_buffer[index] = val
-		}
-	}
-
 	// MARK: 計算
 	
 	public func fillZero() {
-		for index in 0 ..< _capacity {
-			_buffer[index] = 0.0
-		}
+		_FloatBuffer_FillZero(_buffer, Int32(_capacity))
 	}
 	
 	public func fillRandom() {

@@ -30,7 +30,7 @@ public class SkipGram {
 		self.itemSelectBuffer.fillZero()
 		for itemSequence in itemSequenceArray {
 			for itemIndex in itemSequence {
-				itemSelectBuffer[itemIndex] += 1.0
+				itemSelectBuffer.contents[itemIndex] += 1.0
 				if (itemIndex > itemCount) {
 					itemCount = itemIndex + 1
 				}
@@ -92,7 +92,7 @@ public class SkipGram {
 							let grad = (label - (expDot / (expDot + 1.0))) * 0.001 // TODO: learningRate
 							
 							for featureIndex in 0 ..< itemVectorSize {
-								neu1e[featureIndex] += grad * headTarget[featureIndex]
+								neu1e.contents[featureIndex] += grad * headTarget[featureIndex]
 							}
 							for featureIndex in 0 ..< itemVectorSize {
 								headTarget[featureIndex] += grad * headRelated[featureIndex]
@@ -100,7 +100,7 @@ public class SkipGram {
 						}
 
 						for featureIndex in 0 ..< itemVectorSize {
-							headRelated[featureIndex] += neu1e[featureIndex]
+							headRelated[featureIndex] += neu1e.contents[featureIndex]
 						}
 
 					}

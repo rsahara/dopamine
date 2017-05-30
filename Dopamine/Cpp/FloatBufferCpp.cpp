@@ -14,6 +14,9 @@ extern "C" {
 
 #include "FloatBufferCpp.hpp"
 
+void _FloatBuffer_FillZero(float* res, int length) {
+	memset(res, 0, length * sizeof (float));
+}
 
 void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {
 

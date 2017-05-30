@@ -77,7 +77,8 @@ public class GruCell {
 		resultState.copy(doutput)
 		resultState.mul(last1mZ)
 
-		let dC = FloatBuffer(copyOf:doutput)
+		let dC = FloatBuffer(like:doutput)
+		dC.copy(doutput)
 		dC.mul(sigmoidZ.lastOutput)
 		let temp1 = FloatBuffer(like: doutput)
 		tanhC.backward(doutput: dC, result: temp1)

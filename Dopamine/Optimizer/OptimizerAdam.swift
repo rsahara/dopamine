@@ -47,7 +47,8 @@ class OptimizerAdam: Optimizer {
 			v.fillZero()
 		}
 		
-		let temp = FloatBuffer(copyOf: gradient)
+		let temp = FloatBuffer(like: gradient)
+		temp.copy(gradient)
 		temp.sub(m)
 		temp.mul(1.0 - _beta1)
 		m.add(temp)
@@ -58,7 +59,8 @@ class OptimizerAdam: Optimizer {
 		temp.mul(1.0 - _beta2)
 		v.add(temp)
 
-		let temp2 = FloatBuffer(copyOf: v)
+		let temp2 = FloatBuffer(like: v)
+		temp2.copy(v)
 		temp2.sqrt()
 		temp2.add(0.0000001)
 		
