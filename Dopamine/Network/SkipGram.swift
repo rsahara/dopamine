@@ -8,13 +8,14 @@
 
 import Foundation
 
-class SkipGram {
+public class SkipGram {
 	
-	init(itemCapacity: Int, itemVectorSize: Int) {
+	public init(itemCapacity: Int, itemVectorSize: Int) {
 
 		self.itemVectorSize = itemVectorSize
 		self.weight = FloatBuffer(itemCapacity, itemVectorSize)
 		self.weight.fillRandom()
+		self.weight.mul(1.0 / Float(itemVectorSize))
 		self.weightNeg = FloatBuffer(itemCapacity, itemVectorSize)
 		self.weightNeg.fillZero()
 		self.itemSelectBuffer = FloatBuffer(1, itemCapacity)
@@ -22,7 +23,7 @@ class SkipGram {
 		
 	}
 
-	func trainWithSequences(itemSequenceArray: [[Int]]) {
+	public func trainWithSequences(itemSequenceArray: [[Int]]) {
 		// TODO: C++化
 
 		// 数をカウントする
@@ -39,57 +40,70 @@ class SkipGram {
 		// ランダム選択の処理を準備
 		var itemSelectSum: Float = 0.0
 		for itemIndex in 0 ..< itemCount {
-			itemSelectBuffer[itemIndex] = powf(itemSelectBuffer.contents[itemIndex], 0.75)
+			itemSelectBuffer.contents[itemIndex] = powf(itemSelectBuffer.contents[itemIndex], 0.75)
 			itemSelectSum += itemSelectBuffer.contents[itemIndex];
 		}
 		let itemSelectSumInv: Float = 1.0 / itemSelectSum
 		var itemSelectStep: Float = 0.0
 		for itemIndex in 0 ..< itemCount {
 			itemSelectStep += itemSelectBuffer.contents[itemIndex] * itemSelectSumInv
+			itemSelectBuffer.contents[itemIndex] = itemSelectStep
 		}
 		
 		// 学習
-		let neu1e = FloatBuffer(1, itemVectorSize)
-		for itemSequence in itemSequenceArray {
-			for itemIndex in itemSequence {
-				
-				for relatedItemIndex in itemSequence {
+		for iterationIndex in 0 ..< 400 {
+			Swift.print("it \(iterationIndex)")
+			let neu1e = FloatBuffer(1, itemVectorSize)
+			for itemSequence in itemSequenceArray {
+				for itemIndex in itemSequence {
 					
-					if itemIndex == relatedItemIndex {
-						continue
-					}
-					
-					neu1e.fillZero()
-					let headRelated = weight.contents + (itemVectorSize * relatedItemIndex)
-					
-					// Negative Sample
-					var targetIndex: Int = 0
-					var label: Float = 0
-					for negativeIndex in 0 ..< negativeCount {
+					for relatedItemIndex in itemSequence {
 						
-						if negativeIndex == 0 {
-							targetIndex = itemIndex
-							label = 1.0
-						} else {
-							targetIndex = selectRandomNegativeItemIndex()
-							if targetIndex == itemIndex {
-								continue
+						if itemIndex == relatedItemIndex {
+							continue
+						}
+						
+						neu1e.fillZero()
+						let headRelated = weight.contents + (itemVectorSize * relatedItemIndex)
+						
+						// Negative Sample
+						var targetIndex: Int = 0
+						var label: Float = 0
+						for negativeIndex in 0 ..< negativeCount + 1 {
+							
+							if negativeIndex == 0 {
+								targetIndex = itemIndex
+								label = 1.0
+							} else {
+								targetIndex = selectRandomNegativeItemIndex()
+								if targetIndex == itemIndex {
+									continue
+								}
+								label = 0.0
 							}
-							label = 0.0
+							
+							let headTarget = weightNeg.contents + (itemVectorSize * targetIndex)
+							var dot: Float = 0.0
+							for featureIndex in 0 ..< itemVectorSize {
+								dot += headRelated[featureIndex] * headTarget[featureIndex]
+							}
+							
+							let expDot = expf(dot)
+							let grad = (label - (expDot / (expDot + 1.0))) * 0.001 // TODO: learningRate
+							
+							for featureIndex in 0 ..< itemVectorSize {
+								neu1e[featureIndex] += grad * headTarget[featureIndex]
+							}
+							for featureIndex in 0 ..< itemVectorSize {
+								headTarget[featureIndex] += grad * headRelated[featureIndex]
+							}
 						}
-						
-						let headTarget = weightNeg.contents + (itemVectorSize * targetIndex)
-						var dot: Float = 0.0
+
 						for featureIndex in 0 ..< itemVectorSize {
-							dot += headRelated[featureIndex] * headTarget[featureIndex]
+							headRelated[featureIndex] += neu1e[featureIndex]
 						}
-						
-						let expDot = expf(dot)
-						let grad = label - (expDot / (expDot + 1.0))
 
-						
 					}
-
 				}
 
 				
@@ -105,7 +119,7 @@ class SkipGram {
 					
 					
 					// NEGATIVE SAMPLING
-					if (negative > 0) for (d = 0; d < negative + 1; d++) {
+					for (d = 0; d < negative + 1; d++) {
 						if (d == 0) {
 							target = word;
 							label = 1;
@@ -133,10 +147,13 @@ class SkipGram {
 				
 			}
 		}
+
+		// テスト
+//		weight.print()
 	}
 
 	func selectRandomNegativeItemIndex() -> Int {
-		// TODO: テスト
+//		return Int(arc4random_uniform(UInt32(itemCount)))
 		let randMax = itemSelectBuffer.contents[itemCount - 1]
 		let randVal = Float(arc4random()) * (1.0 / Float(UINT32_MAX)) * randMax
 		
@@ -162,7 +179,7 @@ class SkipGram {
 	
 	let itemVectorSize: Int
 	var itemCount: Int
-	var weight: FloatBuffer
+	public var weight: FloatBuffer
 	var weightNeg: FloatBuffer
 	let negativeCount: Int = 5
 	

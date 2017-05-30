@@ -430,29 +430,74 @@ class ViewController: NSViewController {
 		
 		// データをロード
 		let categoryModelDict: Dictionary<Int, CategoryModel> = loadCategoryModels()
-		var outputArrayDict = Dictionary<Int, Array<Int>>()
+		
+		var groupArrayDict = Dictionary<Int, Array<Int>>()
 		for (_, categoryModel) in categoryModelDict {
 			if categoryModel.parentId != -1 {
 				
-				if var array = outputArrayDict[categoryModel.parentId] {
+				if var array = groupArrayDict[categoryModel.parentId] {
 					array.append(categoryModel.id)
-					outputArrayDict[categoryModel.parentId] = array
+					groupArrayDict[categoryModel.parentId] = array
 				} else {
-					outputArrayDict[categoryModel.parentId] = Array<Int>(arrayLiteral: categoryModel.id)
-				}
-
-				if var array = outputArrayDict[categoryModel.id] {
-					array.append(categoryModel.parentId)
-					outputArrayDict[categoryModel.parentId] = array
-				} else {
-					outputArrayDict[categoryModel.id] = Array<Int>(arrayLiteral: categoryModel.parentId)
+					groupArrayDict[categoryModel.parentId] = [categoryModel.parentId, categoryModel.id]
 				}
 
 			}
 		}
 
-		Swift.print(outputArrayDict)
+		Swift.print(groupArrayDict)
 
+		var itemSequenceArray = [[Int]]()
+		for (_, categoryModel) in categoryModelDict {
+			if categoryModel.parentId != -1 {
+				itemSequenceArray.append([categoryModel.id, categoryModel.parentId])
+			}
+		}
+		
+		let itemVectorSize = 20
+
+		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize)
+//		skipGram.trainWithSequences(itemSequenceArray: itemSequenceArray)
+		skipGram.trainWithSequences(itemSequenceArray: [[Int]](groupArrayDict.values))
+		
+		let vectors: FloatBuffer = skipGram.weight
+
+		// Normalize
+		for vectorIndex in 0 ..< categoryModelDict.count {
+			let vectorHead = vectors.contents + (itemVectorSize * vectorIndex)
+			var normsq: Float = 0.0
+			for featureIndex in 0 ..< itemVectorSize {
+				normsq += vectorHead[featureIndex] * vectorHead[featureIndex]
+			}
+			let normInv: Float = 1.0 / sqrtf(normsq)
+			for featureIndex in 0 ..< itemVectorSize {
+				vectorHead[featureIndex] *= normInv
+			}
+		}
+
+		let testItemIndex = 269//52
+		let testItemHead = vectors.contents + (itemVectorSize * testItemIndex)
+		var testSimilarityArray = [(Int, Float, String)]()
+		for vectorIndex in 0 ..< categoryModelDict.count {
+			if let categoryModel = categoryModelDict[vectorIndex] {
+				let vectorHead = vectors.contents + (itemVectorSize * vectorIndex)
+				
+				var dot: Float = 0.0
+				for featureIndex in 0 ..< itemVectorSize {
+					dot += testItemHead[featureIndex] * vectorHead[featureIndex]
+				}
+
+				testSimilarityArray.append((vectorIndex, dot, categoryModel.text))
+			}
+		}
+		
+		testSimilarityArray.sort { (a, b) -> Bool in
+			return a.1 < b.1
+		}
+		
+		for (index, similarity, text) in testSimilarityArray {
+			Swift.print("[\(index)] \(text): \(similarity)")
+		}
 	}
 	
 	func loadCategoryModels() -> Dictionary<Int, CategoryModel> {
