@@ -106,45 +106,6 @@ public class SkipGram {
 					}
 				}
 
-				
-				/*
-				for (a = b; a < window * 2 + 1 - b; a++) if (a != window) {
-					c = sentence_position - window + a;
-					if (c < 0) continue;
-					if (c >= sentence_length) continue;
-					last_word = sen[c];
-					if (last_word == -1) continue;
-					l1 = last_word * layer1_size;
-					for (c = 0; c < layer1_size; c++) neu1e[c] = 0;
-					
-					
-					// NEGATIVE SAMPLING
-					for (d = 0; d < negative + 1; d++) {
-						if (d == 0) {
-							target = word;
-							label = 1;
-						} else {
-							next_random = next_random * (unsigned long long)25214903917 + 11;
-							target = table[(next_random >> 16) % table_size];
-							if (target == 0) target = next_random % (vocab_size - 1) + 1;
-							if (target == word) continue;
-							label = 0;
-						}
-						l2 = target * layer1_size;
-						f = 0;
-						for (c = 0; c < layer1_size; c++) f += syn0[c + l1] * syn1neg[c + l2];
-						if (f > MAX_EXP) g = (label - 1) * alpha;
-						else if (f < -MAX_EXP) g = (label - 0) * alpha;
-						else g = (label - expTable[(int)((f + MAX_EXP) * (EXP_TABLE_SIZE / MAX_EXP / 2))]) * alpha;
-						for (c = 0; c < layer1_size; c++) neu1e[c] += g * syn1neg[c + l2];
-						for (c = 0; c < layer1_size; c++) syn1neg[c + l2] += g * syn0[c + l1];
-					}
-					// Learn weights input -> hidden
-					for (c = 0; c < layer1_size; c++) syn0[c + l1] += neu1e[c];
-				}
-				*/
-				
-				
 			}
 		}
 
