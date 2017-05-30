@@ -22,7 +22,7 @@ void FloatBuffer_ScalarAdd(float* left, float right, int leftCapacity);
 void FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapacity);
 void FloatBuffer_ScalarSub(float* left, float right, int leftCapacity);
 void FloatBuffer_CrossEntropyError(float* res, float* left, float* right, int leftCapacity);
-void FloatBuffer_SoftMax(float* res, float* left, int leftHeight, int leftWidth);
+void FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth);
 void FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth);
 void FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth);
 void FloatBuffer_Sqrt(float* left, int leftCapacity);

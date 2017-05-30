@@ -55,8 +55,7 @@ public class FloatBuffer {
 	}
 
 	public func add(_ right: FloatBuffer) {
-		let rightCapacity = right._capacity
-		assert(_capacity % rightCapacity == 0)
+		assert(_capacity % right._capacity == 0)
 
 		FloatBuffer_Add(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
@@ -66,8 +65,7 @@ public class FloatBuffer {
 	}
 	
 	public func sub(_ right: FloatBuffer) {
-		let rightCapacity = right._capacity
-		assert(_capacity % rightCapacity == 0)
+		assert(_capacity % right._capacity == 0)
 
 		FloatBuffer_Sub(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
@@ -77,8 +75,7 @@ public class FloatBuffer {
 	}
 
 	public func mul(_ right: FloatBuffer) {
-		let rightCapacity = right._capacity
-		assert(_capacity % rightCapacity == 0)
+		assert(_capacity % right._capacity == 0)
 		FloatBuffer_Mul(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
@@ -87,8 +84,7 @@ public class FloatBuffer {
 	}
 	
 	public func div(_ right: FloatBuffer) {
-		let rightCapacity = right._capacity
-		assert(_capacity % rightCapacity == 0)
+		assert(_capacity % right._capacity == 0)
 		FloatBuffer_Div(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 
@@ -99,10 +95,11 @@ public class FloatBuffer {
 	
 	public func softmax(result: FloatBuffer) {
 		result.resetLazy(like: self)
-		FloatBuffer_SoftMax(result._buffer, _buffer, Int32(_rows), Int32(_columns))
+		FloatBuffer_Softmax(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 	
 	public func maxPosition() -> Array<Int> {
+		// TODO: C++
 
 		let length = _columns
 		assert(_capacity % length == 0)
@@ -130,6 +127,7 @@ public class FloatBuffer {
 	}
 	
 	public func minMax() -> (Float, Float) {
+		// TODO: C++
 
 		var minVal: Float = _buffer[0]
 		var maxVal: Float = _buffer[0]
@@ -145,20 +143,11 @@ public class FloatBuffer {
 		
 		return (minVal, maxVal)
 	}
-	
-	public func printMinMax(title: String = "notitle") {
-		let (min, max) = minMax()
-		Swift.print("  \(title) minmax: \(min) / \(max)")
-	}
 
-	
 	public func crossEntropyError(against right: FloatBuffer) -> Float {
 		assert(_capacity == right.capacity)
-		
 		var sum: Float = 0.0
-		
 		FloatBuffer_CrossEntropyError(&sum, _buffer, right._buffer, Int32(_capacity))
-
 		return sum
 	}
 	
@@ -175,9 +164,7 @@ public class FloatBuffer {
 	}
 	
 	public func copy(_ src: FloatBuffer) {
-		
 		resetLazy(like: src)
-
 		memcpy(_buffer, src._buffer, _capacity * 4)
 	}
 

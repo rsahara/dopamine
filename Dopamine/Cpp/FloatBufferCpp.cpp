@@ -161,7 +161,7 @@ void FloatBuffer_CrossEntropyError(float* res, float* left, float* right, int le
 	*res = sum;
 }
 	
-void FloatBuffer_SoftMax(float* res, float* left, int leftHeight, int leftWidth) {
+void FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth) {
 
 	int leftCapacity = leftHeight * leftWidth;
 	for (int offset = 0; offset < leftCapacity; offset += leftWidth) {
