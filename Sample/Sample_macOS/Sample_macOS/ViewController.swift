@@ -15,9 +15,9 @@ class ViewController: NSViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		testMNIST()
-		//testGRU()
-		
+//		testMNIST()
+//		testGRU()
+		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -417,4 +417,127 @@ class ViewController: NSViewController {
 		
 	}
 	
+	// MARK: - SkipGram test
+	
+	struct CategoryModel {
+		public var id: Int
+		public var text: String
+		public var parentId: Int
+		
+	}
+
+	func testSkipGram() {
+		
+		// データをロード
+		let categoryModelDict: Dictionary<Int, CategoryModel> = loadCategoryModels()
+		
+		var groupArrayDict = Dictionary<Int, Array<Int>>()
+		for (_, categoryModel) in categoryModelDict {
+			if categoryModel.parentId != -1 {
+				
+				if var array = groupArrayDict[categoryModel.parentId] {
+					array.append(categoryModel.id)
+					groupArrayDict[categoryModel.parentId] = array
+				} else {
+					groupArrayDict[categoryModel.parentId] = [categoryModel.parentId, categoryModel.id]
+				}
+
+			}
+		}
+
+		Swift.print(groupArrayDict)
+
+		var itemSequenceArray = [[Int]]()
+		for (_, categoryModel) in categoryModelDict {
+			if categoryModel.parentId != -1 {
+				itemSequenceArray.append([categoryModel.id, categoryModel.parentId])
+			}
+		}
+		
+		let itemVectorSize = 100
+
+		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize)
+//		skipGram.trainWithSequences(itemSequenceArray: itemSequenceArray)
+		skipGram.trainWithSequences(itemSequenceArray: [[Int]](groupArrayDict.values))
+		
+		let vectors: FloatBuffer = skipGram.weight
+
+		// Normalize
+		for vectorIndex in 0 ..< categoryModelDict.count {
+			let vectorHead = vectors.contents + (itemVectorSize * vectorIndex)
+			var normsq: Float = 0.0
+			for featureIndex in 0 ..< itemVectorSize {
+				normsq += vectorHead[featureIndex] * vectorHead[featureIndex]
+			}
+			let normInv: Float = 1.0 / sqrtf(normsq)
+			for featureIndex in 0 ..< itemVectorSize {
+				vectorHead[featureIndex] *= normInv
+			}
+		}
+
+		let testItemIndex = 225//52
+		let testItemHead = vectors.contents + (itemVectorSize * testItemIndex)
+		var testSimilarityArray = [(Int, Float, String)]()
+		for vectorIndex in 0 ..< categoryModelDict.count {
+			if let categoryModel = categoryModelDict[vectorIndex] {
+				let vectorHead = vectors.contents + (itemVectorSize * vectorIndex)
+				
+				var dot: Float = 0.0
+				for featureIndex in 0 ..< itemVectorSize {
+					dot += testItemHead[featureIndex] * vectorHead[featureIndex]
+				}
+
+				testSimilarityArray.append((vectorIndex, dot, categoryModel.text))
+			}
+		}
+		
+		testSimilarityArray.sort { (a, b) -> Bool in
+			return a.1 < b.1
+		}
+		
+		for (index, similarity, text) in testSimilarityArray {
+			Swift.print("[\(index)] \(text): \(similarity)")
+		}
+	}
+	
+	func loadCategoryModels() -> Dictionary<Int, CategoryModel> {
+		let sampleMasterUrl = Bundle.main.url(forResource: "samplemaster", withExtension: "json")!
+		let sampleMasterData = try! Data(contentsOf: sampleMasterUrl)
+		let sampleMasterObj = (try! JSONSerialization.jsonObject(with: sampleMasterData, options: JSONSerialization.ReadingOptions())) as! Dictionary<String, Any>
+		
+		let categoryObjArray = sampleMasterObj["genre_m"] as! Array<Dictionary<String, Any>>
+		var categoryModelDict = Dictionary<Int, CategoryModel>()
+		var translateIdDict = Dictionary<Int, Int>()
+		translateIdDict[0] = -1
+		var currentId = 0
+
+		for categoryObj in categoryObjArray {
+			var categoryModel = CategoryModel(id: Int(categoryObj["genre_id"] as! String)!,
+			                                  text: categoryObj["genre_name"] as! String,
+			                                  parentId: Int(categoryObj["parent_genre_id"] as! String)!)
+
+			if let newId = translateIdDict[categoryModel.id] {
+				categoryModel.id = newId
+			} else {
+				translateIdDict[categoryModel.id] = currentId
+				categoryModel.id = currentId
+				currentId += 1
+			}
+
+			if let newId = translateIdDict[categoryModel.parentId] {
+				categoryModel.parentId = newId
+			} else {
+				translateIdDict[categoryModel.parentId] = currentId
+				categoryModel.parentId = currentId
+				currentId += 1
+			}
+
+			categoryModelDict.updateValue(categoryModel, forKey: categoryModel.id)
+		}
+
+		return categoryModelDict
+	}
+	
+	
+
 }
