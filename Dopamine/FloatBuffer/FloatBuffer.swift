@@ -48,58 +48,6 @@ public class FloatBuffer {
 		_FloatBuffer_FillRandomGaussian(_buffer, Int32(capacity))
 	}
 	
-	public func printDistributionAuto(title: String = "notitle", desiredDivisions: Int = 50) {
-		Swift.print("=== \(title) distribution begin")
-		let (rangeArray, countArray) = distributionArrayAuto(desiredDivisions: desiredDivisions)
-		for index in 0 ..< rangeArray.count {
-			Swift.print("\(rangeArray[index]): \(countArray[index])")
-			
-		}
-		Swift.print("=== \(title) distribution end")
-	}
-
-	public func distributionArrayAuto(desiredDivisions: Int = 50) -> (Array<Float>, Array<Int>) {
-		assert(_capacity > 0)
-		
-		var minValue: Float = _buffer[0]
-		var maxValue: Float = _buffer[0]
-
-		for index in 1 ..< _capacity {
-			let val = _buffer[index]
-			if (val < minValue) {
-				minValue = val
-			}
-			if (val > maxValue) {
-				maxValue = val
-			}
-		}
-		
-		var distance: Float = maxValue - minValue
-		if (distance == 0.0) {
-			distance = 1.0
-		}
-		let step = distance / Float(desiredDivisions)
-		let startIndex = Int((minValue / step).rounded(.down))
-		let endIndex = Int((maxValue / step).rounded(.up))
-
-		var counterDict = Dictionary<Int, Int>()
-		for index in 0 ..< _capacity {
-			let val = _buffer[index]
-			let rangeIndex = Int((val / step).rounded(.down))
-			let count: Int = counterDict[rangeIndex] != nil ? counterDict[rangeIndex]! + 1 : 1
-			counterDict.updateValue(count, forKey: rangeIndex)
-		}
-
-		var resIndex = [Float]()
-		var resCount = [Int]()
-		for rangeIndex in startIndex ..< endIndex {
-			resIndex.append(Float(rangeIndex) * step)
-			resCount.append(counterDict[rangeIndex] != nil ? counterDict[rangeIndex]! : 0)
-		}
-		
-		return (resIndex, resCount)
-	}
-	
 	public func matmul(by right: FloatBuffer, to res: FloatBuffer) {
 		assert(_columns == right._rows)
 		res.resetLazy(_rows, right._columns)
@@ -155,7 +103,7 @@ public class FloatBuffer {
 	}
 	
 	public func maxPosition() -> Array<Int> {
-		
+
 		let length = _columns
 		assert(_capacity % length == 0)
 		var result = Array<Int>()
@@ -246,22 +194,6 @@ public class FloatBuffer {
 
 	public func sqrt() {
 		FloatBuffer_Sqrt(_buffer, Int32(_capacity))
-	}
-	
-	// TODO: これはレイヤーに特化しすぎ
-	public func maskZeroOrNegative(result: FloatBuffer, mask: FloatBuffer) {
-		FloatBuffer_ResetZeroOrNegativeAndMakeMask(result._buffer, mask._buffer, _buffer, Int32(_capacity))
-	}
-	
-	// TODO: これはレイヤーに特化しすぎ
-	public func resetZeroOrNegative(result: FloatBuffer) {
-		FloatBuffer_ResetZeroOrNegative(result._buffer, _buffer, Int32(_capacity))
-	}
-
-	// TODO: これはレイヤーに特化しすぎ
-	public func applyMask(_ mask: FloatBuffer) {
-		assert(_capacity == mask._capacity)
-		FloatBuffer_ApplyMask(_buffer, mask._buffer, Int32(_capacity));
 	}
 	
 	public func sumFirstAxis(to result: FloatBuffer) {

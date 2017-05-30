@@ -21,10 +21,10 @@ class ReluLayer :SimpleLayer {
 		result.resetLazy(like: input)
 		
 		if forTraining && hasPreviousLayer {
-			input.maskZeroOrNegative(result: result, mask: mask)
+			_Layer_ResetZeroOrNegativeAndMakeMask(result.contents, mask.contents, input.contents, Int32(input.capacity))
 		}
 		else {
-			input.resetZeroOrNegative(result: result)
+			_Layer_ResetZeroOrNegative(result.contents, input.contents, Int32(input.capacity))
 		}
 	}
 	
@@ -36,7 +36,7 @@ class ReluLayer :SimpleLayer {
 		}
 		
 		result.copy(doutput)
-		result.applyMask(mask)
+		_Layer_ApplyMask(result.contents, mask.contents, Int32(result.capacity));
 	}
 
 	var mask: FloatBuffer

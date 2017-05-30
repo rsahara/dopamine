@@ -222,52 +222,6 @@ void FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidt
 	
 }
 	
-//
-void FloatBuffer_ResetZeroOrNegativeAndMakeMask(float* res, float* mask, float* left, int leftCapacity) {
-
-	float* leftEnd = left + leftCapacity;
-	for (; left < leftEnd; left++) {
-		float val = *left;
-		int gtZero = val > 0.0f;
-		if (gtZero) {
-			*res = val;
-		} else {
-			*(int*)res = 0;
-		}
-		*(int*)mask = gtZero;
-		res++;
-		mask++;
-	}
-
-}
-
-void FloatBuffer_ResetZeroOrNegative(float* res, float* left, int leftCapacity) {
-
-	float* leftEnd = left + leftCapacity;
-	for (; left < leftEnd; left++) {
-		float val = *left;
-		if (*left > 0.0f) {
-			*res = val;
-		} else {
-			*(int*)res = 0;
-		}
-		res++;
-	}
-
-}
-	
-void FloatBuffer_ApplyMask(float* left, float* mask, int leftCapacity) {
-	
-	float* leftEnd = left + leftCapacity;
-	for (; left < leftEnd; left++) {
-		if (*(int*)mask == 0) {
-			*(int*)left = 0;
-		}
-		mask++;
-	}
-	
-}
-	
 void FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth) {
 	
 	float* resEnd = res + leftWidth;
