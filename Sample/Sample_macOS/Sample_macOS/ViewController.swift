@@ -454,7 +454,7 @@ class ViewController: NSViewController {
 			}
 		}
 		
-		let itemVectorSize = 20
+		let itemVectorSize = 100
 
 		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize)
 //		skipGram.trainWithSequences(itemSequenceArray: itemSequenceArray)
@@ -475,7 +475,7 @@ class ViewController: NSViewController {
 			}
 		}
 
-		let testItemIndex = 269//52
+		let testItemIndex = 225//52
 		let testItemHead = vectors.contents + (itemVectorSize * testItemIndex)
 		var testSimilarityArray = [(Int, Float, String)]()
 		for vectorIndex in 0 ..< categoryModelDict.count {
