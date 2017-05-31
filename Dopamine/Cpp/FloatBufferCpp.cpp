@@ -36,7 +36,7 @@ void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, i
 #if 1
 	
 	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, leftHeight, rightWidth, leftWidth, 1.0f, left, leftWidth, right, rightWidth, 0.0, res, rightWidth);
-	
+
 #else
 	
 	float* leftEnd = left + (leftHeight * leftWidth);
@@ -63,6 +63,18 @@ void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, i
 		
 		left = leftHeadEnd;
 	}
+	
+#endif
+
+}
+
+void _FloatBuffer_DotProduct(float* res, float* left, float* right, int leftWidth) {
+
+#if 1
+	*res = cblas_sdot(leftWidth, left, 1, right, 1);
+#else
+	
+	// TODO
 	
 #endif
 

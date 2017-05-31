@@ -154,19 +154,17 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 					
 					float* targetVector = negWeightBuffer + (itemVectorSize * targetItemIndex);
 
-					float dotProduct = 0.0f;
-//					FloatBuffer_MatMul(&dotProduct, relatedVector, targetVector, 1, itemVectorSize, 1);
-					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) { // TODO: performance
-						dotProduct += relatedVector[featureIndex] * targetVector[featureIndex];
-					}
+					float dotProduct;
+					_FloatBuffer_DotProduct(&dotProduct, relatedVector, targetVector, itemVectorSize);
+//					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) {
+//						dotProduct += relatedVector[featureIndex] * targetVector[featureIndex];
+//					}
 					
 					float expDotProduct = expf(dotProduct); // TODO: table lookup
 					float delta = (label - (expDotProduct / (expDotProduct + 1.0f))) * learningRate;
 					
-					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) { // TODO: performance
+					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) {
 						tempItemVector[featureIndex] += delta * targetVector[featureIndex];
-					}
-					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) { // TODO: performance
 						targetVector[featureIndex] += delta * relatedVector[featureIndex];
 					}
 					

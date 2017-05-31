@@ -15,6 +15,7 @@ void _FloatBuffer_FillRandomGaussian(float* res, int length);
 // TODO: '_'を先頭につける
 
 void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth);
+void _FloatBuffer_DotProduct(float* res, float* left, float* right, int leftWidth);
 void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapacity);
 void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity);
 void FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapacity);
