@@ -110,8 +110,7 @@ public class SkipGram {
 			}
 		}
 
-		// テスト
-//		weight.print()
+	
 	}
 
 	func selectRandomNegativeItemIndex() -> Int {

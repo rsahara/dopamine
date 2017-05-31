@@ -9,6 +9,8 @@
 #ifndef LayersCpp_hpp
 #define LayersCpp_hpp
 
+// TODO: '_'を先頭につける
+
 void Layer_Sigmoid(float* res, float* left, int leftCapacity);
 void Layer_SigmoidBackward(float* res, float* left, float* lastOutput, int leftCapacity);
 
