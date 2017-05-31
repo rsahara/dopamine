@@ -8,11 +8,11 @@
 
 import Foundation
 
-class IntBuffer {
+public class IntBuffer {
 
 	var DEBUG_BUFFERINITIALIZATION = false
 	
-	public typealias Pointer = UnsafeMutablePointer<Int>
+	public typealias Pointer = UnsafeMutablePointer<Int32>
 
 	public init(_ capacity: Int) {
 		
@@ -30,7 +30,16 @@ class IntBuffer {
 	deinit {
 		_buffer.deallocate(capacity: _allocationSize)
 	}
-
+	
+	public func print() {
+		var valuesStr = ""
+		
+		for valIndex in 0 ..< _capacity {
+			valuesStr += "\(_buffer[valIndex]),"
+		}
+		Swift.print("Buffer[\(_capacity)] \(valuesStr)")
+	}
+	
 	// MARK: プロパティ
 	
 	public var capacity: Int {

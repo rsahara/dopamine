@@ -9,25 +9,35 @@
 #ifndef SkipGramCpp_hpp
 #define SkipGramCpp_hpp
 
-// 初期化
-// itemSequenceArray: アイテムIDシーケンスの先頭ポインタの配列（アイテムIDは0から始まる連番、シーケンスは-1で終わる）
-// itemSequencesCount: itemSequenceArrayの長さ
+// expテーブルの作成
+// int _SkipGram_GlobalContextSize();
+// void _SkipGram_CreateGlobalContext(void* buffer);
+
+
+// 学習の初期化
+// itemSequenceBuffer: 入力とするアイテムIDのシーケンスの配列（アイテムIDは0から始まる値、アイテムのシーケンスはアイテムID-1で終わる）
+// itemSequenceBufferLength: itemSequenceBufferの長さ
+// itemSequenceOffsetArray: [out] アイテムシーケンス先頭オフセットの配列
+// itemSequencesCount:
+//   [in] itemSequenceOffsetArrayの長さ、又は扱うシーケンス数の最大数
+//   [out] 処理したアイテムのシーケンス数
 // itemNegLotteryInfoArray: [out] アイテムごとのネガティブ抽選用の情報配列
 // itemsCount:
-//   [in] itemNegLotteryInfoArray の長さ、又は有効とするアイテムIDの最大値+1
-//   [out] 実際にカウントしたアイテム数を返す
-void _SkipGram_Init(int** itemSequenceArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int* itemsCount);
+//   [in] itemNegLotteryInfoArray の長さ、又は扱うアイテムの最大数（＝アイテムIDの最大値+1）
+//   [out] 処理したアイテム数
+void _SkipGram_TrainInit(int* itemSequenceBuffer, int itemSequenceBufferLength, int* itemSequenceOffsetArray, int* itemSequencesCount, float* itemNegLotteryInfoArray, int* itemsCount);
 
 
-// 初期化
-// itemSequenceArray: アイテムIDシーケンスの先頭ポインタの配列（アイテムIDは0から始まる連番、シーケンスは-1で終わる）
-// itemSequencesCount: itemSequenceArrayの長さ
+// 学習のイテレーション
+// itemSequenceBuffer: 入力とするアイテムIDのシーケンスの配列（アイテムIDは0から始まる値、アイテムのシーケンスはアイテムID-1で終わる）
+// itemSequenceOffsetArray: アイテムシーケンス先頭オフセットの配列
+// itemSequencesCount: 扱うアイテムシーケンスの数
 // itemNegLotteryInfoArray: アイテムごとのネガティブ抽選用の情報配列
 // itemsCount: 有効とするアイテムIDの最大値+1（itemNegLotteryInfoArrayの長さはitemsCount以上）
 // itemVectorSize: アイテムの特徴ベクトルのサイズ
 // weightBuffer: [in, out] 全アイテムの特徴ベクトルのバッファ、itemsCount x itemVectorSize の行列
 // negWeightBuffer: [in, out] 特徴ベクトルネガティブサンプリング計算用のバッファ、itemsCount x itemVectorSize の行列
-// tempItemVector: 計算に必要な一時メモリ領域、itemVectorSize の長さのバッファー
-void _SkipGram_Iterate(int** itemSequenceArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int itemsCount, int itemVectorSize, float* weightBuffer, float* negWeightBuffer, float* tempItemVector);
+// tempItemVector: [in, out] 計算に必要な一時メモリ領域、itemVectorSize の長さのバッファー（特に意味のあるデータは出力しない）
+void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int itemsCount, int itemVectorSize, float* weightBuffer, float* negWeightBuffer, float* tempItemVector);
 
 #endif /* SkipGramCpp_hpp */

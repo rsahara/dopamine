@@ -15,9 +15,9 @@ class ViewController: NSViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		testMNIST()
+//		testMNIST()
 //		testGRU()
-//		testSkipGram()
+		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -446,21 +446,26 @@ class ViewController: NSViewController {
 		}
 
 		Swift.print(groupArrayDict)
-
-		var itemSequenceArray = [[Int]]()
-		for (_, categoryModel) in categoryModelDict {
-			if categoryModel.parentId != -1 {
-				itemSequenceArray.append([categoryModel.id, categoryModel.parentId])
-			}
-		}
 		
+		let sequenceBuffer = IntBuffer(1024)
+		var sequenceLength = 0
+		for sequenceArray in groupArrayDict.values {
+			
+			for itemId in sequenceArray {
+				sequenceBuffer.contents[sequenceLength] = Int32(itemId)
+				sequenceLength += 1
+			}
+			
+			sequenceBuffer.contents[sequenceLength] = SkipGram.EndOfItemSequenceId
+			sequenceLength += 1
+		}
+
 		let itemVectorSize = 100
 
-		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize)
-//		skipGram.trainWithSequences(itemSequenceArray: itemSequenceArray)
-		skipGram.trainWithSequences(itemSequenceArray: [[Int]](groupArrayDict.values))
+		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize, itemSequenceCapacity: 1024)
+		skipGram.train(itemSequenceBuffer: sequenceBuffer, itemSequenceLength: sequenceLength)
 		
-		let vectors: FloatBuffer = skipGram.weight
+		let vectors: FloatBuffer = skipGram._weight
 
 		// Normalize
 		for vectorIndex in 0 ..< categoryModelDict.count {
