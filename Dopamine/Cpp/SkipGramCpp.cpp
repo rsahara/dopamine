@@ -99,14 +99,10 @@ inline int _SkipGram_RandomNegativeItemIndex(float* itemNegLotteryInfoArray, int
 		}
 	}
 	
-	return maxIndex % itemsCount; // TODO: 整理
+	return maxIndex % itemsCount; // TODO: 整理、デバッグ
 }
 
-void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int itemsCount, int itemVectorSize, float* weightBuffer, float* negWeightBuffer, float* tempItemVector) {
-	
-	int window = 100; // TODO: parameter
-	int negativeSamplingCount = 5; // TODO: parameter
-	float learningRate = 0.005f; // TODO: parameter
+void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int itemsCount, int itemVectorSize, float* weightBuffer, float* negWeightBuffer, float* tempItemVector, int windowSize, int negativeSamplingCount, float learningRate) {
 	
 	std::random_device dev;
 	std::mt19937 gen(dev());
@@ -121,8 +117,8 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 				break; // End of sequence.
 			}
 			
-			int* headRelated = headItem - window;
-			int* headRelatedEnd = headItem + window;
+			int* headRelated = headItem - windowSize;
+			int* headRelatedEnd = headItem + windowSize;
 			if (headRelated < itemSequenceStart) {
 				headRelated = itemSequenceStart;
 			}
@@ -140,11 +136,11 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 				
 				float* relatedVector = weightBuffer + (itemVectorSize * relatedItemIndex);
 				
-				// Negative sampling.
+				// Positive sampling, then negative sampling.
 				float label;
 				int targetItemIndex;
-				for (int negativeSamplingIndex = -1; negativeSamplingIndex < negativeSamplingCount; negativeSamplingIndex++) { // for each (negative) sampling
-
+				for (int negativeSamplingIndex = -1; negativeSamplingIndex < negativeSamplingCount; negativeSamplingIndex++) { // for each (positive/negative) sampling
+					
 					if (negativeSamplingIndex == -1) {
 						targetItemIndex = itemIndex;
 						label = 1.0f;
@@ -173,8 +169,8 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) { // TODO: performance
 						targetVector[featureIndex] += delta * relatedVector[featureIndex];
 					}
-
-				} // for each (negative) sampling
+					
+				} // for each (positive/negative) sampling
 				
 				FloatBuffer_Add(relatedVector, tempItemVector, itemVectorSize, itemVectorSize);
 				

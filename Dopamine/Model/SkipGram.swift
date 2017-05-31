@@ -34,7 +34,7 @@ public class SkipGram {
 	}
 
 	public func train(itemSequenceBuffer: IntBuffer, itemSequenceLength: Int) {
-		
+
 		// アイテムを処理する準備
 		var itemSequencesCount: Int32 = Int32(_itemSequenceCapacity)
 		var itemsCount: Int32 = Int32(_itemCapacity)
@@ -44,13 +44,14 @@ public class SkipGram {
 		_itemSequencesCount = Int(itemSequencesCount)
 		_itemsCount = Int(itemsCount)
 		
-		
+		let perfCheck = PerfCheck()
 		for iterationIndex in 0 ..< 400 {
 			Swift.print("it \(iterationIndex)")
 			
 			_SkipGram_TrainIterate(itemSequenceBuffer.contents, _itemSequenceOffsetArray.contents, itemSequencesCount, _itemNegLotteryInfoArray.contents, itemsCount, Int32(_itemVectorSize),
-			                       _weight.contents, _weightNeg.contents, _tempItemVector.contents);
+			                       _weight.contents, _weightNeg.contents, _tempItemVector.contents, 100, 5, 0.005);// param
 		}
+		perfCheck.print()
 
 	}
 

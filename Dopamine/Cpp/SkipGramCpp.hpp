@@ -38,6 +38,9 @@ void _SkipGram_TrainInit(int* itemSequenceBuffer, int itemSequenceBufferLength, 
 // weightBuffer: [in, out] 全アイテムの特徴ベクトルのバッファ、itemsCount x itemVectorSize の行列
 // negWeightBuffer: [in, out] 特徴ベクトルネガティブサンプリング計算用のバッファ、itemsCount x itemVectorSize の行列
 // tempItemVector: [in, out] 計算に必要な一時メモリ領域、itemVectorSize の長さのバッファー（特に意味のあるデータは出力しない）
-void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int itemsCount, int itemVectorSize, float* weightBuffer, float* negWeightBuffer, float* tempItemVector);
+// windowSize: 窓の大きさ
+// negativeSamplingCount: ネガティブサンプル数
+// learningRate: 学習の係数
+void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int itemsCount, int itemVectorSize, float* weightBuffer, float* negWeightBuffer, float* tempItemVector, int windowSize, int negativeSamplingCount, float learningRate);
 
 #endif /* SkipGramCpp_hpp */
