@@ -14,6 +14,8 @@ public class SkipGram {
 	
 	public init(itemCapacity: Int, itemVectorSize: Int, itemSequenceCapacity: Int = 1024, negativeSamplingCount: Int = 5) {
 
+		_SkipGram_GlobalInit()
+
 		_itemCapacity = itemCapacity
 		_itemVectorSize = itemVectorSize
 		_itemSequenceCapacity = itemSequenceCapacity

@@ -9,10 +9,8 @@
 #ifndef SkipGramCpp_hpp
 #define SkipGramCpp_hpp
 
-// expテーブルの作成
-// int _SkipGram_GlobalContextSize();
-// void _SkipGram_CreateGlobalContext(void* buffer);
-
+// 全体の初期化
+void _SkipGram_GlobalInit();
 
 // 学習の初期化
 // itemSequenceBuffer: 入力とするアイテムIDのシーケンスの配列（アイテムIDは0から始まる値、アイテムのシーケンスはアイテムID-1で終わる）

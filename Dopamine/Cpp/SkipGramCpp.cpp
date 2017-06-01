@@ -15,6 +15,25 @@ extern "C" {
 #include "FloatBufferCpp.hpp"
 #include "SkipGramCpp.hpp"
 
+#define EXPTABLE_SIZE		1000
+#define EXPTABLE_INPUTMAX	6.0f
+
+float* _SkipGram_ExpTable = NULL;
+	
+void _SkipGram_GlobalInit() {
+	
+	// exp/(exp+1)の計算テーブル
+	if (_SkipGram_ExpTable == nullptr) {
+		_SkipGram_ExpTable = (float*)malloc(EXPTABLE_SIZE * sizeof(float));
+		for (int tableIndex = 0; tableIndex < EXPTABLE_SIZE; tableIndex++) {
+			float input = (((float)tableIndex) / ((float)EXPTABLE_SIZE)) * (EXPTABLE_INPUTMAX * 2.0f) - EXPTABLE_INPUTMAX;
+			float val = expf(input);
+			_SkipGram_ExpTable[tableIndex] = val / (val + 1.0f);
+		}
+	}
+	
+}
+
 void _SkipGram_TrainInit(int* itemSequenceBuffer, int itemSequenceBufferLength, int* itemSequenceOffsetArray, int* itemSequencesCount, float* itemNegLotteryInfoArray, int* itemsCount) {
 
 	int maxItemSequencesCount = *itemSequencesCount;
@@ -101,6 +120,17 @@ inline int _SkipGram_RandomNegativeItemIndex(float* itemNegLotteryInfoArray, int
 
 	return maxIndex % itemsCount; // TODO: 整理、デバッグ
 }
+	
+inline float _SkipGram_ExpTableOutput(float input) {
+
+	int tableIndex = (input + EXPTABLE_INPUTMAX) * (((float)EXPTABLE_SIZE) / EXPTABLE_INPUTMAX / 2.0f);
+	if (tableIndex < 0)
+		return 0.0f;
+	if (tableIndex >= EXPTABLE_SIZE)
+		return 1.0f;
+	
+	return _SkipGram_ExpTable[tableIndex];
+}
 
 void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int itemsCount, int itemVectorSize, float* weightBuffer, float* negWeightBuffer, float* tempItemVector, int windowSize, int negativeSamplingCount, float learningRate) {
 	
@@ -155,13 +185,30 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 					float* targetVector = negWeightBuffer + (itemVectorSize * targetItemIndex);
 
 					float dotProduct = _FloatBuffer_DotProduct(relatedVector, targetVector, itemVectorSize);
-					float expDotProduct = expf(dotProduct); // TODO: table lookup
-					float delta = (label - (expDotProduct / (expDotProduct + 1.0f))) * learningRate;
 					
-#if 0
+#if 0 // 計算版
+					float expDotProduct = expf(dotProduct);
+					float delta = (label - (expDotProduct / (expDotProduct + 1.0f))) * learningRate;
+#else // テーブル版
+					float delta = (label - _SkipGram_ExpTableOutput(dotProduct)) * learningRate;
+#endif
+					
+#if 0 // BLAS版
 					_FloatBuffer_AddScaled(tempItemVector, targetVector, delta, itemVectorSize, itemVectorSize);
 					_FloatBuffer_AddScaled(targetVector, relatedVector, delta, itemVectorSize, itemVectorSize);
-#else
+#endif
+#if 1 // ポインタ版
+					float* headTempItemVector = tempItemVector;
+					float* headRelatedVector = relatedVector;
+					for (float* targetVectorEnd = targetVector + itemVectorSize; targetVector < targetVectorEnd; targetVector++) {
+						*headTempItemVector += delta * *targetVector;
+						*targetVector += delta * *headRelatedVector;
+						
+						headTempItemVector++;
+						headRelatedVector++;
+					}
+#endif
+#if 0 // インデックス版
 					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) {
 						tempItemVector[featureIndex] += delta * targetVector[featureIndex];
 						targetVector[featureIndex] += delta * relatedVector[featureIndex];
