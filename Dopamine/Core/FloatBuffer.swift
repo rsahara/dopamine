@@ -97,10 +97,6 @@ public class FloatBuffer {
 		FloatBuffer_Sub(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
-	public func sub(_ right: Float) {
-		FloatBuffer_ScalarSub(_buffer, right, Int32(_capacity))
-	}
-
 	public func mul(_ right: FloatBuffer) {
 		assert(_capacity % right._capacity == 0)
 		FloatBuffer_Mul(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))

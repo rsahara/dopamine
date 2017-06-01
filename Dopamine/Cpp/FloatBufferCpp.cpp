@@ -137,10 +137,6 @@ void FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapac
 	
 }
 
-void FloatBuffer_ScalarDiv(float* left, float right, int leftCapacity) {
-	FloatBuffer_ScalarMul(left, 1.0f / right, leftCapacity);
-}
-
 void FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapacity) {
 
 #if ENABLE_BLAS
@@ -211,13 +207,6 @@ void FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapac
 			left++;
 		}
 	}
-	
-}
-
-void FloatBuffer_ScalarSub(float* left, float right, int leftCapacity) {
-	
-	for (float* leftEnd = left + leftCapacity; left < leftEnd; left++)
-		*left -= right;
 	
 }
 
