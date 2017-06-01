@@ -465,22 +465,20 @@ class ViewController: NSViewController {
 		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize, itemSequenceCapacity: 1024)
 		skipGram.train(itemSequenceBuffer: sequenceBuffer, itemSequenceLength: sequenceLength)
 		
-		let vectors: FloatBuffer = skipGram._weight
-
 		// Normalize
 		for vectorIndex in 0 ..< categoryModelDict.count {
 
-			let refVector = FloatBuffer(1, itemVectorSize, referenceOf: vectors, startRow: vectorIndex, startColumn: 0)
+			let refVector = skipGram.vectorRef(vectorIndex)
 			let _ = refVector.normalize()
 		}
 
 		let testItemIndex = 225//52
-		let testItemRef = FloatBuffer(1, itemVectorSize, referenceOf: vectors, startRow: testItemIndex, startColumn: 0)
+		let testItemRef = skipGram.vectorRef(testItemIndex)
 		var testSimilarityArray = [(Int, Float, String)]()
 		for vectorIndex in 0 ..< categoryModelDict.count {
 			if let categoryModel = categoryModelDict[vectorIndex] {
 				
-				let refVector = FloatBuffer(1, itemVectorSize, referenceOf: vectors, startRow: vectorIndex, startColumn: 0)
+				let refVector = skipGram.vectorRef(vectorIndex)
 				let cosine = testItemRef.dot(refVector)
 
 				testSimilarityArray.append((vectorIndex, cosine, categoryModel.text))

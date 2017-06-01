@@ -57,8 +57,17 @@ public class SkipGram {
 		perfCheck.print()
 
 	}
+	
+	public func vectorRef(_ index: Int) -> FloatBuffer {
+		assert(index < _itemsCount);
+		return FloatBuffer(1, _itemVectorSize, referenceOf: _weight, startRow: index, startColumn: 0)
+	}
 
 	// MARK: - プロパティ
+	
+	public var vectorBuffer: FloatBuffer {
+		return _weight;
+	}
 	
 	var _itemVectorSize: Int
 	var _itemCapacity: Int
@@ -69,7 +78,7 @@ public class SkipGram {
 	var _itemSequenceOffsetArray: IntBuffer
 	var _tempItemVector: FloatBuffer
 	
-	public var _weight: FloatBuffer
+	var _weight: FloatBuffer
 	var _weightNeg: FloatBuffer
 	var _windowSize: Int
 	var _negativeSamplingCount: Int
