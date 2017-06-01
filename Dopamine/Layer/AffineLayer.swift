@@ -57,7 +57,6 @@ class AffineLayer: SimpleLayer {
 		lastInput.transpose(result: tempBuffer)
 		tempBuffer.matmul(by: doutput, to: dWeight)
 		
-//		dBias.copy(doutput)
 		doutput.sumFirstAxis(to: dBias)
 		
 //		perfCheck.print()

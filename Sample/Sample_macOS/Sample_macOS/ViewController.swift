@@ -16,8 +16,8 @@ class ViewController: NSViewController {
 		super.viewDidLoad()
 		
 //		testMNIST()
-		testGRU()
-//		testSkipGram()
+//		testGRU()
+		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -37,7 +37,7 @@ class ViewController: NSViewController {
 		let net = LayerNet(inputSize: 784, hiddenSize: 50, outputSize: 10)
 		let numIterations: Int = 10000
 		let batchSize: Int = 100
-		let epochBatchCount: Int = max(1, trainImagesBuffer.shape.first! / batchSize)
+		let epochBatchCount: Int = max(1, trainImagesBuffer.rows / batchSize)
 		
 		let batchInput = FloatBuffer(batchSize, 784)
 		let batchOutput = FloatBuffer(batchSize, 10)
@@ -51,7 +51,7 @@ class ViewController: NSViewController {
 			
 			if (iterationIndex % epochBatchCount == epochBatchCount - 1) {
 				
-				let testSize = testImagesBuffer.shape.first!
+				let testSize = testImagesBuffer.rows
 				let testInput = testImagesBuffer! //FloatBuffer(testSize, 784)
 				let testOutput = testLabelsBuffer!
 				let resultBuffer = FloatBuffer(testSize, 10)
@@ -60,7 +60,7 @@ class ViewController: NSViewController {
 				
 				net.predict(input: testInput, result: resultBuffer)
 				let maxPositionArray = resultBuffer.maxPosition()
-				let resCount = resultBuffer.shape.first!
+				let resCount = resultBuffer.rows
 				var correctCount: Int = 0
 				for sampleIndex in 0 ..< resCount {
 					let correct = testOutput.contents[sampleIndex * 10 + maxPositionArray[sampleIndex]] == 1.0
@@ -263,7 +263,7 @@ class ViewController: NSViewController {
 		trainLabelsFileData.withUnsafeBytes { (pointer: UnsafePointer<UInt8>) in
 			let fileHead = pointer + 8
 			let bufferHead = trainLabelsBuffer.contents
-			for imageIndex in 0 ..< trainLabelsBuffer.shape.first! {
+			for imageIndex in 0 ..< trainLabelsBuffer.rows {
 				let label = Int(fileHead[imageIndex])
 				bufferHead[imageIndex * 10 + label] = 1.0
 			}
@@ -287,7 +287,7 @@ class ViewController: NSViewController {
 		testLabelsFileData.withUnsafeBytes { (pointer: UnsafePointer<UInt8>) in
 			let fileHead = pointer + 8
 			let bufferHead = testLabelsBuffer.contents
-			for imageIndex in 0 ..< testLabelsBuffer.shape.first! {
+			for imageIndex in 0 ..< testLabelsBuffer.rows {
 				let label = Int(fileHead[imageIndex])
 				bufferHead[imageIndex * 10 + label] = 1.0
 			}
@@ -309,14 +309,14 @@ class ViewController: NSViewController {
 	
 	func loadTrainRandomSamples(maxSamples: Int, input: FloatBuffer, output: FloatBuffer) {
 		
-		let totalSamples = trainImagesBuffer.shape.first!
+		let totalSamples = trainImagesBuffer.rows
 		var numSamples = maxSamples
 		if (numSamples > totalSamples) {
 			numSamples = totalSamples
 		}
 		
-		let imageSize = trainImagesBuffer.shape.last!
-		let labelSize = trainLabelsBuffer.shape.last!
+		let imageSize = trainImagesBuffer.columns
+		let labelSize = trainLabelsBuffer.columns
 		
 		var remainingIndexArray = [Int]()
 		for imageIndex in 0 ..< totalSamples {
@@ -446,48 +446,42 @@ class ViewController: NSViewController {
 		}
 
 		Swift.print(groupArrayDict)
-
-		var itemSequenceArray = [[Int]]()
-		for (_, categoryModel) in categoryModelDict {
-			if categoryModel.parentId != -1 {
-				itemSequenceArray.append([categoryModel.id, categoryModel.parentId])
-			}
-		}
 		
+		let sequenceBuffer = IntBuffer(1024)
+		var sequenceLength = 0
+		for sequenceArray in groupArrayDict.values {
+			
+			for itemId in sequenceArray {
+				sequenceBuffer.contents[sequenceLength] = Int32(itemId)
+				sequenceLength += 1
+			}
+			
+			sequenceBuffer.contents[sequenceLength] = SkipGram.EndOfItemSequenceId
+			sequenceLength += 1
+		}
+
 		let itemVectorSize = 100
 
-		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize)
-//		skipGram.trainWithSequences(itemSequenceArray: itemSequenceArray)
-		skipGram.trainWithSequences(itemSequenceArray: [[Int]](groupArrayDict.values))
+		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize, itemSequenceCapacity: 1024)
+		skipGram.train(itemSequenceBuffer: sequenceBuffer, itemSequenceLength: sequenceLength)
 		
-		let vectors: FloatBuffer = skipGram.weight
-
 		// Normalize
 		for vectorIndex in 0 ..< categoryModelDict.count {
-			let vectorHead = vectors.contents + (itemVectorSize * vectorIndex)
-			var normsq: Float = 0.0
-			for featureIndex in 0 ..< itemVectorSize {
-				normsq += vectorHead[featureIndex] * vectorHead[featureIndex]
-			}
-			let normInv: Float = 1.0 / sqrtf(normsq)
-			for featureIndex in 0 ..< itemVectorSize {
-				vectorHead[featureIndex] *= normInv
-			}
+
+			let refVector = skipGram.vectorRef(vectorIndex)
+			let _ = refVector.normalize()
 		}
 
 		let testItemIndex = 225//52
-		let testItemHead = vectors.contents + (itemVectorSize * testItemIndex)
+		let testItemRef = skipGram.vectorRef(testItemIndex)
 		var testSimilarityArray = [(Int, Float, String)]()
 		for vectorIndex in 0 ..< categoryModelDict.count {
 			if let categoryModel = categoryModelDict[vectorIndex] {
-				let vectorHead = vectors.contents + (itemVectorSize * vectorIndex)
 				
-				var dot: Float = 0.0
-				for featureIndex in 0 ..< itemVectorSize {
-					dot += testItemHead[featureIndex] * vectorHead[featureIndex]
-				}
+				let refVector = skipGram.vectorRef(vectorIndex)
+				let cosine = testItemRef.dot(refVector)
 
-				testSimilarityArray.append((vectorIndex, dot, categoryModel.text))
+				testSimilarityArray.append((vectorIndex, cosine, categoryModel.text))
 			}
 		}
 		

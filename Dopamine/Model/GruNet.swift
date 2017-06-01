@@ -54,7 +54,7 @@ public class GruNet {
 		assert(!resultArray.isEmpty)
 		assert(!inputArray.isEmpty)
 
-		let batchSize = inputArray[0].shape[0]
+		let batchSize = inputArray[0].rows
 		var previousStateArray = tempBufferArray1
 		var nextStateArray = tempBufferArray2
 		let tempBuffer = FloatBuffer(batchSize, outputSize)
@@ -112,7 +112,7 @@ public class GruNet {
 		assert(inputArray.count == outputArray.count)
 		assert(inputArray.count <= sequenceLength) // TODO: 修正
 		
-		let batchSize = inputArray[0].shape[0]
+		let batchSize = inputArray[0].rows
 		var previousStateArray = tempBufferArray1
 		var nextStateArray = tempBufferArray2
 		let tempBuffer = FloatBuffer(batchSize, outputSize)
@@ -142,7 +142,7 @@ public class GruNet {
 		// 順伝播用の初期ステートを準備
 		for layerIndex in 0 ..< layersCount {
 			let previousState = previousStateArray[layerIndex]
-			previousState.resetLazy(shape: [batchSize, cellArray[layerIndex].outputSize])
+			previousState.resetLazy(batchSize, cellArray[layerIndex].outputSize)
 			previousState.fillZero()
 		}
 		
@@ -172,7 +172,7 @@ public class GruNet {
 		// 逆伝播用の初期ステート
 		for layerIndex in 0 ..< layersCount {
 			let previousState = previousStateArray[layerIndex]
-			previousState.resetLazy(shape: [inputArray[0].shape[0], cellArray[layerIndex].outputSize])
+			previousState.resetLazy(inputArray[0].rows, cellArray[layerIndex].outputSize)
 			previousState.fillZero()
 		}
 		
