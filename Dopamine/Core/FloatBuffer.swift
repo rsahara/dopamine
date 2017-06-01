@@ -33,9 +33,25 @@ public class FloatBuffer {
 	public convenience init(like src: FloatBuffer) {
 		self.init(src._rows, src._columns)
 	}
+	
+	public init(_ rows: Int, _ columns: Int, referenceOf src: FloatBuffer, startRow: Int, startColumn: Int) {
+
+		assert(startRow < src._rows)
+		assert(startColumn < src._columns)
+		assert(startRow * src._columns + startColumn + rows * columns <= src._capacity)
+		
+		_rows = rows;
+		_columns = columns
+		_capacity = rows * columns
+		
+		_allocationSize = 0
+		_buffer = src._buffer + (startRow * src._columns + startColumn)
+	}
 
 	deinit {
-		_buffer.deallocate(capacity: _allocationSize)
+		if (_allocationSize != 0) {
+			_buffer.deallocate(capacity: _allocationSize)
+		}
 	}
 
 	// MARK: 計算
@@ -182,6 +198,7 @@ public class FloatBuffer {
 	public func subcopy(_ src: FloatBuffer, startRow: Int, startColumn: Int) {
 		assert(startRow + _rows <= src._rows)
 		assert(startColumn + _columns <= src._columns)
+		// TODO: C++
 
 		for y in 0 ..< _rows {
 			memcpy(_buffer + (y * _columns),
@@ -192,6 +209,14 @@ public class FloatBuffer {
 
 	public func sqrt() {
 		FloatBuffer_Sqrt(_buffer, Int32(_capacity))
+	}
+	
+	public func norm() -> Float {
+		return _FloatBuffer_Norm(_buffer, Int32(_capacity))
+	}
+
+	public func normalize() -> Float {
+		return _FloatBuffer_Normalize(_buffer, Int32(_capacity))
 	}
 	
 	public func sumFirstAxis(to result: FloatBuffer) {
@@ -222,7 +247,9 @@ public class FloatBuffer {
 	public func resetLazy(_ rows: Int, _ columns: Int) {
 		let capacity = rows * columns
 		if (capacity > _allocationSize) {
-			_buffer.deallocate(capacity: _allocationSize)
+			if _allocationSize != 0 {
+				_buffer.deallocate(capacity: _allocationSize)
+			}
 			_allocationSize = capacity
 			_buffer = Pointer.allocate(capacity: _allocationSize)
 		}

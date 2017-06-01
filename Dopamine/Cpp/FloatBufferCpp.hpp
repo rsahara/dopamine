@@ -30,6 +30,8 @@ void FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth)
 void FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth);
 void FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth);
 void FloatBuffer_Sqrt(float* left, int leftCapacity);
+float _FloatBuffer_Norm(float* left, int leftCapacity);
+float _FloatBuffer_Normalize(float* left, int leftCapacity);
 
 
 #endif /* FloatBufferCpp_hpp */

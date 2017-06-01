@@ -12,7 +12,7 @@ public class SkipGram {
 	
 	public static let EndOfItemSequenceId: Int32 = -1
 	
-	public init(itemCapacity: Int, itemVectorSize: Int, itemSequenceCapacity: Int = 1024, negativeSamplingCount: Int = 5) {
+	public init(itemCapacity: Int, itemVectorSize: Int, itemSequenceCapacity: Int = 1024, windowSize: Int = 100, negativeSamplingCount: Int = 5) {
 
 		_SkipGram_GlobalInit()
 
@@ -32,10 +32,11 @@ public class SkipGram {
 		_itemSequencesCount = 0
 		_itemSequenceOffsetArray = IntBuffer(itemSequenceCapacity)
 		_tempItemVector = FloatBuffer(1, itemVectorSize)
+		_windowSize = windowSize
 		_negativeSamplingCount = negativeSamplingCount
 	}
 
-	public func train(itemSequenceBuffer: IntBuffer, itemSequenceLength: Int) {
+	public func train(itemSequenceBuffer: IntBuffer, itemSequenceLength: Int, trainingRate: Float = 0.005) {
 
 		// アイテムを処理する準備
 		var itemSequencesCount: Int32 = Int32(_itemSequenceCapacity)
@@ -51,7 +52,7 @@ public class SkipGram {
 			Swift.print("it \(iterationIndex)")
 			
 			_SkipGram_TrainIterate(itemSequenceBuffer.contents, _itemSequenceOffsetArray.contents, itemSequencesCount, _itemNegLotteryInfoArray.contents, itemsCount, Int32(_itemVectorSize),
-			                       _weight.contents, _weightNeg.contents, _tempItemVector.contents, 100, 5, 0.005);// param
+			                       _weight.contents, _weightNeg.contents, _tempItemVector.contents, Int32(_windowSize), Int32(_negativeSamplingCount), trainingRate);
 		}
 		perfCheck.print()
 
@@ -70,5 +71,6 @@ public class SkipGram {
 	
 	public var _weight: FloatBuffer
 	var _weightNeg: FloatBuffer
+	var _windowSize: Int
 	var _negativeSamplingCount: Int
 }

@@ -16,8 +16,8 @@ class ViewController: NSViewController {
 		super.viewDidLoad()
 		
 //		testMNIST()
-//		testGRU()
-		testSkipGram()
+		testGRU()
+//		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -469,30 +469,21 @@ class ViewController: NSViewController {
 
 		// Normalize
 		for vectorIndex in 0 ..< categoryModelDict.count {
-			let vectorHead = vectors.contents + (itemVectorSize * vectorIndex)
-			var normsq: Float = 0.0
-			for featureIndex in 0 ..< itemVectorSize {
-				normsq += vectorHead[featureIndex] * vectorHead[featureIndex]
-			}
-			let normInv: Float = 1.0 / sqrtf(normsq)
-			for featureIndex in 0 ..< itemVectorSize {
-				vectorHead[featureIndex] *= normInv
-			}
+
+			let refVector = FloatBuffer(1, itemVectorSize, referenceOf: vectors, startRow: vectorIndex, startColumn: 0)
+			let _ = refVector.normalize()
 		}
 
 		let testItemIndex = 225//52
-		let testItemHead = vectors.contents + (itemVectorSize * testItemIndex)
+		let testItemRef = FloatBuffer(1, itemVectorSize, referenceOf: vectors, startRow: testItemIndex, startColumn: 0)
 		var testSimilarityArray = [(Int, Float, String)]()
 		for vectorIndex in 0 ..< categoryModelDict.count {
 			if let categoryModel = categoryModelDict[vectorIndex] {
-				let vectorHead = vectors.contents + (itemVectorSize * vectorIndex)
 				
-				var dot: Float = 0.0
-				for featureIndex in 0 ..< itemVectorSize {
-					dot += testItemHead[featureIndex] * vectorHead[featureIndex]
-				}
+				let refVector = FloatBuffer(1, itemVectorSize, referenceOf: vectors, startRow: vectorIndex, startColumn: 0)
+				let cosine = testItemRef.dot(refVector)
 
-				testSimilarityArray.append((vectorIndex, dot, categoryModel.text))
+				testSimilarityArray.append((vectorIndex, cosine, categoryModel.text))
 			}
 		}
 		

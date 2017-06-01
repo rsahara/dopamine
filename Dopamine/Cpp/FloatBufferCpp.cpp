@@ -110,10 +110,16 @@ void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapac
 
 void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity) {
 
-	// TODO: cblas_sscal
+#if ENABLE_BLAS
+
+	cblas_sscal(leftCapacity, right, left, 1);
+	
+#else
 	
 	for (float* leftEnd = left + leftCapacity; left < leftEnd; left++)
 		*left *= right;
+
+#endif
 	
 }
 
@@ -312,6 +318,35 @@ void FloatBuffer_Sqrt(float* left, int leftCapacity) {
 		*left = sqrtf(*left);
 	}
 	
+}
+
+float _FloatBuffer_Norm(float* left, int leftCapacity) {
+
+#if ENABLE_BLAS
+	
+	return cblas_snrm2(leftCapacity, left, 1);
+	
+#else
+	
+	float norm = 0.0f;
+	float* leftEnd = left + leftCapacity;
+	for (; left < leftEnd; left++) {
+		norm += *left * *left;
+	}
+	return sqrtf(norm);
+	
+#endif
+}
+
+float _FloatBuffer_Normalize(float* left, int leftCapacity) {
+
+	float norm = _FloatBuffer_Norm(left, leftCapacity);
+	
+	if (norm != 0.0f) {
+		FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
+	}
+	
+	return norm;
 }
 
 
