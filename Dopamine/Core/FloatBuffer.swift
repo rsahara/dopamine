@@ -48,6 +48,11 @@ public class FloatBuffer {
 		_FloatBuffer_FillRandomGaussian(_buffer, Int32(capacity))
 	}
 	
+	public func dot(_ right: FloatBuffer) -> Float {
+		assert(_capacity == right._capacity)
+		return _FloatBuffer_DotProduct(_buffer, right._buffer, Int32(_capacity))
+	}
+	
 	public func matmul(by right: FloatBuffer, to res: FloatBuffer) {
 		assert(_columns == right._rows)
 		res.resetLazy(_rows, right._columns)
@@ -58,6 +63,12 @@ public class FloatBuffer {
 		assert(_capacity % right._capacity == 0)
 
 		FloatBuffer_Add(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
+	}
+
+	public func add(_ right: FloatBuffer, scaledBy rightScale: Float) {
+		assert(_capacity % right._capacity == 0)
+		
+		_FloatBuffer_AddScaled(_buffer, right._buffer, rightScale, Int32(_capacity), Int32(right._capacity))
 	}
 
 	public func add(_ right: Float) {

@@ -98,7 +98,7 @@ inline int _SkipGram_RandomNegativeItemIndex(float* itemNegLotteryInfoArray, int
 			minIndex = testIndex + 1;
 		}
 	}
-	
+
 	return maxIndex % itemsCount; // TODO: 整理、デバッグ
 }
 
@@ -154,19 +154,19 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 					
 					float* targetVector = negWeightBuffer + (itemVectorSize * targetItemIndex);
 
-					float dotProduct;
-					_FloatBuffer_DotProduct(&dotProduct, relatedVector, targetVector, itemVectorSize);
-//					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) {
-//						dotProduct += relatedVector[featureIndex] * targetVector[featureIndex];
-//					}
-					
+					float dotProduct = _FloatBuffer_DotProduct(relatedVector, targetVector, itemVectorSize);
 					float expDotProduct = expf(dotProduct); // TODO: table lookup
 					float delta = (label - (expDotProduct / (expDotProduct + 1.0f))) * learningRate;
 					
+#if 0
+					_FloatBuffer_AddScaled(tempItemVector, targetVector, delta, itemVectorSize, itemVectorSize);
+					_FloatBuffer_AddScaled(targetVector, relatedVector, delta, itemVectorSize, itemVectorSize);
+#else
 					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) {
 						tempItemVector[featureIndex] += delta * targetVector[featureIndex];
 						targetVector[featureIndex] += delta * relatedVector[featureIndex];
 					}
+#endif
 					
 				} // for each (positive/negative) sampling
 				

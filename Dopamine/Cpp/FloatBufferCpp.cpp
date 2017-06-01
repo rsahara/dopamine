@@ -10,7 +10,11 @@
 #include <cstring>
 #include <random>
 
+#define ENABLE_CBLAS 1
+
+#if ENABLE_CBLAS
 #include <Accelerate/Accelerate.h>
+#endif
 
 extern "C" {
 
@@ -33,7 +37,7 @@ void _FloatBuffer_FillRandomGaussian(float* res, int length) {
 
 void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {
 
-#if 1
+#if ENABLE_CBLAS
 	
 	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, leftHeight, rightWidth, leftWidth, 1.0f, left, leftWidth, right, rightWidth, 0.0, res, rightWidth);
 
@@ -68,14 +72,24 @@ void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, i
 
 }
 
-void _FloatBuffer_DotProduct(float* res, float* left, float* right, int leftWidth) {
+float _FloatBuffer_DotProduct(float* left, float* right, int leftWidth) {
 
-#if 1
-	*res = cblas_sdot(leftWidth, left, 1, right, 1);
+#if ENABLE_CBLAS
+	
+	return cblas_sdot(leftWidth, left, 1, right, 1);
+	
 #else
+
+	float res = 0.0f;
+	float* leftEnd = left + leftWidth;
+	while (left < leftEnd) {
+		res += *left * *right;
+		left++;
+		right++;
+	}
 	
-	// TODO
-	
+	return res;
+
 #endif
 
 }
@@ -96,6 +110,8 @@ void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapac
 
 void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity) {
 
+	// TODO: cblas_sscal
+	
 	for (float* leftEnd = left + leftCapacity; left < leftEnd; left++)
 		*left *= right;
 	
@@ -121,6 +137,16 @@ void FloatBuffer_ScalarDiv(float* left, float right, int leftCapacity) {
 
 void FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapacity) {
 
+#if ENABLE_BLAS
+
+	float* leftEnd = left + leftCapacity;
+	while (left < leftEnd) {
+		cblas_saxpy(rightCapacity, 1.0f, right, 1, left, 1);
+		left += rightCapacity;
+	}
+
+#else
+
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
 		float* rightHead = right;
@@ -130,6 +156,34 @@ void FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapac
 			left++;
 		}
 	}
+
+#endif
+
+}
+
+void _FloatBuffer_AddScaled(float* left, float* right, float rightScale, int leftCapacity, int rightCapacity) {
+
+#if ENABLE_BLAS
+
+	float* leftEnd = left + leftCapacity;
+	while (left < leftEnd) {
+		cblas_saxpy(rightCapacity, rightScale, right, 1, left, 1);
+		left += rightCapacity;
+	}
+
+#else
+	
+	float* leftEnd = left + leftCapacity;
+	while (left < leftEnd) {
+		float* rightHead = right;
+		float* rightHeadEnd = right + rightCapacity;
+		for (; rightHead < rightHeadEnd; rightHead++) {
+			*left += *rightHead * rightScale;
+			left++;
+		}
+	}
+	
+#endif
 
 }
 
