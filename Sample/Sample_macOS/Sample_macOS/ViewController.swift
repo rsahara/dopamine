@@ -16,8 +16,8 @@ class ViewController: NSViewController {
 		super.viewDidLoad()
 		
 //		testMNIST()
-		testGRU()
-//		testSkipGram()
+//		testGRU()
+		testSkipGram()
 	}
 	
 	override var representedObject: Any? {

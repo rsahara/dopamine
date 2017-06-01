@@ -117,8 +117,7 @@ inline int _SkipGram_RandomNegativeItemIndex(float* itemNegLotteryInfoArray, int
 			minIndex = testIndex + 1;
 		}
 	}
-
-	return maxIndex % itemsCount; // TODO: 整理、デバッグ
+	return maxIndex;
 }
 	
 inline float _SkipGram_ExpTableOutput(float input) {
@@ -136,12 +135,12 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 	
 	std::random_device dev;
 	std::mt19937 gen(dev());
-	std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+	std::uniform_real_distribution<float> dist(0.0f, itemNegLotteryInfoArray[itemsCount - 1]);
 
-	for (int itemSequenceIndex = 0; itemSequenceIndex < itemSequencesCount; itemSequenceIndex++) { // for each sequence
+	for (int itemSequenceIndex = 0; itemSequenceIndex < itemSequencesCount; itemSequenceIndex++) { // For each sequence.
 		
 		int* itemSequenceStart = itemSequenceBuffer + itemSequenceOffsetArray[itemSequenceIndex];
-		for (int* headItem = itemSequenceStart; ; headItem++) { // for each item
+		for (int* headItem = itemSequenceStart; ; headItem++) { // For each item.
 			int itemIndex = *headItem;
 			if (itemIndex < 0) {
 				break; // End of sequence.
@@ -153,7 +152,7 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 				headRelated = itemSequenceStart;
 			}
 			
-			for (; headRelated <= headRelatedEnd; headRelated++) { // for each related item
+			for (; headRelated <= headRelatedEnd; headRelated++) { // For each related item.
 				int relatedItemIndex = *headRelated;
 				if (relatedItemIndex == itemIndex) {
 					continue; // Skip center item.
@@ -169,7 +168,7 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 				// Positive sampling, then negative sampling.
 				float label;
 				int targetItemIndex;
-				for (int negativeSamplingIndex = -1; negativeSamplingIndex < negativeSamplingCount; negativeSamplingIndex++) { // for each (positive/negative) sampling
+				for (int negativeSamplingIndex = -1; negativeSamplingIndex < negativeSamplingCount; negativeSamplingIndex++) { // For each (positive/negative) sampling.
 					
 					if (negativeSamplingIndex == -1) {
 						targetItemIndex = itemIndex;
@@ -208,22 +207,16 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 						headRelatedVector++;
 					}
 #endif
-#if 0 // インデックス版
-					for (int featureIndex = 0; featureIndex < itemVectorSize; featureIndex++) {
-						tempItemVector[featureIndex] += delta * targetVector[featureIndex];
-						targetVector[featureIndex] += delta * relatedVector[featureIndex];
-					}
-#endif
 					
-				} // for each (positive/negative) sampling
+				} // For each (positive/negative) sampling.
 				
 				FloatBuffer_Add(relatedVector, tempItemVector, itemVectorSize, itemVectorSize);
 				
-			} // for each related item
+			} // For each related item.
 
-		} // for each item
+		} // For each item.
 
-	} // for each sequence
+	} // For each sequence.
 
 }
 
