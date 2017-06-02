@@ -33,9 +33,8 @@ public class FloatBuffer {
 	public convenience init(like src: FloatBuffer) {
 		self.init(src._rows, src._columns)
 	}
-	
-	public init(_ rows: Int, _ columns: Int, referenceOf src: FloatBuffer, startRow: Int, startColumn: Int) {
 
+	public init(referenceOf src: FloatBuffer, startRow: Int, startColumn: Int, rows: Int, columns: Int) {
 		assert(startRow < src._rows)
 		assert(startColumn < src._columns)
 		assert(startRow * src._columns + startColumn + rows * columns <= src._capacity)
@@ -46,6 +45,10 @@ public class FloatBuffer {
 		
 		_allocationSize = 0
 		_buffer = src._buffer + (startRow * src._columns + startColumn)
+	}
+
+	public convenience init(referenceOf src: FloatBuffer, rowIndex: Int) {
+		self.init(referenceOf: src, startRow: rowIndex, startColumn: 0, rows: 1, columns: src._columns)
 	}
 
 	deinit {
@@ -112,6 +115,7 @@ public class FloatBuffer {
 		}
 	}
 
+	// TODO: 整理
 	public func resetLazy(_ rows: Int, _ columns: Int) {
 		let capacity = rows * columns
 		if (capacity > _allocationSize) {

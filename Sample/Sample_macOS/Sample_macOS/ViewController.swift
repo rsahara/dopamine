@@ -463,25 +463,24 @@ class ViewController: NSViewController {
 		let itemVectorSize = 100
 
 		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize, itemSequenceCapacity: 1024)
-		skipGram.train(itemSequenceBuffer: sequenceBuffer, itemSequenceLength: sequenceLength)
 		
-		// Normalize
-		for vectorIndex in 0 ..< categoryModelDict.count {
-
-			let refVector = skipGram.vectorRef(vectorIndex)
-			let _ = refVector.normalize()
-		}
+		let perfCheck = PerfCheck()
+		skipGram.train(itemSequenceBuffer: sequenceBuffer, itemSequenceLength: sequenceLength, iterationsCount: 400)
+		perfCheck.print()
+		
+		let vectorBuffer = skipGram.result
+		vectorBuffer.normalizeRows()
 
 		let testItemIndex = 225//52
-		let testItemRef = skipGram.vectorRef(testItemIndex)
+		let testItemRef = FloatBuffer(referenceOf: vectorBuffer, rowIndex: testItemIndex)
+		let similarityBuffer = FloatBuffer(1, vectorBuffer.rows)
+		vectorBuffer.dotProductByRows(testItemRef, to: similarityBuffer)
+		
 		var testSimilarityArray = [(Int, Float, String)]()
 		for vectorIndex in 0 ..< categoryModelDict.count {
 			if let categoryModel = categoryModelDict[vectorIndex] {
-				
-				let refVector = skipGram.vectorRef(vectorIndex)
-				let cosine = testItemRef.dot(refVector)
-
-				testSimilarityArray.append((vectorIndex, cosine, categoryModel.text))
+				let similarity = similarityBuffer.contents[vectorIndex]
+				testSimilarityArray.append((vectorIndex, similarity, categoryModel.text))
 			}
 		}
 		
