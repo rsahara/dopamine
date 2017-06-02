@@ -15,9 +15,9 @@ class ViewController: NSViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		testMNIST()
-		//testGRU()
-		
+//		testMNIST()
+//		testGRU()
+		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -37,7 +37,7 @@ class ViewController: NSViewController {
 		let net = LayerNet(inputSize: 784, hiddenSize: 50, outputSize: 10)
 		let numIterations: Int = 10000
 		let batchSize: Int = 100
-		let epochBatchCount: Int = max(1, trainImagesBuffer.shape.first! / batchSize)
+		let epochBatchCount: Int = max(1, trainImagesBuffer.rows / batchSize)
 		
 		let batchInput = FloatBuffer(batchSize, 784)
 		let batchOutput = FloatBuffer(batchSize, 10)
@@ -51,7 +51,7 @@ class ViewController: NSViewController {
 			
 			if (iterationIndex % epochBatchCount == epochBatchCount - 1) {
 				
-				let testSize = testImagesBuffer.shape.first!
+				let testSize = testImagesBuffer.rows
 				let testInput = testImagesBuffer! //FloatBuffer(testSize, 784)
 				let testOutput = testLabelsBuffer!
 				let resultBuffer = FloatBuffer(testSize, 10)
@@ -60,10 +60,10 @@ class ViewController: NSViewController {
 				
 				net.predict(input: testInput, result: resultBuffer)
 				let maxPositionArray = resultBuffer.maxPosition()
-				let resCount = resultBuffer.shape.first!
+				let resCount = resultBuffer.rows
 				var correctCount: Int = 0
 				for sampleIndex in 0 ..< resCount {
-					let correct = testOutput[sampleIndex * 10 + maxPositionArray[sampleIndex]] == 1.0
+					let correct = testOutput.contents[sampleIndex * 10 + maxPositionArray[sampleIndex]] == 1.0
 					if correct {
 						correctCount += 1
 					}
@@ -227,7 +227,7 @@ class ViewController: NSViewController {
 		assert(size <= buffer.capacity)
 		
 		buffer.fillZero()
-		buffer[value] = 1.0
+		buffer.contents[value] = 1.0
 	}
 	
 	func loadOneHotArray(valueArray: [Int], size: Int, to buffer: FloatBuffer) {
@@ -237,7 +237,7 @@ class ViewController: NSViewController {
 		for valueIndex in 0 ..< valueArray.count {
 			let value = valueArray[valueIndex]
 			assert(value < size)
-			buffer[size * valueIndex + value] = 1.0
+			buffer.contents[size * valueIndex + value] = 1.0
 		}
 	}
 	
@@ -263,7 +263,7 @@ class ViewController: NSViewController {
 		trainLabelsFileData.withUnsafeBytes { (pointer: UnsafePointer<UInt8>) in
 			let fileHead = pointer + 8
 			let bufferHead = trainLabelsBuffer.contents
-			for imageIndex in 0 ..< trainLabelsBuffer.shape.first! {
+			for imageIndex in 0 ..< trainLabelsBuffer.rows {
 				let label = Int(fileHead[imageIndex])
 				bufferHead[imageIndex * 10 + label] = 1.0
 			}
@@ -287,7 +287,7 @@ class ViewController: NSViewController {
 		testLabelsFileData.withUnsafeBytes { (pointer: UnsafePointer<UInt8>) in
 			let fileHead = pointer + 8
 			let bufferHead = testLabelsBuffer.contents
-			for imageIndex in 0 ..< testLabelsBuffer.shape.first! {
+			for imageIndex in 0 ..< testLabelsBuffer.rows {
 				let label = Int(fileHead[imageIndex])
 				bufferHead[imageIndex * 10 + label] = 1.0
 			}
@@ -309,14 +309,14 @@ class ViewController: NSViewController {
 	
 	func loadTrainRandomSamples(maxSamples: Int, input: FloatBuffer, output: FloatBuffer) {
 		
-		let totalSamples = trainImagesBuffer.shape.first!
+		let totalSamples = trainImagesBuffer.rows
 		var numSamples = maxSamples
 		if (numSamples > totalSamples) {
 			numSamples = totalSamples
 		}
 		
-		let imageSize = trainImagesBuffer.shape.last!
-		let labelSize = trainLabelsBuffer.shape.last!
+		let imageSize = trainImagesBuffer.columns
+		let labelSize = trainLabelsBuffer.columns
 		
 		var remainingIndexArray = [Int]()
 		for imageIndex in 0 ..< totalSamples {
@@ -417,4 +417,132 @@ class ViewController: NSViewController {
 		
 	}
 	
+	// MARK: - SkipGram test
+	
+	struct CategoryModel {
+		public var id: Int
+		public var text: String
+		public var parentId: Int
+		
+	}
+
+	func testSkipGram() {
+
+		let itemVectorSize = 100
+		let iterationsCount = 400
+		let itemSequenceCapacity = 1024
+
+		// カテゴリをロード
+		let categoryModelDict: Dictionary<Int, CategoryModel> = loadCategoryModels()
+		
+		var groupArrayDict = Dictionary<Int, Array<Int>>()
+		for (_, categoryModel) in categoryModelDict {
+			if categoryModel.parentId != -1 {
+				
+				if var array = groupArrayDict[categoryModel.parentId] {
+					array.append(categoryModel.id)
+					groupArrayDict[categoryModel.parentId] = array
+				} else {
+					groupArrayDict[categoryModel.parentId] = [categoryModel.parentId, categoryModel.id]
+				}
+				
+			}
+		}
+		
+		Swift.print(groupArrayDict)
+
+		// ベクトルをロード又は学習
+		let fileUrl = URL(fileURLWithPath: "/tmp/skipgram_vectors")
+		var vectorBuffer: FloatBuffer! = try? FloatBuffer(contentsOf: fileUrl)
+		if (vectorBuffer != nil) {
+			print("Loaded from: \(fileUrl.absoluteURL)")
+		} else {
+			let sequenceBuffer = IntBuffer(1024)
+			var sequenceLength = 0
+			for sequenceArray in groupArrayDict.values {
+				
+				for itemId in sequenceArray {
+					sequenceBuffer.contents[sequenceLength] = Int32(itemId)
+					sequenceLength += 1
+				}
+				
+				sequenceBuffer.contents[sequenceLength] = SkipGram.EndOfItemSequenceId
+				sequenceLength += 1
+			}
+
+
+			let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize, itemSequenceCapacity: itemSequenceCapacity)
+			
+			let perfCheck = PerfCheck()
+			skipGram.train(itemSequenceBuffer: sequenceBuffer, itemSequenceLength: sequenceLength, iterationsCount: iterationsCount)
+			perfCheck.print()
+			
+			vectorBuffer = skipGram.result
+			vectorBuffer.normalizeRows()
+			
+			try? vectorBuffer.write(to: fileUrl)
+		}
+		
+		let testItemIndex = 225//52
+		let testItemRef = FloatBuffer(referenceOf: vectorBuffer, rowIndex: testItemIndex)
+		let similarityBuffer = FloatBuffer(1, vectorBuffer.rows)
+		vectorBuffer.dotProductByRows(testItemRef, to: similarityBuffer)
+		
+		var testSimilarityArray = [(Int, Float, String)]()
+		for vectorIndex in 0 ..< categoryModelDict.count {
+			if let categoryModel = categoryModelDict[vectorIndex] {
+				let similarity = similarityBuffer.contents[vectorIndex]
+				testSimilarityArray.append((vectorIndex, similarity, categoryModel.text))
+			}
+		}
+		
+		testSimilarityArray.sort { (a, b) -> Bool in
+			return a.1 < b.1
+		}
+		
+		for (index, similarity, text) in testSimilarityArray {
+			Swift.print("[\(index)] \(text): \(similarity)")
+		}
+	}
+	
+	func loadCategoryModels() -> Dictionary<Int, CategoryModel> {
+		let sampleMasterUrl = Bundle.main.url(forResource: "samplemaster", withExtension: "json")!
+		let sampleMasterData = try! Data(contentsOf: sampleMasterUrl)
+		let sampleMasterObj = (try! JSONSerialization.jsonObject(with: sampleMasterData, options: JSONSerialization.ReadingOptions())) as! Dictionary<String, Any>
+		
+		let categoryObjArray = sampleMasterObj["genre_m"] as! Array<Dictionary<String, Any>>
+		var categoryModelDict = Dictionary<Int, CategoryModel>()
+		var translateIdDict = Dictionary<Int, Int>()
+		translateIdDict[0] = -1
+		var currentId = 0
+
+		for categoryObj in categoryObjArray {
+			var categoryModel = CategoryModel(id: Int(categoryObj["genre_id"] as! String)!,
+			                                  text: categoryObj["genre_name"] as! String,
+			                                  parentId: Int(categoryObj["parent_genre_id"] as! String)!)
+
+			if let newId = translateIdDict[categoryModel.id] {
+				categoryModel.id = newId
+			} else {
+				translateIdDict[categoryModel.id] = currentId
+				categoryModel.id = currentId
+				currentId += 1
+			}
+
+			if let newId = translateIdDict[categoryModel.parentId] {
+				categoryModel.parentId = newId
+			} else {
+				translateIdDict[categoryModel.parentId] = currentId
+				categoryModel.parentId = currentId
+				currentId += 1
+			}
+
+			categoryModelDict.updateValue(categoryModel, forKey: categoryModel.id)
+		}
+
+		return categoryModelDict
+	}
+	
+	
+
 }
