@@ -15,7 +15,7 @@ void _FloatBuffer_FillRandomGaussian(float* left, int leftCapacity);
 // TODO: '_'を先頭につける
 // TODO: height/width を使わない
 
-void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth);
+void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth);
 float _FloatBuffer_DotProduct(float* left, float* right, int leftWidth);
 void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapacity);
 void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity);
@@ -25,10 +25,10 @@ void _FloatBuffer_AddScaled(float* left, float* right, float rightScale, int lef
 void FloatBuffer_ScalarAdd(float* left, float right, int leftCapacity);
 void FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapacity);
 float _FloatBuffer_CrossEntropyError(float* left, float* right, int leftCapacity);
-void FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth);
-void FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth);
-void FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth);
-void FloatBuffer_Sqrt(float* left, int leftCapacity);
+void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth);
+void _FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth);
+void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth);
+void _FloatBuffer_Sqrt(float* left, int leftCapacity);
 
 // Calculate the Euclidian norm of a vector.
 float _FloatBuffer_Norm(float* left, int leftCapacity);

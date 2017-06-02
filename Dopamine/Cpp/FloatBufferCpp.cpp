@@ -35,7 +35,7 @@ void _FloatBuffer_FillRandomGaussian(float* left, int leftCapacity) {
 	}
 }
 
-void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {
+void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {
 
 #if ENABLE_CBLAS
 	
@@ -222,7 +222,7 @@ float _FloatBuffer_CrossEntropyError(float* left, float* right, int leftCapacity
 	return sum;
 }
 	
-void FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth) {
 
 	int leftCapacity = leftHeight * leftWidth;
 	for (int offset = 0; offset < leftCapacity; offset += leftWidth) {
@@ -269,7 +269,7 @@ void FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth)
 	}
 }
 
-void FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth) {
 
 	float* leftEnd = left + leftWidth;
 	for (; left < leftEnd; left++) {
@@ -283,7 +283,7 @@ void FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidt
 	
 }
 	
-void FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth) {
 	
 	float* resEnd = res + leftWidth;
 	float* leftHeadEnd = left + (leftHeight * leftWidth);
@@ -300,7 +300,7 @@ void FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int lef
 	
 }
 	
-void FloatBuffer_Sqrt(float* left, int leftCapacity) {
+void _FloatBuffer_Sqrt(float* left, int leftCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	for (; left < leftEnd; left++) {

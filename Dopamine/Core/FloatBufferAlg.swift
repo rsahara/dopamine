@@ -18,7 +18,7 @@ extension FloatBuffer {
 	public func matmul(by right: FloatBuffer, to res: FloatBuffer) {
 		assert(_columns == right._rows)
 		res.resetLazy(_rows, right._columns) // TODO: ここでやるべきでない
-		FloatBuffer_MatMul(res._buffer, _buffer, right._buffer, Int32(_rows), Int32(_columns), Int32(right._columns))
+		_FloatBuffer_MatMul(res._buffer, _buffer, right._buffer, Int32(_rows), Int32(_columns), Int32(right._columns))
 	}
 	
 	public func add(_ right: FloatBuffer) {
@@ -56,11 +56,11 @@ extension FloatBuffer {
 	
 	public func transpose(result: FloatBuffer) {
 		result.resetLazy(_columns, _rows) // TODO: ここでやるべきでない
-		FloatBuffer_Transpose(result._buffer, _buffer, Int32(_rows), Int32(_columns))
+		_FloatBuffer_Transpose(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 
 	public func sqrt() {
-		FloatBuffer_Sqrt(_buffer, Int32(_capacity))
+		_FloatBuffer_Sqrt(_buffer, Int32(_capacity))
 	}
 	
 	public func norm() -> Float {
@@ -83,12 +83,12 @@ extension FloatBuffer {
 
 	public func sumFirstAxis(to result: FloatBuffer) {
 		result.resetLazy(1, _columns) // TODO: ここでやるべきでない
-		FloatBuffer_SumToFirstAxis(result._buffer, _buffer, Int32(_rows), Int32(_columns))
+		_FloatBuffer_SumToFirstAxis(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 
 	public func softmax(result: FloatBuffer) {
 		result.resetLazy(like: self) // TODO: ここでやるべきでない
-		FloatBuffer_Softmax(result._buffer, _buffer, Int32(_rows), Int32(_columns))
+		_FloatBuffer_Softmax(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 	
 	public func maxPosition() -> Array<Int> {
