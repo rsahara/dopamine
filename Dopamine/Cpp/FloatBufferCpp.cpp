@@ -20,22 +20,22 @@ extern "C" {
 
 #include "FloatBufferCpp.hpp"
 
-void _FloatBuffer_FillZero(float* res, int length) {
-	memset(res, 0, length * sizeof (float));
+void _FloatBuffer_FillZero(float* left, int leftCapacity) {
+	memset(left, 0, leftCapacity * sizeof (float));
 }
 
-void _FloatBuffer_FillRandomGaussian(float* res, int length) {
+void _FloatBuffer_FillRandomGaussian(float* left, int leftCapacity) {
 	std::random_device dev;
 	std::mt19937 gen(dev());
 	std::normal_distribution<float> dist;
 
-	float* resEnd = res + length;
-	for (; res < resEnd; res++) {
-		*res = dist(gen);
+	float* leftEnd = left + leftCapacity;
+	for (; left < leftEnd; left++) {
+		*left = dist(gen);
 	}
 }
 
-void FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {
+void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {
 
 #if ENABLE_CBLAS
 	
@@ -210,7 +210,7 @@ void FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapac
 	
 }
 
-void FloatBuffer_CrossEntropyError(float* res, float* left, float* right, int leftCapacity) {
+float _FloatBuffer_CrossEntropyError(float* left, float* right, int leftCapacity) {
 	
 	float sum = 0.0f;
 	float* leftEnd = left + leftCapacity;
@@ -219,10 +219,10 @@ void FloatBuffer_CrossEntropyError(float* res, float* left, float* right, int le
 		right++;
 	}
 
-	*res = sum;
+	return sum;
 }
 	
-void FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth) {
 
 	int leftCapacity = leftHeight * leftWidth;
 	for (int offset = 0; offset < leftCapacity; offset += leftWidth) {
@@ -269,7 +269,7 @@ void FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth)
 	}
 }
 
-void FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth) {
 
 	float* leftEnd = left + leftWidth;
 	for (; left < leftEnd; left++) {
@@ -283,7 +283,7 @@ void FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidt
 	
 }
 	
-void FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth) {
 	
 	float* resEnd = res + leftWidth;
 	float* leftHeadEnd = left + (leftHeight * leftWidth);
@@ -300,7 +300,7 @@ void FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int lef
 	
 }
 	
-void FloatBuffer_Sqrt(float* left, int leftCapacity) {
+void _FloatBuffer_Sqrt(float* left, int leftCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	for (; left < leftEnd; left++) {
@@ -331,11 +331,30 @@ float _FloatBuffer_Normalize(float* left, int leftCapacity) {
 
 	float norm = _FloatBuffer_Norm(left, leftCapacity);
 	
-	if (norm != 0.0f) {
+	if (norm == 0.0f) {
+		left[0] = 1.0f;
+	} else {
 		FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
 	}
 	
 	return norm;
+}
+
+void _FloatBuffer_NormalizeRows(float* left, int leftRows, int leftColumns) {
+	
+	for (float* leftEnd = left + (leftRows * leftColumns); left < leftEnd; left += leftColumns) {
+		_FloatBuffer_Normalize(left, leftColumns);
+	}
+	
+}
+
+void _FloatBuffer_DotProductByRows(float* res, float* left, int leftRows, int leftColumns, float* right) {
+
+	for (float* resEnd = res + leftRows; res < resEnd; res++)
+	{
+		*res = _FloatBuffer_DotProduct(left, right, leftColumns);
+		left += leftColumns;
+	}
 }
 
 

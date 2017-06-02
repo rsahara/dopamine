@@ -33,19 +33,27 @@ public class FloatBuffer {
 	public convenience init(like src: FloatBuffer) {
 		self.init(src._rows, src._columns)
 	}
-	
-	public init(_ rows: Int, _ columns: Int, referenceOf src: FloatBuffer, startRow: Int, startColumn: Int) {
 
+	public init(referenceOf pointer: Pointer, rows: Int, columns: Int) {
+
+		_rows = rows;
+		_columns = columns
+		_capacity = rows * columns
+
+		_allocationSize = 0
+		_buffer = pointer
+	}
+
+	public convenience init(referenceOf src: FloatBuffer, startRow: Int, startColumn: Int, rows: Int, columns: Int) {
 		assert(startRow < src._rows)
 		assert(startColumn < src._columns)
 		assert(startRow * src._columns + startColumn + rows * columns <= src._capacity)
 		
-		_rows = rows;
-		_columns = columns
-		_capacity = rows * columns
-		
-		_allocationSize = 0
-		_buffer = src._buffer + (startRow * src._columns + startColumn)
+		self.init(referenceOf: src._buffer + (startRow * src._columns + startColumn), rows: rows, columns: columns)
+	}
+
+	public convenience init(referenceOf src: FloatBuffer, rowIndex: Int) {
+		self.init(referenceOf: src, startRow: rowIndex, startColumn: 0, rows: 1, columns: src._columns)
 	}
 
 	deinit {
@@ -54,7 +62,7 @@ public class FloatBuffer {
 		}
 	}
 
-	// MARK: 計算
+	// MARK: - 基本機能
 	
 	public func fillZero() {
 		_FloatBuffer_FillZero(_buffer, Int32(_capacity))
@@ -63,117 +71,7 @@ public class FloatBuffer {
 	public func fillRandom() {
 		_FloatBuffer_FillRandomGaussian(_buffer, Int32(capacity))
 	}
-	
-	public func dot(_ right: FloatBuffer) -> Float {
-		assert(_capacity == right._capacity)
-		return _FloatBuffer_DotProduct(_buffer, right._buffer, Int32(_capacity))
-	}
-	
-	public func matmul(by right: FloatBuffer, to res: FloatBuffer) {
-		assert(_columns == right._rows)
-		res.resetLazy(_rows, right._columns)
-		FloatBuffer_MatMul(res._buffer, _buffer, right._buffer, Int32(_rows), Int32(_columns), Int32(right._columns))
-	}
-
-	public func add(_ right: FloatBuffer) {
-		assert(_capacity % right._capacity == 0)
-
-		FloatBuffer_Add(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
-	}
-
-	public func add(_ right: FloatBuffer, scaledBy rightScale: Float) {
-		assert(_capacity % right._capacity == 0)
 		
-		_FloatBuffer_AddScaled(_buffer, right._buffer, rightScale, Int32(_capacity), Int32(right._capacity))
-	}
-
-	public func add(_ right: Float) {
-		FloatBuffer_ScalarAdd(_buffer, right, Int32(_capacity))
-	}
-	
-	public func sub(_ right: FloatBuffer) {
-		assert(_capacity % right._capacity == 0)
-
-		FloatBuffer_Sub(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
-	}
-	
-	public func mul(_ right: FloatBuffer) {
-		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Mul(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
-	}
-	
-	public func mul(_ right: Float) {
-		FloatBuffer_ScalarMul(_buffer, right, Int32(_capacity))
-	}
-	
-	public func div(_ right: FloatBuffer) {
-		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Div(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
-	}
-
-	public func transpose(result: FloatBuffer) {
-		result.resetLazy(_columns, _rows)
-		FloatBuffer_Transpose(result._buffer, _buffer, Int32(_rows), Int32(_columns))
-	}
-	
-	public func softmax(result: FloatBuffer) {
-		result.resetLazy(like: self)
-		FloatBuffer_Softmax(result._buffer, _buffer, Int32(_rows), Int32(_columns))
-	}
-	
-	public func maxPosition() -> Array<Int> {
-		// TODO: C++
-
-		let length = _columns
-		assert(_capacity % length == 0)
-		var result = Array<Int>()
-		
-		var headIndex = 0
-		while (headIndex < _capacity) {
-			
-			var maxIndex = headIndex
-			var maxValue = _buffer[headIndex]
-			for index in headIndex + 1 ..< headIndex + length {
-				let val = _buffer[index]
-				if (val > maxValue) {
-					maxValue = val
-					maxIndex = index
-				}
-			}
-			
-			result.append(maxIndex - headIndex)
-			
-			headIndex += length
-		}
-		
-		return result
-	}
-	
-	public func minMax() -> (Float, Float) {
-		// TODO: C++
-
-		var minVal: Float = _buffer[0]
-		var maxVal: Float = _buffer[0]
-		for index in 1 ..< _capacity {
-			let val = _buffer[index]
-			if (val > maxVal) {
-				maxVal = val
-			}
-			else if (val < minVal) {
-				minVal = val
-			}
-		}
-		
-		return (minVal, maxVal)
-	}
-
-	public func crossEntropyError(against right: FloatBuffer) -> Float {
-		assert(_capacity == right.capacity)
-		var sum: Float = 0.0
-		FloatBuffer_CrossEntropyError(&sum, _buffer, right._buffer, Int32(_capacity))
-		return sum
-	}
-	
 	public func print() {
 		var valuesStr = ""
 		
@@ -202,24 +100,6 @@ public class FloatBuffer {
 			       _columns * 4)
 		}
 	}
-
-	public func sqrt() {
-		FloatBuffer_Sqrt(_buffer, Int32(_capacity))
-	}
-	
-	public func norm() -> Float {
-		return _FloatBuffer_Norm(_buffer, Int32(_capacity))
-	}
-
-	public func normalize() -> Float {
-		return _FloatBuffer_Normalize(_buffer, Int32(_capacity))
-	}
-	
-	public func sumFirstAxis(to result: FloatBuffer) {
-		result.resetLazy(1, _columns)
-		FloatBuffer_SumToFirstAxis(result._buffer, _buffer, Int32(_rows), Int32(_columns))
-
-	}
 	
 	public func copyConcatRows(left: FloatBuffer, right: FloatBuffer) {
 		assert(left._rows == right._rows)
@@ -240,6 +120,7 @@ public class FloatBuffer {
 		}
 	}
 
+	// TODO: 整理
 	public func resetLazy(_ rows: Int, _ columns: Int) {
 		let capacity = rows * columns
 		if (capacity > _allocationSize) {
@@ -265,7 +146,7 @@ public class FloatBuffer {
 		resetLazy(src._rows, src._columns)
 	}
 
-	// MARK: プロパティ
+	// MARK: - プロパティ
 
 	public var capacity: Int {
 		return _capacity
@@ -283,11 +164,77 @@ public class FloatBuffer {
 		return _columns
 	}
 
-	// MARK: プライベート
+	internal static let ALIGNMENT = 8
+	
+	internal var _buffer: Pointer
+	internal var _rows: Int
+	internal var _columns: Int
+//	internal var _stride: Int
+	internal var _capacity: Int
+	internal var _allocationSize: Int
+}
 
-	private var _buffer: Pointer
-	private var _rows: Int
-	private var _columns: Int
-	private var _capacity: Int
-	private var _allocationSize: Int
+
+// MARK: - Save/Load
+
+extension FloatBuffer {
+
+	public convenience init(data: Data) {
+
+		let headerBuffer = UnsafeMutableRawPointer.allocate(bytes: FloatBuffer.HEADERSIZE, alignedTo: FloatBuffer.ALIGNMENT)
+		defer {
+			headerBuffer.deallocate(bytes: FloatBuffer.HEADERSIZE, alignedTo: FloatBuffer.ALIGNMENT)
+		}
+		
+		data.copyBytes(to: headerBuffer.assumingMemoryBound(to: UInt8.self), count: FloatBuffer.HEADERSIZE)
+		
+		let rows = headerBuffer.load(as: Int32.self)
+		let columns = (headerBuffer + 4).load(as: Int32.self)
+
+		self.init(Int(rows), Int(columns))
+
+		data.advanced(by: FloatBuffer.HEADERSIZE).copyBytes(to: UnsafeMutableRawPointer(_buffer).assumingMemoryBound(to: UInt8.self), count: _capacity * 4)
+	}
+
+	public convenience init(contentsOf url: URL) throws {
+		self.init(data: try Data(contentsOf: url))
+	}
+
+	public func write(to path: URL) throws {
+		var data = Data(capacity: writeSize())
+		write(to: &data)
+		try data.write(to: path, options: Data.WritingOptions.atomic)
+	}
+	
+	public func write(to data: inout Data) {
+
+		let headerBuffer = UnsafeMutableRawPointer.allocate(bytes: FloatBuffer.HEADERSIZE, alignedTo: FloatBuffer.ALIGNMENT)
+		defer {
+			headerBuffer.deallocate(bytes: FloatBuffer.HEADERSIZE, alignedTo: FloatBuffer.ALIGNMENT)
+		}
+		headerBuffer.storeBytes(of: Int32(_rows), as: Int32.self)
+		(headerBuffer + 4).storeBytes(of: Int32(_columns), as: Int32.self)
+		
+		data.append(UnsafeBufferPointer<UInt8>(start: headerBuffer.assumingMemoryBound(to: UInt8.self), count: FloatBuffer.HEADERSIZE))
+		data.append(UnsafeBufferPointer<Float>(start: _buffer, count: _capacity))
+	}
+	
+	public func writeSize() -> Int {
+		return FloatBuffer.HEADERSIZE + _capacity
+	}
+	
+	internal static let HEADERSIZE = 64
+
+}
+
+extension Data {
+	
+	init(floatBuffer: FloatBuffer) {
+		
+		self.init(capacity: floatBuffer.writeSize())
+		
+		floatBuffer.write(to: &self)
+		
+	}
+	
 }

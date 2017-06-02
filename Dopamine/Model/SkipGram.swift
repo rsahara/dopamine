@@ -36,7 +36,7 @@ public class SkipGram {
 		_negativeSamplingCount = negativeSamplingCount
 	}
 
-	public func train(itemSequenceBuffer: IntBuffer, itemSequenceLength: Int, trainingRate: Float = 0.005) {
+	public func train(itemSequenceBuffer: IntBuffer, itemSequenceLength: Int, iterationsCount: Int, trainingRate: Float = 0.005) {
 
 		// アイテムを処理する準備
 		var itemSequencesCount: Int32 = Int32(_itemSequenceCapacity)
@@ -47,39 +47,26 @@ public class SkipGram {
 		_itemSequencesCount = Int(itemSequencesCount)
 		_itemsCount = Int(itemsCount)
 		
-		let perfCheck = PerfCheck()
-		for iterationIndex in 0 ..< 400 {
-			Swift.print("it \(iterationIndex)")
-			
-			_SkipGram_TrainIterate(itemSequenceBuffer.contents, _itemSequenceOffsetArray.contents, itemSequencesCount, _itemNegLotteryInfoArray.contents, itemsCount, Int32(_itemVectorSize),
-			                       _weight.contents, _weightNeg.contents, _tempItemVector.contents, Int32(_windowSize), Int32(_negativeSamplingCount), trainingRate);
-		}
-		perfCheck.print()
-
-	}
-	
-	public func vectorRef(_ index: Int) -> FloatBuffer {
-		assert(index < _itemsCount);
-		return FloatBuffer(1, _itemVectorSize, referenceOf: _weight, startRow: index, startColumn: 0)
+		_SkipGram_TrainIterate(itemSequenceBuffer.contents, _itemSequenceOffsetArray.contents, itemSequencesCount, _itemNegLotteryInfoArray.contents, itemsCount, Int32(_itemVectorSize),
+							   _weight.contents, _weightNeg.contents, _tempItemVector.contents, Int32(_windowSize), Int32(_negativeSamplingCount), trainingRate, Int32(iterationsCount));
 	}
 
 	// MARK: - プロパティ
 	
-	public var vectorBuffer: FloatBuffer {
+	public var result: FloatBuffer {
 		return _weight;
 	}
 	
-	var _itemVectorSize: Int
-	var _itemCapacity: Int
-	var _itemSequenceCapacity: Int
-	var _itemsCount: Int
-	var _itemSequencesCount: Int
-	var _itemNegLotteryInfoArray: FloatBuffer
-	var _itemSequenceOffsetArray: IntBuffer
-	var _tempItemVector: FloatBuffer
-	
-	var _weight: FloatBuffer
-	var _weightNeg: FloatBuffer
-	var _windowSize: Int
-	var _negativeSamplingCount: Int
+	private var _itemVectorSize: Int
+	private var _itemCapacity: Int
+	private var _itemSequenceCapacity: Int
+	private var _itemsCount: Int
+	private var _itemSequencesCount: Int
+	private var _itemNegLotteryInfoArray: FloatBuffer
+	private var _itemSequenceOffsetArray: IntBuffer
+	private var _tempItemVector: FloatBuffer
+	private var _weight: FloatBuffer
+	private var _weightNeg: FloatBuffer
+	private var _windowSize: Int
+	private var _negativeSamplingCount: Int
 }

@@ -39,6 +39,7 @@ void _SkipGram_TrainInit(int* itemSequenceBuffer, int itemSequenceBufferLength, 
 // windowSize: 窓の大きさ
 // negativeSamplingCount: ネガティブサンプル数
 // learningRate: 学習の係数
-void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int itemsCount, int itemVectorSize, float* weightBuffer, float* negWeightBuffer, float* tempItemVector, int windowSize, int negativeSamplingCount, float learningRate);
+// iterationsCount: イテレーションの回数
+void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArray, int itemSequencesCount, float* itemNegLotteryInfoArray, int itemsCount, int itemVectorSize, float* weightBuffer, float* negWeightBuffer, float* tempItemVector, int windowSize, int negativeSamplingCount, float learningRate, int iterationsCount);
 
 #endif /* SkipGramCpp_hpp */
