@@ -178,7 +178,7 @@ public class FloatBuffer {
 // MARK: - Save/Load
 
 extension FloatBuffer {
-	
+
 	public convenience init(data: Data) {
 
 		let headerBuffer = UnsafeMutableRawPointer.allocate(bytes: FloatBuffer.HEADERSIZE, alignedTo: FloatBuffer.ALIGNMENT)
@@ -192,9 +192,8 @@ extension FloatBuffer {
 		let columns = (headerBuffer + 4).load(as: Int32.self)
 
 		self.init(Int(rows), Int(columns))
-		
-		
-		data.copyBytes(to: UnsafeMutableRawPointer(_buffer).assumingMemoryBound(to: UInt8.self), count: _capacity)
+
+		data.advanced(by: FloatBuffer.HEADERSIZE).copyBytes(to: UnsafeMutableRawPointer(_buffer).assumingMemoryBound(to: UInt8.self), count: _capacity * 4)
 	}
 
 	public convenience init(contentsOf url: URL) throws {
@@ -208,7 +207,7 @@ extension FloatBuffer {
 	}
 	
 	public func write(to data: inout Data) {
-		
+
 		let headerBuffer = UnsafeMutableRawPointer.allocate(bytes: FloatBuffer.HEADERSIZE, alignedTo: FloatBuffer.ALIGNMENT)
 		defer {
 			headerBuffer.deallocate(bytes: FloatBuffer.HEADERSIZE, alignedTo: FloatBuffer.ALIGNMENT)
@@ -239,4 +238,3 @@ extension Data {
 	}
 	
 }
-

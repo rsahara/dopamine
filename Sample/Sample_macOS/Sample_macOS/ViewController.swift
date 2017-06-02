@@ -427,8 +427,12 @@ class ViewController: NSViewController {
 	}
 
 	func testSkipGram() {
-		
-		// データをロード
+
+		let itemVectorSize = 100
+		let iterationsCount = 400
+		let itemSequenceCapacity = 1024
+
+		// カテゴリをロード
 		let categoryModelDict: Dictionary<Int, CategoryModel> = loadCategoryModels()
 		
 		var groupArrayDict = Dictionary<Int, Array<Int>>()
@@ -441,36 +445,44 @@ class ViewController: NSViewController {
 				} else {
 					groupArrayDict[categoryModel.parentId] = [categoryModel.parentId, categoryModel.id]
 				}
-
+				
 			}
 		}
-
-		Swift.print(groupArrayDict)
 		
-		let sequenceBuffer = IntBuffer(1024)
-		var sequenceLength = 0
-		for sequenceArray in groupArrayDict.values {
-			
-			for itemId in sequenceArray {
-				sequenceBuffer.contents[sequenceLength] = Int32(itemId)
+		Swift.print(groupArrayDict)
+
+		// ベクトルをロード又は学習
+		let fileUrl = URL(fileURLWithPath: "/tmp/skipgram_vectors")
+		var vectorBuffer: FloatBuffer! = try? FloatBuffer(contentsOf: fileUrl)
+		if (vectorBuffer != nil) {
+			print("Loaded from: \(fileUrl.absoluteURL)")
+		} else {
+			let sequenceBuffer = IntBuffer(1024)
+			var sequenceLength = 0
+			for sequenceArray in groupArrayDict.values {
+				
+				for itemId in sequenceArray {
+					sequenceBuffer.contents[sequenceLength] = Int32(itemId)
+					sequenceLength += 1
+				}
+				
+				sequenceBuffer.contents[sequenceLength] = SkipGram.EndOfItemSequenceId
 				sequenceLength += 1
 			}
+
+
+			let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize, itemSequenceCapacity: itemSequenceCapacity)
 			
-			sequenceBuffer.contents[sequenceLength] = SkipGram.EndOfItemSequenceId
-			sequenceLength += 1
+			let perfCheck = PerfCheck()
+			skipGram.train(itemSequenceBuffer: sequenceBuffer, itemSequenceLength: sequenceLength, iterationsCount: iterationsCount)
+			perfCheck.print()
+			
+			vectorBuffer = skipGram.result
+			vectorBuffer.normalizeRows()
+			
+			try? vectorBuffer.write(to: fileUrl)
 		}
-
-		let itemVectorSize = 100
-
-		let skipGram = SkipGram(itemCapacity: categoryModelDict.count, itemVectorSize: itemVectorSize, itemSequenceCapacity: 1024)
 		
-		let perfCheck = PerfCheck()
-		skipGram.train(itemSequenceBuffer: sequenceBuffer, itemSequenceLength: sequenceLength, iterationsCount: 400)
-		perfCheck.print()
-		
-		let vectorBuffer = skipGram.result
-		vectorBuffer.normalizeRows()
-
 		let testItemIndex = 225//52
 		let testItemRef = FloatBuffer(referenceOf: vectorBuffer, rowIndex: testItemIndex)
 		let similarityBuffer = FloatBuffer(1, vectorBuffer.rows)

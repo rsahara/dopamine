@@ -77,7 +77,7 @@ extension FloatBuffer {
 
 	public func dotProductByRows(_ right: FloatBuffer, to res: FloatBuffer) {
 		assert(res._capacity >= _rows)
-		assert(right._capacity >= _rows)
+		assert(right._capacity >= _columns)
 		_FloatBuffer_DotProductByRows(res._buffer, _buffer, Int32(_rows), Int32(_columns), right._buffer);
 	}
 
