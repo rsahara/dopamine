@@ -15,11 +15,11 @@ public class IntBuffer {
 	public typealias Pointer = UnsafeMutablePointer<Int32>
 
 	public init(_ capacity: Int) {
-		
+
 		_capacity = capacity
 		_allocationSize = _capacity
 		_buffer = Pointer.allocate(capacity: _allocationSize)
-		
+
 		if DEBUG_BUFFERINITIALIZATION {
 			for index in 0 ..< _capacity {
 				_buffer[index] = -1
@@ -27,8 +27,23 @@ public class IntBuffer {
 		}
 	}
 	
+	public init(referenceOf pointer: Pointer, capacity: Int) {
+		
+		_capacity = capacity		
+		_allocationSize = 0
+		_buffer = pointer
+	}
+
+	public convenience init(referenceOf src: IntBuffer, startOffset: Int, capacity: Int) {
+		assert(startOffset + capacity <= src._capacity)
+		
+		self.init(referenceOf: src._buffer + startOffset, capacity: capacity)
+	}
+
 	deinit {
-		_buffer.deallocate(capacity: _allocationSize)
+		if _allocationSize != 0 {
+			_buffer.deallocate(capacity: _allocationSize)
+		}
 	}
 	
 	public func print() {
@@ -51,7 +66,7 @@ public class IntBuffer {
 	}
 
 	// MARK: プライベート
-	
+
 	private var _buffer: Pointer
 	private var _capacity: Int
 	private var _allocationSize: Int

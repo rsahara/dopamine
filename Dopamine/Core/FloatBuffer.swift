@@ -57,7 +57,7 @@ public class FloatBuffer {
 	}
 
 	deinit {
-		if (_allocationSize != 0) {
+		if _allocationSize != 0 {
 			_buffer.deallocate(capacity: _allocationSize)
 		}
 	}
