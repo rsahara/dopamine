@@ -117,6 +117,11 @@ inline int _SkipGram_RandomNegativeItemIndex(float* itemNegLotteryInfoArray, int
 			minIndex = testIndex + 1;
 		}
 	}
+	
+	if (maxIndex < 0)
+		return 0;
+	if (maxIndex >= itemsCount)
+		return itemsCount - 1;
 	return maxIndex;
 }
 	
