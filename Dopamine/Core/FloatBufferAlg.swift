@@ -70,6 +70,9 @@ extension FloatBuffer {
 	public func normalize() -> Float {
 		return _FloatBuffer_Normalize(_buffer, Int32(_capacity))
 	}
+	public func safeNormalize() {
+		_FloatBuffer_SafeNormalize(_buffer, Int32(_capacity))
+	}
 
 	public func normalizeRows() {
 		return _FloatBuffer_NormalizeRows(_buffer, Int32(_rows), Int32(_columns))

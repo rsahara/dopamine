@@ -30,16 +30,20 @@ void _FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWid
 void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth);
 void _FloatBuffer_Sqrt(float* left, int leftCapacity);
 
+// Get the index of absolute max value. leftCapacity must not be 0.
+int _FloatBuffer_IndexOfAbsMax(float* left, int leftCapacity);
+
 // Calculate the Euclidian norm of a vector.
 float _FloatBuffer_Norm(float* left, int leftCapacity);
 
-// Normalizes a vector.
+// Normalize a vector.
 float _FloatBuffer_Normalize(float* left, int leftCapacity);
+void _FloatBuffer_SafeNormalize(float* left, int leftCapacity);
 
-// Normalizes each row of a matrix.
+// Normalize each row of a matrix.
 void _FloatBuffer_NormalizeRows(float* left, int leftRows, int leftColumns);
 
-// Performs dot products between a given vector and each rows of matrix.
+// Perform dot products between a given vector and each rows of matrix.
 // (To get the cosine similarity, provide a matrix with each rows normalized and a normalized vector.)
 // res: result buffer of size leftRows containing the dot products.
 // left: matrix
