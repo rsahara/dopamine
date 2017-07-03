@@ -309,6 +309,28 @@ void _FloatBuffer_Sqrt(float* left, int leftCapacity) {
 	
 }
 
+int _FloatBuffer_IndexOfAbsMax(float* left, int leftCapacity) {
+
+	int resIndex = 0;
+	float resVal = *left;
+	if (resVal < 0.0f) {
+		resVal = -resVal;
+	}
+	
+	for (int leftIndex = 1; leftIndex < leftCapacity; leftIndex++) {
+		float val = left[leftIndex];
+		if (val < 0.0f) {
+			val = -val;
+		}
+		if (val > resVal) {
+			resVal = val;
+			resIndex = leftIndex;
+		}
+	}
+
+	return resIndex;
+}
+
 float _FloatBuffer_Norm(float* left, int leftCapacity) {
 
 #if ENABLE_BLAS
@@ -331,13 +353,26 @@ float _FloatBuffer_Normalize(float* left, int leftCapacity) {
 
 	float norm = _FloatBuffer_Norm(left, leftCapacity);
 	
-	if (norm == 0.0f) {
-		left[0] = 1.0f;
-	} else {
+	if (norm != 0.0f) {
 		FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
 	}
 	
 	return norm;
+}
+
+void _FloatBuffer_SafeNormalize(float* left, int leftCapacity) {
+	
+	int indexOfAbsMax = _FloatBuffer_IndexOfAbsMax(left, leftCapacity);
+	float absMax = left[indexOfAbsMax];
+	if (absMax == 0.0f) {
+		return;
+	}
+	
+	FloatBuffer_ScalarMul(left, 1.0f / absMax, leftCapacity);
+	float norm = _FloatBuffer_Norm(left, leftCapacity);
+	if (norm != 0.0f) {
+		FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
+	}
 }
 
 void _FloatBuffer_NormalizeRows(float* left, int leftRows, int leftColumns) {
