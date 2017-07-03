@@ -367,6 +367,9 @@ void _FloatBuffer_SafeNormalize(float* left, int leftCapacity) {
 	if (absMax == 0.0f) {
 		return;
 	}
+	if (absMax < 0.0f) {
+		absMax = -absMax;
+	}
 	
 	FloatBuffer_ScalarMul(left, 1.0f / absMax, leftCapacity);
 	float norm = _FloatBuffer_Norm(left, leftCapacity);
