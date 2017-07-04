@@ -2,8 +2,8 @@
 //  LayerNet.swift
 //  RunoNetTest
 //
-//  Created by 佐原 瑠能 on 2017/04/28.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/04/28.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 import Foundation
