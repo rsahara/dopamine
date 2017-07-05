@@ -67,7 +67,7 @@ extension FloatBuffer {
 		return _FloatBuffer_Norm(_buffer, Int32(_capacity))
 	}
 	
-	public func normalize() -> Float {
+	@discardableResult public func normalize() -> Float {
 		return _FloatBuffer_Normalize(_buffer, Int32(_capacity))
 	}
 	public func safeNormalize() {

@@ -9,14 +9,18 @@
 #ifndef FloatBufferCpp_hpp
 #define FloatBufferCpp_hpp
 
+// Fill buffer with 0.0f.
 void _FloatBuffer_FillZero(float* left, int leftCapacity);
+// Fill buffer with random values, gaussian distribution.
 void _FloatBuffer_FillRandomGaussian(float* left, int leftCapacity);
 
 // TODO: '_'を先頭につける
-// TODO: height/width を使わない
 
-void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth);
-float _FloatBuffer_DotProduct(float* left, float* right, int leftWidth);
+// Matrix multiplication.
+void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftRows, int leftColumns, int rightColumns);
+
+
+float _FloatBuffer_DotProduct(float* left, float* right, int leftColumns);
 void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapacity);
 void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity);
 void FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapacity);
@@ -25,9 +29,9 @@ void _FloatBuffer_AddScaled(float* left, float* right, float rightScale, int lef
 void FloatBuffer_ScalarAdd(float* left, float right, int leftCapacity);
 void FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapacity);
 float _FloatBuffer_CrossEntropyError(float* left, float* right, int leftCapacity);
-void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth);
-void _FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth);
-void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth);
+void _FloatBuffer_Softmax(float* res, float* left, int leftRows, int leftColumns);
+void _FloatBuffer_Transpose(float* res, float* left, int leftRows, int leftColumns);
+void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftRows, int leftColumns);
 void _FloatBuffer_Sqrt(float* left, int leftCapacity);
 
 // Get the index of absolute max value. leftCapacity must not be 0.

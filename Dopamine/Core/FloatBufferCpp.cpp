@@ -35,18 +35,18 @@ void _FloatBuffer_FillRandomGaussian(float* left, int leftCapacity) {
 	}
 }
 
-void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {
+void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftRows, int leftColumns, int rightColumns) {
 
 #if ENABLE_APPLE_BLAS
 	
-	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, leftHeight, rightWidth, leftWidth, 1.0f, left, leftWidth, right, rightWidth, 0.0, res, rightWidth);
+	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, leftRows, rightColumns, leftColumns, 1.0f, left, leftColumns, right, rightColumns, 0.0, res, rightColumns);
 
 #else
 	
-	float* leftEnd = left + (leftHeight * leftWidth);
-	float* rightHeadEnd = right + rightWidth;
+	float* leftEnd = left + (leftRows * leftColumns);
+	float* rightHeadEnd = right + rightColumns;
 	while (left < leftEnd) {
-		float* leftHeadEnd = left + leftWidth;
+		float* leftHeadEnd = left + leftColumns;
 
 		for (float* rightHeadStart = right; rightHeadStart < rightHeadEnd; rightHeadStart++) {
 			
@@ -58,7 +58,7 @@ void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, 
 			while (leftHead < leftHeadEnd) {
 				temp += *leftHead * *rightHead;
 				leftHead++;
-				rightHead += rightWidth;
+				rightHead += rightColumns;
 			}
 			
 			*res = temp;
@@ -72,16 +72,16 @@ void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, 
 
 }
 
-float _FloatBuffer_DotProduct(float* left, float* right, int leftWidth) {
+float _FloatBuffer_DotProduct(float* left, float* right, int leftColumns) {
 
 #if ENABLE_APPLE_BLAS
 	
-	return cblas_sdot(leftWidth, left, 1, right, 1);
+	return cblas_sdot(leftColumns, left, 1, right, 1);
 	
 #else
 
 	float res = 0.0f;
-	float* leftEnd = left + leftWidth;
+	float* leftEnd = left + leftColumns;
 	while (left < leftEnd) {
 		res += *left * *right;
 		left++;
@@ -222,10 +222,10 @@ float _FloatBuffer_CrossEntropyError(float* left, float* right, int leftCapacity
 	return sum;
 }
 	
-void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_Softmax(float* res, float* left, int leftRows, int leftColumns) {
 
-	int leftCapacity = leftHeight * leftWidth;
-	for (int offset = 0; offset < leftCapacity; offset += leftWidth) {
+	int leftCapacity = leftRows * leftColumns;
+	for (int offset = 0; offset < leftCapacity; offset += leftColumns) {
 
 		// MAXを検索
 		float* src = left + offset;
@@ -234,7 +234,7 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth
 
 		{
 			float* head = src;
-			float* headEnd = head + leftWidth;
+			float* headEnd = head + leftColumns;
 			float maxVal = *head;
 			for (head++; head < headEnd; head++) {
 				float val = *head;
@@ -247,7 +247,7 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth
 		float sumVal = 0.0f;
 		{
 			float* src1 = src;
-			float* src1End = src1 + leftWidth;
+			float* src1End = src1 + leftColumns;
 			float* dst1 = dst;
 			for (; src1 < src1End; src1++) {
 				float val = expf(*src1 - maxVal);
@@ -261,7 +261,7 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth
 		{
 			float invSumVal = 1.0f / sumVal;
 			float* head = dst;
-			float* headEnd = head + leftWidth;
+			float* headEnd = head + leftColumns;
 			for (; head < headEnd; head++) {
 				*head *= invSumVal;
 			}
@@ -269,13 +269,13 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth
 	}
 }
 
-void _FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_Transpose(float* res, float* left, int leftRows, int leftColumns) {
 
-	float* leftEnd = left + leftWidth;
+	float* leftEnd = left + leftColumns;
 	for (; left < leftEnd; left++) {
 		float* leftHead = left;
-		float* leftHeadEnd = leftHead + (leftHeight * leftWidth);
-		for (; leftHead < leftHeadEnd; leftHead += leftWidth) {
+		float* leftHeadEnd = leftHead + (leftRows * leftColumns);
+		for (; leftHead < leftHeadEnd; leftHead += leftColumns) {
 			*res = *leftHead;
 			res++;
 		}
@@ -283,14 +283,14 @@ void _FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWid
 	
 }
 	
-void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftRows, int leftColumns) {
 	
-	float* resEnd = res + leftWidth;
-	float* leftHeadEnd = left + (leftHeight * leftWidth);
+	float* resEnd = res + leftColumns;
+	float* leftHeadEnd = left + (leftRows * leftColumns);
 	for (; res < resEnd; res++) {
 
 		float sum = 0.0f;
-		for (float* leftHead = left; leftHead < leftHeadEnd; leftHead += leftWidth) {
+		for (float* leftHead = left; leftHead < leftHeadEnd; leftHead += leftColumns) {
 			sum += *leftHead;
 		}
 		
