@@ -227,7 +227,7 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftRows, int leftColumns
 	int leftCapacity = leftRows * leftColumns;
 	for (int offset = 0; offset < leftCapacity; offset += leftColumns) {
 
-		// MAXを検索
+		// Search max
 		float* src = left + offset;
 		float* dst = res + offset;
 		float maxVal = 0.0f;
@@ -242,8 +242,8 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftRows, int leftColumns
 					maxVal = val;
 			}
 		}
-		
-		// 各要素に exp(a - max) を入れて、ついでに sum(exp(a - max)) を計算
+
+		// Calculate exp(a - max) and the sum of all values
 		float sumVal = 0.0f;
 		{
 			float* src1 = src;
@@ -257,7 +257,7 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftRows, int leftColumns
 			}
 		}
 		
-		// 各要素に 1 / sum(exp(a - max)) を掛け算
+		// Multiply each values by 1 / sum(exp(a - max))
 		{
 			float invSumVal = 1.0f / sumVal;
 			float* head = dst;
