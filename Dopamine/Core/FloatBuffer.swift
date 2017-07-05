@@ -1,16 +1,18 @@
 //
 //  FloatBuffer.swift
-//  RunoNetTest
+//  Dopamine
 //
-//  Created by 佐原 瑠能 on 2017/05/02.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/05/02.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 import Foundation
 
 public class FloatBuffer {
 	
+	#if DEBUG
 	var DEBUG_BUFFERINITIALIZATION = false
+	#endif
 
 	public typealias Pointer = UnsafeMutablePointer<Float>
 	
@@ -23,11 +25,13 @@ public class FloatBuffer {
 		_allocationSize = _capacity
 		_buffer = Pointer.allocate(capacity: _allocationSize)
 		
+		#if DEBUG
 		if DEBUG_BUFFERINITIALIZATION {
 			for index in 0 ..< _capacity {
 				_buffer[index] = Float.nan
 			}
 		}
+		#endif
 	}
 
 	public convenience init(like src: FloatBuffer) {
@@ -62,7 +66,7 @@ public class FloatBuffer {
 		}
 	}
 
-	// MARK: - 基本機能
+	// MARK: - Main features
 	
 	public func fillZero() {
 		_FloatBuffer_FillZero(_buffer, Int32(_capacity))
@@ -120,7 +124,7 @@ public class FloatBuffer {
 		}
 	}
 
-	// TODO: 整理
+	// TODO: Remove
 	public func resetLazy(_ rows: Int, _ columns: Int) {
 		let capacity = rows * columns
 		if (capacity > _allocationSize) {
@@ -135,11 +139,13 @@ public class FloatBuffer {
 		_columns = columns
 		_capacity = capacity
 
+		#if DEBUG
 		if DEBUG_BUFFERINITIALIZATION {
 			for index in 0 ..< _capacity {
 				_buffer[index] = Float.nan
 			}
 		}
+		#endif
 	}
 
 	public func resetLazy(like src: FloatBuffer) {

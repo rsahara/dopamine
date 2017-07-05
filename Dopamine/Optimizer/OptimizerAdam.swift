@@ -1,9 +1,9 @@
 //
 //  OptimizerAdam.swift
-//  RunoNetTest
+//  Dopamine
 //
-//  Created by 佐原 瑠能 on 2017/05/02.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/05/02.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 import Foundation
@@ -31,7 +31,7 @@ class OptimizerAdam: Optimizer {
 
 	func updateIteration() {
 		_iterationNum += 1
-		_step = _learnRate * sqrtf(1.0 - powf(_beta2, Float(_iterationNum))) / (1.0 - powf(_beta1, Float(_iterationNum))) // TODO: 最適化
+		_step = _learnRate * sqrtf(1.0 - powf(_beta2, Float(_iterationNum))) / (1.0 - powf(_beta1, Float(_iterationNum))) // TODO: optimize
 	}
 	
 	func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) {

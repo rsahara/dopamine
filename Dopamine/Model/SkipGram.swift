@@ -1,9 +1,9 @@
 //
 //  SkipGram.swift
-//  Pods
+//  Dopamine
 //
-//  Created by 佐原 瑠能 on 2017/05/26.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/05/26.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 import Foundation
@@ -51,12 +51,14 @@ public class SkipGram {
 							   _weight.contents, _weightNeg.contents, _tempItemVector.contents, Int32(_windowSize), Int32(_negativeSamplingCount), trainingRate, Int32(iterationsCount));
 	}
 
-	// MARK: - プロパティ
+	// MARK: - Properties
 	
 	public var result: FloatBuffer {
 		return _weight;
 	}
-	
+
+	// MARK: - Private
+
 	private var _itemVectorSize: Int
 	private var _itemCapacity: Int
 	private var _itemSequenceCapacity: Int

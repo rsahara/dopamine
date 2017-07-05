@@ -1,9 +1,9 @@
 //
 //  SimpleLayersCpp.cpp
-//  RunoNetTest
+//  Dopamine
 //
-//  Created by 佐原 瑠能 on 2017/05/11.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/05/11.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 #include <cmath>
@@ -12,7 +12,7 @@ extern "C" {
 
 #include "LayersCpp.hpp"
 
-void Layer_Sigmoid(float* res, float* left, int leftCapacity) {
+void _Layer_Sigmoid(float* res, float* left, int leftCapacity) {
 
 	float* leftEnd = left + leftCapacity;
 	for (; left < leftEnd; left++) {
@@ -22,7 +22,7 @@ void Layer_Sigmoid(float* res, float* left, int leftCapacity) {
 
 }
 
-void Layer_SigmoidBackward(float* res, float* left, float* lastOutput, int leftCapacity) {
+void _Layer_SigmoidBackward(float* res, float* left, float* lastOutput, int leftCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	for (; left < leftEnd; left++) {
@@ -36,7 +36,7 @@ void Layer_SigmoidBackward(float* res, float* left, float* lastOutput, int leftC
 
 }
 
-void Layer_Tanh(float* res, float* left, int leftCapacity) {
+void _Layer_Tanh(float* res, float* left, int leftCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	for (; left < leftEnd; left++) {
@@ -46,7 +46,7 @@ void Layer_Tanh(float* res, float* left, int leftCapacity) {
 	
 }
 
-void Layer_TanhBackward(float* res, float* left, float* lastOutput, int leftCapacity) {
+void _Layer_TanhBackward(float* res, float* left, float* lastOutput, int leftCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	for (; left < leftEnd; left++) {

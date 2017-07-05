@@ -1,9 +1,9 @@
 //
 //  ViewController.swift
-//  RunoNetTest
+//  Sample_macOS
 //
-//  Created by 佐原 瑠能 on 2017/04/27.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/04/27.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 import Cocoa
@@ -15,8 +15,8 @@ class ViewController: NSViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-//		testMNIST()
-//		testGRU()
+		testMNIST()
+		testGRU()
 		testSkipGram()
 	}
 	
@@ -77,8 +77,7 @@ class ViewController: NSViewController {
 			}
 		}
 	}
-	
-	// 画像一覧取得
+
 	func loadImagePaths() -> (Dictionary<String, Int>, Dictionary<String, Int>) {
 		
 		let rootPath = "/Users/rsahara/mnist_png"
@@ -103,7 +102,6 @@ class ViewController: NSViewController {
 		return (trainArray, testArray)
 	}
 	
-	// ランダムでロード
 	func loadRandomSamples(filePathDict: Dictionary<String, Int>, filePathArray: Array<String>, maxSamples: Int, input: FloatBuffer, output: FloatBuffer) {
 		
 		var numSamples = maxSamples
@@ -132,7 +130,6 @@ class ViewController: NSViewController {
 		loadOneHotArray(valueArray: outputArray, size: 10, to: output)
 	}
 	
-	// 画像のロード
 	func loadImage(imagePath: String, to output: FloatBuffer) {
 		
 		let image = NSImage(byReferencingFile: imagePath)!
@@ -173,7 +170,6 @@ class ViewController: NSViewController {
 		
 	}
 	
-	// 画像のロード
 	func loadImageArray(imagePathArray: [String], to output: FloatBuffer) {
 		
 		let colorSpace = CGColorSpaceCreateDeviceRGB()
@@ -432,7 +428,7 @@ class ViewController: NSViewController {
 		let iterationsCount = 400
 		let itemSequenceCapacity = 1024
 
-		// カテゴリをロード
+		// Load categories
 		let categoryModelDict: Dictionary<Int, CategoryModel> = loadCategoryModels()
 		
 		var groupArrayDict = Dictionary<Int, Array<Int>>()
@@ -451,9 +447,10 @@ class ViewController: NSViewController {
 		
 		Swift.print(groupArrayDict)
 
-		// ベクトルをロード又は学習
+		// Load vectors or train
 		let fileUrl = URL(fileURLWithPath: "/tmp/skipgram_vectors")
 		var vectorBuffer: FloatBuffer! = try? FloatBuffer(contentsOf: fileUrl)
+		vectorBuffer = nil // comment to use loaded data
 		if (vectorBuffer != nil) {
 			print("Loaded from: \(fileUrl.absoluteURL)")
 		} else {

@@ -1,9 +1,9 @@
 //
 //  OptimizerRmsProp.swift
-//  RunoNetTest
+//  Dopamine
 //
-//  Created by 佐原 瑠能 on 2017/05/02.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/05/02.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 import Foundation
@@ -36,7 +36,7 @@ class OptimizerRmsProp : Optimizer {
 		let h = context as! FloatBuffer
 
 		if _iterationNum == 1 {
-			h.resetLazy(like: input) // TODO: リファクタ
+			h.resetLazy(like: input) // TODO: refactor
 			h.fillZero()
 		}
 		h.mul(_decayRate)

@@ -1,9 +1,9 @@
 //
 //  TanhLayer.swift
-//  RunoNetTest
+//  Dopamine
 //
-//  Created by 佐原 瑠能 on 2017/05/11.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/05/11.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 import Foundation
@@ -20,7 +20,7 @@ class TanhLayer: SimpleLayer {
 	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
 
 		result.resetLazy(like: input)
-		Layer_Tanh(result.contents, input.contents, Int32(input.capacity))
+		_Layer_Tanh(result.contents, input.contents, Int32(input.capacity))
 		
 		if forTraining && hasPreviousLayer {
 			_lastOutput.copy(result)
@@ -37,7 +37,7 @@ class TanhLayer: SimpleLayer {
 		assert(doutput.capacity == lastOutput.capacity)
 		
 		result.resetLazy(like: doutput)
-		Layer_TanhBackward(result.contents, doutput.contents, lastOutput.contents, Int32(doutput.capacity));
+		_Layer_TanhBackward(result.contents, doutput.contents, lastOutput.contents, Int32(doutput.capacity));
 	}
 	
 	var lastOutput: FloatBuffer {

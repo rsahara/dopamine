@@ -1,9 +1,9 @@
 //
 //  FloatBufferAlg.swift
-//  Pods
+//  Dopamine
 //
-//  Created by 佐原 瑠能 on 2017/06/02.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/06/02.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 import Foundation
@@ -17,13 +17,13 @@ extension FloatBuffer {
 	
 	public func matmul(by right: FloatBuffer, to res: FloatBuffer) {
 		assert(_columns == right._rows)
-		res.resetLazy(_rows, right._columns) // TODO: ここでやるべきでない
+		res.resetLazy(_rows, right._columns) // TODO: Remove
 		_FloatBuffer_MatMul(res._buffer, _buffer, right._buffer, Int32(_rows), Int32(_columns), Int32(right._columns))
 	}
 	
 	public func add(_ right: FloatBuffer) {
 		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Add(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
+		_FloatBuffer_Add(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
 	public func add(_ right: FloatBuffer, scaledBy rightScale: Float) {
@@ -32,26 +32,26 @@ extension FloatBuffer {
 	}
 	
 	public func add(_ right: Float) {
-		FloatBuffer_ScalarAdd(_buffer, right, Int32(_capacity))
+		_FloatBuffer_ScalarAdd(_buffer, right, Int32(_capacity))
 	}
 	
 	public func sub(_ right: FloatBuffer) {
 		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Sub(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
+		_FloatBuffer_Sub(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
 	public func mul(_ right: FloatBuffer) {
 		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Mul(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
+		_FloatBuffer_Mul(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
 	public func mul(_ right: Float) {
-		FloatBuffer_ScalarMul(_buffer, right, Int32(_capacity))
+		_FloatBuffer_ScalarMul(_buffer, right, Int32(_capacity))
 	}
 	
 	public func div(_ right: FloatBuffer) {
 		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Div(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
+		_FloatBuffer_Div(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
 	public func transpose(result: FloatBuffer) {
@@ -67,7 +67,7 @@ extension FloatBuffer {
 		return _FloatBuffer_Norm(_buffer, Int32(_capacity))
 	}
 	
-	public func normalize() -> Float {
+	@discardableResult public func normalize() -> Float {
 		return _FloatBuffer_Normalize(_buffer, Int32(_capacity))
 	}
 	public func safeNormalize() {
@@ -85,12 +85,12 @@ extension FloatBuffer {
 	}
 
 	public func sumFirstAxis(to result: FloatBuffer) {
-		result.resetLazy(1, _columns) // TODO: ここでやるべきでない
+		result.resetLazy(1, _columns) // TODO: Remove
 		_FloatBuffer_SumToFirstAxis(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 
 	public func softmax(result: FloatBuffer) {
-		result.resetLazy(like: self) // TODO: ここでやるべきでない
+		result.resetLazy(like: self) // TODO: Remove
 		_FloatBuffer_Softmax(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 	

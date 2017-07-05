@@ -1,18 +1,18 @@
 //
 //  FloatBufferCpp.cpp
-//  RunoNetTest
+//  Dopamine
 //
-//  Created by 佐原 瑠能 on 2017/05/08.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/05/08.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 #include <cmath>
 #include <cstring>
 #include <random>
 
-#define ENABLE_CBLAS 1
+#include "Environment.hpp"
 
-#if ENABLE_CBLAS
+#if ENABLE_APPLE_BLAS
 #include <Accelerate/Accelerate.h>
 #endif
 
@@ -35,18 +35,18 @@ void _FloatBuffer_FillRandomGaussian(float* left, int leftCapacity) {
 	}
 }
 
-void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {
+void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftRows, int leftColumns, int rightColumns) {
 
-#if ENABLE_CBLAS
+#if ENABLE_APPLE_BLAS
 	
-	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, leftHeight, rightWidth, leftWidth, 1.0f, left, leftWidth, right, rightWidth, 0.0, res, rightWidth);
+	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, leftRows, rightColumns, leftColumns, 1.0f, left, leftColumns, right, rightColumns, 0.0, res, rightColumns);
 
 #else
 	
-	float* leftEnd = left + (leftHeight * leftWidth);
-	float* rightHeadEnd = right + rightWidth;
+	float* leftEnd = left + (leftRows * leftColumns);
+	float* rightHeadEnd = right + rightColumns;
 	while (left < leftEnd) {
-		float* leftHeadEnd = left + leftWidth;
+		float* leftHeadEnd = left + leftColumns;
 
 		for (float* rightHeadStart = right; rightHeadStart < rightHeadEnd; rightHeadStart++) {
 			
@@ -58,7 +58,7 @@ void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, 
 			while (leftHead < leftHeadEnd) {
 				temp += *leftHead * *rightHead;
 				leftHead++;
-				rightHead += rightWidth;
+				rightHead += rightColumns;
 			}
 			
 			*res = temp;
@@ -72,16 +72,16 @@ void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, 
 
 }
 
-float _FloatBuffer_DotProduct(float* left, float* right, int leftWidth) {
+float _FloatBuffer_DotProduct(float* left, float* right, int leftColumns) {
 
-#if ENABLE_CBLAS
+#if ENABLE_APPLE_BLAS
 	
-	return cblas_sdot(leftWidth, left, 1, right, 1);
+	return cblas_sdot(leftColumns, left, 1, right, 1);
 	
 #else
 
 	float res = 0.0f;
-	float* leftEnd = left + leftWidth;
+	float* leftEnd = left + leftColumns;
 	while (left < leftEnd) {
 		res += *left * *right;
 		left++;
@@ -94,7 +94,7 @@ float _FloatBuffer_DotProduct(float* left, float* right, int leftWidth) {
 
 }
 
-void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapacity) {
+void _FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -108,9 +108,9 @@ void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapac
 
 }
 
-void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity) {
+void _FloatBuffer_ScalarMul(float* left, float right, int leftCapacity) {
 
-#if ENABLE_BLAS
+#if ENABLE_APPLE_BLAS
 
 	cblas_sscal(leftCapacity, right, left, 1);
 	
@@ -123,7 +123,7 @@ void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity) {
 	
 }
 
-void FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapacity) {
+void _FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -137,9 +137,9 @@ void FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapac
 	
 }
 
-void FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapacity) {
+void _FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapacity) {
 
-#if ENABLE_BLAS
+#if ENABLE_APPLE_BLAS
 
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -165,7 +165,7 @@ void FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapac
 
 void _FloatBuffer_AddScaled(float* left, float* right, float rightScale, int leftCapacity, int rightCapacity) {
 
-#if ENABLE_BLAS
+#if ENABLE_APPLE_BLAS
 
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -189,14 +189,14 @@ void _FloatBuffer_AddScaled(float* left, float* right, float rightScale, int lef
 
 }
 
-void FloatBuffer_ScalarAdd(float* left, float right, int leftCapacity) {
+void _FloatBuffer_ScalarAdd(float* left, float right, int leftCapacity) {
 
 	for (float* leftEnd = left + leftCapacity; left < leftEnd; left++)
 		*left += right;
 
 }
 
-void FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapacity) {
+void _FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -222,19 +222,19 @@ float _FloatBuffer_CrossEntropyError(float* left, float* right, int leftCapacity
 	return sum;
 }
 	
-void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_Softmax(float* res, float* left, int leftRows, int leftColumns) {
 
-	int leftCapacity = leftHeight * leftWidth;
-	for (int offset = 0; offset < leftCapacity; offset += leftWidth) {
+	int leftCapacity = leftRows * leftColumns;
+	for (int offset = 0; offset < leftCapacity; offset += leftColumns) {
 
-		// MAXを検索
+		// Search max
 		float* src = left + offset;
 		float* dst = res + offset;
 		float maxVal = 0.0f;
 
 		{
 			float* head = src;
-			float* headEnd = head + leftWidth;
+			float* headEnd = head + leftColumns;
 			float maxVal = *head;
 			for (head++; head < headEnd; head++) {
 				float val = *head;
@@ -242,12 +242,12 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth
 					maxVal = val;
 			}
 		}
-		
-		// 各要素に exp(a - max) を入れて、ついでに sum(exp(a - max)) を計算
+
+		// Calculate exp(a - max) and the sum of all values
 		float sumVal = 0.0f;
 		{
 			float* src1 = src;
-			float* src1End = src1 + leftWidth;
+			float* src1End = src1 + leftColumns;
 			float* dst1 = dst;
 			for (; src1 < src1End; src1++) {
 				float val = expf(*src1 - maxVal);
@@ -257,11 +257,11 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth
 			}
 		}
 		
-		// 各要素に 1 / sum(exp(a - max)) を掛け算
+		// Multiply each values by 1 / sum(exp(a - max))
 		{
 			float invSumVal = 1.0f / sumVal;
 			float* head = dst;
-			float* headEnd = head + leftWidth;
+			float* headEnd = head + leftColumns;
 			for (; head < headEnd; head++) {
 				*head *= invSumVal;
 			}
@@ -269,13 +269,13 @@ void _FloatBuffer_Softmax(float* res, float* left, int leftHeight, int leftWidth
 	}
 }
 
-void _FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_Transpose(float* res, float* left, int leftRows, int leftColumns) {
 
-	float* leftEnd = left + leftWidth;
+	float* leftEnd = left + leftColumns;
 	for (; left < leftEnd; left++) {
 		float* leftHead = left;
-		float* leftHeadEnd = leftHead + (leftHeight * leftWidth);
-		for (; leftHead < leftHeadEnd; leftHead += leftWidth) {
+		float* leftHeadEnd = leftHead + (leftRows * leftColumns);
+		for (; leftHead < leftHeadEnd; leftHead += leftColumns) {
 			*res = *leftHead;
 			res++;
 		}
@@ -283,14 +283,14 @@ void _FloatBuffer_Transpose(float* res, float* left, int leftHeight, int leftWid
 	
 }
 	
-void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftHeight, int leftWidth) {
+void _FloatBuffer_SumToFirstAxis(float* res, float* left, int leftRows, int leftColumns) {
 	
-	float* resEnd = res + leftWidth;
-	float* leftHeadEnd = left + (leftHeight * leftWidth);
+	float* resEnd = res + leftColumns;
+	float* leftHeadEnd = left + (leftRows * leftColumns);
 	for (; res < resEnd; res++) {
 
 		float sum = 0.0f;
-		for (float* leftHead = left; leftHead < leftHeadEnd; leftHead += leftWidth) {
+		for (float* leftHead = left; leftHead < leftHeadEnd; leftHead += leftColumns) {
 			sum += *leftHead;
 		}
 		
@@ -333,7 +333,7 @@ int _FloatBuffer_IndexOfAbsMax(float* left, int leftCapacity) {
 
 float _FloatBuffer_Norm(float* left, int leftCapacity) {
 
-#if ENABLE_BLAS
+#if ENABLE_APPLE_BLAS
 	
 	return cblas_snrm2(leftCapacity, left, 1);
 	
@@ -354,7 +354,7 @@ float _FloatBuffer_Normalize(float* left, int leftCapacity) {
 	float norm = _FloatBuffer_Norm(left, leftCapacity);
 	
 	if (norm != 0.0f) {
-		FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
+		_FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
 	}
 	
 	return norm;
@@ -371,10 +371,10 @@ void _FloatBuffer_SafeNormalize(float* left, int leftCapacity) {
 		absMax = -absMax;
 	}
 	
-	FloatBuffer_ScalarMul(left, 1.0f / absMax, leftCapacity);
+	_FloatBuffer_ScalarMul(left, 1.0f / absMax, leftCapacity);
 	float norm = _FloatBuffer_Norm(left, leftCapacity);
 	if (norm != 0.0f) {
-		FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
+		_FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
 	}
 }
 

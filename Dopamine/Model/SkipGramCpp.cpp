@@ -1,9 +1,9 @@
 //
 //  SkipGramCpp.cpp
-//  dopamine
+//  Dopamine
 //
-//  Created by 佐原 瑠能 on 2017/05/31.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/05/31.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 #include <cstring>
@@ -22,7 +22,7 @@ float* _SkipGram_ExpTable = NULL;
 	
 void _SkipGram_GlobalInit() {
 	
-	// exp/(exp+1)の計算テーブル
+	// Calculation table for exp/(exp+1)
 	if (_SkipGram_ExpTable == nullptr) {
 		_SkipGram_ExpTable = (float*)malloc(EXPTABLE_SIZE * sizeof(float));
 		for (int tableIndex = 0; tableIndex < EXPTABLE_SIZE; tableIndex++) {
@@ -50,17 +50,15 @@ void _SkipGram_TrainInit(int* itemSequenceBuffer, int itemSequenceBufferLength, 
 	itemSequenceOffsetArray[0] = 0;
 	int curItemSequenceIndex = 1;
 
-	// バッファーを列挙する
+	// Process buffer.
 	int* itemSequenceHead = itemSequenceBuffer;
 	int* itemSequenceBufferEnd = itemSequenceBuffer + itemSequenceBufferLength;
 	for (; itemSequenceHead < itemSequenceBufferEnd; itemSequenceHead++) {
 
 		int itemIndex = *itemSequenceHead;
 		
-		// シーケンスの終了チェック
+		// Check end of sequence.
 		if (itemIndex < 0) {
-			
-			// 最後のシーケンス
 			if (itemSequenceHead + 1 == itemSequenceBufferEnd
 				|| maxItemSequencesCount == curItemSequenceIndex) {
 				break;
@@ -70,26 +68,26 @@ void _SkipGram_TrainInit(int* itemSequenceBuffer, int itemSequenceBufferLength, 
 			curItemSequenceIndex++;
 		}
 		
-		// アイテムIDの上限チェック
+		// Check if we reached the max number of items.
 		if (itemIndex >= maxItemsCount) {
 			break;
 		}
 		
-		// 最大値更新
+		// Update the max item ID
 		if (itemIndex > maxItemIndex) {
 			maxItemIndex = itemIndex;
 		}
 		
-		// アイテムをカウント
+		// Count items.
 		itemNegLotteryInfoArray[itemIndex] += 1.0f;
 	}
 
-	// 結果を設定
+	// Set the result.
 	*itemSequencesCount = curItemSequenceIndex;
 	int actualItemsCount = maxItemIndex + 1;
 	*itemsCount = actualItemsCount;
 
-	// 抽選データを準備
+	// Prepare lottery data for negative sampling.
 	float sum = 0.0f;
 	float* itemNegLotteryInfoEnd = itemNegLotteryInfoArray + actualItemsCount;
 	for (float* head = itemNegLotteryInfoArray; head < itemNegLotteryInfoEnd; head++) {
@@ -190,19 +188,16 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 						float* targetVector = negWeightBuffer + (itemVectorSize * targetItemIndex);
 
 						float dotProduct = _FloatBuffer_DotProduct(relatedVector, targetVector, itemVectorSize);
-
-#if 0 // 計算版
+						float delta = (label - _SkipGram_ExpTableOutput(dotProduct)) * learningRate;
+#if 0 // naive code
 						float expDotProduct = expf(dotProduct);
 						float delta = (label - (expDotProduct / (expDotProduct + 1.0f))) * learningRate;
-#else // テーブル版
-						float delta = (label - _SkipGram_ExpTableOutput(dotProduct)) * learningRate;
 #endif
 
-#if 0 // BLAS版
 						_FloatBuffer_AddScaled(tempItemVector, targetVector, delta, itemVectorSize, itemVectorSize);
 						_FloatBuffer_AddScaled(targetVector, relatedVector, delta, itemVectorSize, itemVectorSize);
-#endif
-#if 1 // ポインタ版
+						
+#if 0 // naive code
 						float* headTempItemVector = tempItemVector;
 						float* headRelatedVector = relatedVector;
 						for (float* targetVectorEnd = targetVector + itemVectorSize; targetVector < targetVectorEnd; targetVector++) {
@@ -213,10 +208,10 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 							headRelatedVector++;
 						}
 #endif
-						
+
 					} // For each (positive/negative) sampling.
 					
-					FloatBuffer_Add(relatedVector, tempItemVector, itemVectorSize, itemVectorSize);
+					_FloatBuffer_Add(relatedVector, tempItemVector, itemVectorSize, itemVectorSize);
 					
 				} // For each related item.
 
