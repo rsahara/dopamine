@@ -36,7 +36,7 @@ class OptimizerRmsProp : Optimizer {
 		let h = context as! FloatBuffer
 
 		if _iterationNum == 1 {
-			h.resetLazy(like: input) // TODO: リファクタ
+			h.resetLazy(like: input) // TODO: refactor
 			h.fillZero()
 		}
 		h.mul(_decayRate)

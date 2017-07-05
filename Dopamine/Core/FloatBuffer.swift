@@ -66,7 +66,7 @@ public class FloatBuffer {
 		}
 	}
 
-	// MARK: - 基本機能
+	// MARK: - Main features
 	
 	public func fillZero() {
 		_FloatBuffer_FillZero(_buffer, Int32(_capacity))
@@ -124,7 +124,7 @@ public class FloatBuffer {
 		}
 	}
 
-	// TODO: 整理
+	// TODO: Remove
 	public func resetLazy(_ rows: Int, _ columns: Int) {
 		let capacity = rows * columns
 		if (capacity > _allocationSize) {

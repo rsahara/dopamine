@@ -14,8 +14,6 @@ void _FloatBuffer_FillZero(float* left, int leftCapacity);
 // Fill buffer with random values, gaussian distribution.
 void _FloatBuffer_FillRandomGaussian(float* left, int leftCapacity);
 
-// TODO: '_'を先頭につける
-
 // Matrix multiplication.
 // The capacity of res must be leftRows * rightColumns
 void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftRows, int leftColumns, int rightColumns);

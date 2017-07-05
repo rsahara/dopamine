@@ -51,12 +51,14 @@ public class SkipGram {
 							   _weight.contents, _weightNeg.contents, _tempItemVector.contents, Int32(_windowSize), Int32(_negativeSamplingCount), trainingRate, Int32(iterationsCount));
 	}
 
-	// MARK: - プロパティ
+	// MARK: - Properties
 	
 	public var result: FloatBuffer {
 		return _weight;
 	}
-	
+
+	// MARK: - Private
+
 	private var _itemVectorSize: Int
 	private var _itemCapacity: Int
 	private var _itemSequenceCapacity: Int

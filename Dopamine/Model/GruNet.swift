@@ -2,7 +2,7 @@
 //  GruNet.swift
 //  Dopamine
 //
-//  Created by 佐原瑠能 on 2017/05/14.
+//  Created by Runo Sahara on 2017/05/14.
 //  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 

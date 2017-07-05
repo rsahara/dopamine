@@ -1,6 +1,6 @@
 //
 //  SkipGramCpp.hpp
-//  dopamine
+//  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/31.
 //  Copyright © 2017 Runo Sahara. All rights reserved.
@@ -9,7 +9,7 @@
 #ifndef SkipGramCpp_hpp
 #define SkipGramCpp_hpp
 
-// 全体の初期化
+// Global initialization.
 void _SkipGram_GlobalInit();
 
 // 学習の初期化

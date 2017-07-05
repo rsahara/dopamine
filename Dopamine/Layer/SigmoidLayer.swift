@@ -17,7 +17,7 @@ class SigmoidLayer: SimpleLayer {
 	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
 
 		result.resetLazy(like: input)
-		Layer_Sigmoid(result.contents, input.contents, Int32(input.capacity))
+		_Layer_Sigmoid(result.contents, input.contents, Int32(input.capacity))
 
 		if forTraining && hasPreviousLayer {
 			_lastOutput.copy(result)
@@ -34,7 +34,7 @@ class SigmoidLayer: SimpleLayer {
 		assert(doutput.capacity == lastOutput.capacity)
 		
 		result.resetLazy(like: doutput)
-		Layer_SigmoidBackward(result.contents, doutput.contents, lastOutput.contents, Int32(doutput.capacity));
+		_Layer_SigmoidBackward(result.contents, doutput.contents, lastOutput.contents, Int32(doutput.capacity));
 	}
 	
 	var lastOutput: FloatBuffer {

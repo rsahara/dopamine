@@ -17,7 +17,7 @@ extension FloatBuffer {
 	
 	public func matmul(by right: FloatBuffer, to res: FloatBuffer) {
 		assert(_columns == right._rows)
-		res.resetLazy(_rows, right._columns) // TODO: ここでやるべきでない
+		res.resetLazy(_rows, right._columns) // TODO: Remove
 		_FloatBuffer_MatMul(res._buffer, _buffer, right._buffer, Int32(_rows), Int32(_columns), Int32(right._columns))
 	}
 	
@@ -85,12 +85,12 @@ extension FloatBuffer {
 	}
 
 	public func sumFirstAxis(to result: FloatBuffer) {
-		result.resetLazy(1, _columns) // TODO: ここでやるべきでない
+		result.resetLazy(1, _columns) // TODO: Remove
 		_FloatBuffer_SumToFirstAxis(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 
 	public func softmax(result: FloatBuffer) {
-		result.resetLazy(like: self) // TODO: ここでやるべきでない
+		result.resetLazy(like: self) // TODO: Remove
 		_FloatBuffer_Softmax(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 	

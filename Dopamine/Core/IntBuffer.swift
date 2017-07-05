@@ -59,7 +59,7 @@ public class IntBuffer {
 		Swift.print("Buffer[\(_capacity)] \(valuesStr)")
 	}
 	
-	// MARK: プロパティ
+	// MARK: Properties
 	
 	public var capacity: Int {
 		return _capacity
@@ -69,7 +69,7 @@ public class IntBuffer {
 		return _buffer
 	}
 
-	// MARK: プライベート
+	// MARK: Private
 
 	private var _buffer: Pointer
 	private var _capacity: Int

@@ -9,13 +9,11 @@
 #ifndef LayersCpp_hpp
 #define LayersCpp_hpp
 
-// TODO: '_'を先頭につける
+void _Layer_Sigmoid(float* res, float* left, int leftCapacity);
+void _Layer_SigmoidBackward(float* res, float* left, float* lastOutput, int leftCapacity);
 
-void Layer_Sigmoid(float* res, float* left, int leftCapacity);
-void Layer_SigmoidBackward(float* res, float* left, float* lastOutput, int leftCapacity);
-
-void Layer_Tanh(float* res, float* left, int leftCapacity);
-void Layer_TanhBackward(float* res, float* left, float* lastOutput, int leftCapacity);
+void _Layer_Tanh(float* res, float* left, int leftCapacity);
+void _Layer_TanhBackward(float* res, float* left, float* lastOutput, int leftCapacity);
 
 void _Layer_ResetZeroOrNegativeAndMakeMask(float* res, float* mask, float* left, int leftCapacity);
 void _Layer_ResetZeroOrNegative(float* res, float* left, int leftCapacity);
