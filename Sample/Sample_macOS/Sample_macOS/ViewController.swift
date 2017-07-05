@@ -1,6 +1,6 @@
 //
 //  ViewController.swift
-//  RunoNetTest
+//  Sample_macOS
 //
 //  Created by Runo Sahara on 2017/04/27.
 //  Copyright © 2017 Runo Sahara. All rights reserved.
@@ -454,6 +454,7 @@ class ViewController: NSViewController {
 		// ベクトルをロード又は学習
 		let fileUrl = URL(fileURLWithPath: "/tmp/skipgram_vectors")
 		var vectorBuffer: FloatBuffer! = try? FloatBuffer(contentsOf: fileUrl)
+		vectorBuffer = nil
 		if (vectorBuffer != nil) {
 			print("Loaded from: \(fileUrl.absoluteURL)")
 		} else {

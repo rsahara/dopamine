@@ -190,19 +190,16 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 						float* targetVector = negWeightBuffer + (itemVectorSize * targetItemIndex);
 
 						float dotProduct = _FloatBuffer_DotProduct(relatedVector, targetVector, itemVectorSize);
-
-#if 0 // 計算版
+						float delta = (label - _SkipGram_ExpTableOutput(dotProduct)) * learningRate;
+#if 0 // naive code
 						float expDotProduct = expf(dotProduct);
 						float delta = (label - (expDotProduct / (expDotProduct + 1.0f))) * learningRate;
-#else // テーブル版
-						float delta = (label - _SkipGram_ExpTableOutput(dotProduct)) * learningRate;
 #endif
 
-#if 0 // BLAS版
 						_FloatBuffer_AddScaled(tempItemVector, targetVector, delta, itemVectorSize, itemVectorSize);
 						_FloatBuffer_AddScaled(targetVector, relatedVector, delta, itemVectorSize, itemVectorSize);
-#endif
-#if 1 // ポインタ版
+						
+#if 0 // naive code
 						float* headTempItemVector = tempItemVector;
 						float* headRelatedVector = relatedVector;
 						for (float* targetVectorEnd = targetVector + itemVectorSize; targetVector < targetVectorEnd; targetVector++) {
@@ -213,7 +210,7 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 							headRelatedVector++;
 						}
 #endif
-						
+
 					} // For each (positive/negative) sampling.
 					
 					FloatBuffer_Add(relatedVector, tempItemVector, itemVectorSize, itemVectorSize);

@@ -1,6 +1,6 @@
 //
 //  FloatBufferCpp.cpp
-//  RunoNetTest
+//  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/08.
 //  Copyright © 2017 Runo Sahara. All rights reserved.
@@ -10,9 +10,9 @@
 #include <cstring>
 #include <random>
 
-#define ENABLE_CBLAS 1
+#include "Environment.hpp"
 
-#if ENABLE_CBLAS
+#if ENABLE_APPLE_BLAS
 #include <Accelerate/Accelerate.h>
 #endif
 
@@ -37,7 +37,7 @@ void _FloatBuffer_FillRandomGaussian(float* left, int leftCapacity) {
 
 void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, int leftWidth, int rightWidth) {
 
-#if ENABLE_CBLAS
+#if ENABLE_APPLE_BLAS
 	
 	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, leftHeight, rightWidth, leftWidth, 1.0f, left, leftWidth, right, rightWidth, 0.0, res, rightWidth);
 
@@ -74,7 +74,7 @@ void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftHeight, 
 
 float _FloatBuffer_DotProduct(float* left, float* right, int leftWidth) {
 
-#if ENABLE_CBLAS
+#if ENABLE_APPLE_BLAS
 	
 	return cblas_sdot(leftWidth, left, 1, right, 1);
 	
@@ -110,7 +110,7 @@ void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapac
 
 void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity) {
 
-#if ENABLE_BLAS
+#if ENABLE_APPLE_BLAS
 
 	cblas_sscal(leftCapacity, right, left, 1);
 	
@@ -139,7 +139,7 @@ void FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapac
 
 void FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapacity) {
 
-#if ENABLE_BLAS
+#if ENABLE_APPLE_BLAS
 
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -165,7 +165,7 @@ void FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapac
 
 void _FloatBuffer_AddScaled(float* left, float* right, float rightScale, int leftCapacity, int rightCapacity) {
 
-#if ENABLE_BLAS
+#if ENABLE_APPLE_BLAS
 
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -333,7 +333,7 @@ int _FloatBuffer_IndexOfAbsMax(float* left, int leftCapacity) {
 
 float _FloatBuffer_Norm(float* left, int leftCapacity) {
 
-#if ENABLE_BLAS
+#if ENABLE_APPLE_BLAS
 	
 	return cblas_snrm2(leftCapacity, left, 1);
 	

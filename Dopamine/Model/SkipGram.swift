@@ -1,6 +1,6 @@
 //
 //  SkipGram.swift
-//  Pods
+//  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/26.
 //  Copyright © 2017 Runo Sahara. All rights reserved.

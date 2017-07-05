@@ -1,6 +1,6 @@
 //
 //  IntBuffer.swift
-//  Pods
+//  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/30.
 //  Copyright © 2017 Runo Sahara. All rights reserved.
@@ -10,7 +10,9 @@ import Foundation
 
 public class IntBuffer {
 
+	#if DEBUG
 	var DEBUG_BUFFERINITIALIZATION = false
+	#endif
 	
 	public typealias Pointer = UnsafeMutablePointer<Int32>
 
@@ -20,11 +22,13 @@ public class IntBuffer {
 		_allocationSize = _capacity
 		_buffer = Pointer.allocate(capacity: _allocationSize)
 
+		#if DEBUG
 		if DEBUG_BUFFERINITIALIZATION {
 			for index in 0 ..< _capacity {
 				_buffer[index] = -1
 			}
 		}
+		#endif
 	}
 	
 	public init(referenceOf pointer: Pointer, capacity: Int) {

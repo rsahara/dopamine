@@ -1,6 +1,6 @@
 //
 //  LayerNet.swift
-//  RunoNetTest
+//  Dopamine
 //
 //  Created by Runo Sahara on 2017/04/28.
 //  Copyright © 2017 Runo Sahara. All rights reserved.

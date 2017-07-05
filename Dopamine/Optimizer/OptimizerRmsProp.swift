@@ -1,6 +1,6 @@
 //
 //  OptimizerRmsProp.swift
-//  RunoNetTest
+//  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/02.
 //  Copyright © 2017 Runo Sahara. All rights reserved.

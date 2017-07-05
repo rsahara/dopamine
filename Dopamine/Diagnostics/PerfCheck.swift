@@ -1,6 +1,6 @@
 //
 //  PerfCheck.swift
-//  RunoNetTest
+//  Dopamine
 //
 //  Created by 佐原瑠能 on 2017/05/02.
 //  Copyright © 2017 Runo Sahara. All rights reserved.
