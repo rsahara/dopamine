@@ -24,25 +24,25 @@ void _FloatBuffer_MatMul(float* res, float* left, float* right, int leftRows, in
 float _FloatBuffer_DotProduct(float* left, float* right, int leftColumns);
 
 // Element-wise multiplication of vectors, propagated if left vector is bigger than right vector. (leftCapacity must be a multiple of rightCapacity)
-void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapacity);
+void _FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapacity);
 
 // Scalar multiplication of vector.
-void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity);
+void _FloatBuffer_ScalarMul(float* left, float right, int leftCapacity);
 
 // Element-wise division, propagated if left vector is bigger than right vector. (leftCapacity must be a multiple of rightCapacity)
-void FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapacity);
+void _FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapacity);
 
 // Addition of vector, propagated if left vector is bigger than right vector. (leftCapacity must be a multiple of rightCapacity)
-void FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapacity);
+void _FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapacity);
 
 // Addition of scaled vector, propagated if left vector is bigger than right vector. (leftCapacity must be a multiple of rightCapacity)
 void _FloatBuffer_AddScaled(float* left, float* right, float rightScale, int leftCapacity, int rightCapacity);
 
 // Scalar addition of vector.
-void FloatBuffer_ScalarAdd(float* left, float right, int leftCapacity);
+void _FloatBuffer_ScalarAdd(float* left, float right, int leftCapacity);
 
 // Subtraction of vector, propagated if left vector is bigger than right vector. (leftCapacity must be a multiple of rightCapacity)
-void FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapacity);
+void _FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapacity);
 
 // Cross entropy error of vectors.
 float _FloatBuffer_CrossEntropyError(float* left, float* right, int leftCapacity);

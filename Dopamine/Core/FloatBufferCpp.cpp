@@ -94,7 +94,7 @@ float _FloatBuffer_DotProduct(float* left, float* right, int leftColumns) {
 
 }
 
-void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapacity) {
+void _FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -108,7 +108,7 @@ void FloatBuffer_Mul(float* left, float* right, int leftCapacity, int rightCapac
 
 }
 
-void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity) {
+void _FloatBuffer_ScalarMul(float* left, float right, int leftCapacity) {
 
 #if ENABLE_APPLE_BLAS
 
@@ -123,7 +123,7 @@ void FloatBuffer_ScalarMul(float* left, float right, int leftCapacity) {
 	
 }
 
-void FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapacity) {
+void _FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -137,7 +137,7 @@ void FloatBuffer_Div(float* left, float* right, int leftCapacity, int rightCapac
 	
 }
 
-void FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapacity) {
+void _FloatBuffer_Add(float* left, float* right, int leftCapacity, int rightCapacity) {
 
 #if ENABLE_APPLE_BLAS
 
@@ -189,14 +189,14 @@ void _FloatBuffer_AddScaled(float* left, float* right, float rightScale, int lef
 
 }
 
-void FloatBuffer_ScalarAdd(float* left, float right, int leftCapacity) {
+void _FloatBuffer_ScalarAdd(float* left, float right, int leftCapacity) {
 
 	for (float* leftEnd = left + leftCapacity; left < leftEnd; left++)
 		*left += right;
 
 }
 
-void FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapacity) {
+void _FloatBuffer_Sub(float* left, float* right, int leftCapacity, int rightCapacity) {
 	
 	float* leftEnd = left + leftCapacity;
 	while (left < leftEnd) {
@@ -354,7 +354,7 @@ float _FloatBuffer_Normalize(float* left, int leftCapacity) {
 	float norm = _FloatBuffer_Norm(left, leftCapacity);
 	
 	if (norm != 0.0f) {
-		FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
+		_FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
 	}
 	
 	return norm;
@@ -371,10 +371,10 @@ void _FloatBuffer_SafeNormalize(float* left, int leftCapacity) {
 		absMax = -absMax;
 	}
 	
-	FloatBuffer_ScalarMul(left, 1.0f / absMax, leftCapacity);
+	_FloatBuffer_ScalarMul(left, 1.0f / absMax, leftCapacity);
 	float norm = _FloatBuffer_Norm(left, leftCapacity);
 	if (norm != 0.0f) {
-		FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
+		_FloatBuffer_ScalarMul(left, 1.0f / norm, leftCapacity);
 	}
 }
 

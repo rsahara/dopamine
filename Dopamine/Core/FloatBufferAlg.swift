@@ -23,7 +23,7 @@ extension FloatBuffer {
 	
 	public func add(_ right: FloatBuffer) {
 		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Add(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
+		_FloatBuffer_Add(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
 	public func add(_ right: FloatBuffer, scaledBy rightScale: Float) {
@@ -32,26 +32,26 @@ extension FloatBuffer {
 	}
 	
 	public func add(_ right: Float) {
-		FloatBuffer_ScalarAdd(_buffer, right, Int32(_capacity))
+		_FloatBuffer_ScalarAdd(_buffer, right, Int32(_capacity))
 	}
 	
 	public func sub(_ right: FloatBuffer) {
 		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Sub(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
+		_FloatBuffer_Sub(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
 	public func mul(_ right: FloatBuffer) {
 		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Mul(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
+		_FloatBuffer_Mul(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
 	public func mul(_ right: Float) {
-		FloatBuffer_ScalarMul(_buffer, right, Int32(_capacity))
+		_FloatBuffer_ScalarMul(_buffer, right, Int32(_capacity))
 	}
 	
 	public func div(_ right: FloatBuffer) {
 		assert(_capacity % right._capacity == 0)
-		FloatBuffer_Div(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
+		_FloatBuffer_Div(_buffer, right._buffer, Int32(_capacity), Int32(right._capacity))
 	}
 	
 	public func transpose(result: FloatBuffer) {

@@ -213,7 +213,7 @@ void _SkipGram_TrainIterate(int* itemSequenceBuffer, int* itemSequenceOffsetArra
 
 					} // For each (positive/negative) sampling.
 					
-					FloatBuffer_Add(relatedVector, tempItemVector, itemVectorSize, itemVectorSize);
+					_FloatBuffer_Add(relatedVector, tempItemVector, itemVectorSize, itemVectorSize);
 					
 				} // For each related item.
 
