@@ -31,7 +31,7 @@ class OptimizerRmsProp : Optimizer {
 		_iterationNum += 1
 	}
 	
-	func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) {
+	func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) { // TODO: optimize
 		
 		let h = context as! FloatBuffer
 

@@ -74,10 +74,10 @@ void _FloatBuffer_SafeNormalize(float* left, int leftCapacity);
 void _FloatBuffer_NormalizeRows(float* left, int leftRows, int leftColumns);
 
 // Perform dot products between a given vector and each rows of matrix.
-// (To get the cosine similarity, provide a matrix with each rows normalized and a normalized vector.)
-// res: result buffer of size leftRows containing the dot products.
-// left: matrix
-// right: vector of size leftColumns
+//   (To get the cosine similarity, provide a matrix with each rows normalized and a normalized vector.)
+//   res: result buffer of size leftRows containing the dot products.
+//   left: matrix
+//   right: vector of size leftColumns
 void _FloatBuffer_DotProductByRows(float* res, float* left, int leftRows, int leftColumns, float* right);
 
 #endif /* FloatBufferCpp_hpp */
