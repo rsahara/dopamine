@@ -34,7 +34,7 @@ class ViewController: NSViewController {
 		
 		preloadMNISTImages()
 		
-		let net = LayerNet(inputSize: 784, hiddenSize: 50, outputSize: 10)
+		let net = LayerNet(inputSize: 784, outputSize: 10)
 		let numIterations: Int = 10000
 		let batchSize: Int = 100
 		let epochBatchCount: Int = max(1, trainImagesBuffer.rows / batchSize)

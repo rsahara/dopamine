@@ -12,37 +12,37 @@ public class PerfCheck {
 	
 	public init(_ name: String = "") {
 
-		self.name = name
-		stepArray = Array<Date>()
-		stepNameArray = Array<String>()
+		_name = name
+		_stepArray = Array<Date>()
+		_stepNameArray = Array<String>()
 
 		step("begin")
 	}
 	
 	public func step(_ name: String = "") {
-		stepArray.append(Date())
-		stepNameArray.append(name)
+		_stepArray.append(Date())
+		_stepNameArray.append(name)
 	}
 	
 	public func print() {
 		step("print")
 		
-		let beginTime = stepArray.first!
-		for stepIndex in 1 ..< stepArray.count {
-			let date = stepArray[stepIndex]
-			let stepName = stepNameArray[stepIndex]
-			Swift.print(String(format:"  %06f %@: %@", date.timeIntervalSince(beginTime), name, stepName))
+		let beginTime = _stepArray.first!
+		for stepIndex in 1 ..< _stepArray.count {
+			let date = _stepArray[stepIndex]
+			let stepName = _stepNameArray[stepIndex]
+			Swift.print(String(format:"  %06f %@: %@", date.timeIntervalSince(beginTime), _name, stepName))
 		}
 	}
 	
 	public func reset() {
-		stepArray = Array<Date>()
-		stepNameArray = Array<String>()
+		_stepArray = Array<Date>()
+		_stepNameArray = Array<String>()
 		step("begin")
 	}
 	
-	let name: String
-	var stepArray: Array<Date>
-	var stepNameArray: Array<String>
+	private let _name: String
+	private var _stepArray: Array<Date>
+	private var _stepNameArray: Array<String>
 
 }

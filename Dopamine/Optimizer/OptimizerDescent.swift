@@ -30,6 +30,8 @@ class OptimizerDescent: Optimizer {
 		input.sub(_tempBuffer)
 	}
 	
-	let _learnRate: Float
-	var _tempBuffer: FloatBuffer
+	// MARK: - Hidden
+	
+	private let _learnRate: Float
+	private var _tempBuffer: FloatBuffer
 }

@@ -13,10 +13,9 @@ import Foundation
 
 public class LayerNet {
 	
-	public init(inputSize: Int, hiddenSize: Int, outputSize: Int) {
+	public init(inputSize: Int, outputSize: Int) {
 		
 		self.inputSize = inputSize
-		self.hiddenSize = hiddenSize
 		self.outputSize = outputSize
 
 		layers = Array()
@@ -99,7 +98,6 @@ public class LayerNet {
 
 	let optimizer: Optimizer
 	let inputSize: Int
-	let hiddenSize: Int
 	let outputSize: Int
 	
 	var layers: Array<Layer>

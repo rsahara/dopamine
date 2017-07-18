@@ -152,7 +152,7 @@ public class FloatBuffer {
 		resetLazy(src._rows, src._columns)
 	}
 
-	// MARK: - プロパティ
+	// MARK: - Properties
 
 	public var capacity: Int {
 		return _capacity
@@ -169,6 +169,8 @@ public class FloatBuffer {
 	public var columns: Int {
 		return _columns
 	}
+	
+	// MARK: - Hidden
 
 	internal static let ALIGNMENT = 8
 	

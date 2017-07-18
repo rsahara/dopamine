@@ -26,5 +26,5 @@ class Layer {
 	func optimize(optimizer: Optimizer){
 	}
 	
-	var hasPreviousLayer: Bool
+	internal var hasPreviousLayer: Bool
 }

@@ -57,10 +57,12 @@ class OptimizerRmsProp : Optimizer {
 		input.sub(_tempBuffer1)
 	}
 	
-	var _iterationNum: Int
-	let _learnRate: Float
-	let _decayRate: Float
-	var _tempBuffer1: FloatBuffer
-	var _tempBuffer2: FloatBuffer
+	// MARK: - Hidden
+	
+	private var _iterationNum: Int
+	private let _learnRate: Float
+	private let _decayRate: Float
+	private var _tempBuffer1: FloatBuffer
+	private var _tempBuffer2: FloatBuffer
 
 }

@@ -56,7 +56,7 @@ public class SkipGram {
 		return _weight;
 	}
 
-	// MARK: - Private
+	// MARK: - Hidden
 
 	private var _itemVectorSize: Int
 	private var _itemCapacity: Int

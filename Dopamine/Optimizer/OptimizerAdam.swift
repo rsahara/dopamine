@@ -71,9 +71,11 @@ class OptimizerAdam: Optimizer {
 		input.sub(temp)
 	}
 	
-	var _iterationNum: Int
-	var _step: Float
-	let _learnRate: Float
-	let _beta1: Float
-	let _beta2: Float
+	// MARK: - Hidden
+	
+	private var _iterationNum: Int
+	private var _step: Float
+	private let _learnRate: Float
+	private let _beta1: Float
+	private let _beta2: Float
 }

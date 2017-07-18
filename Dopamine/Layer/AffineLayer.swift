@@ -10,7 +10,6 @@ import Foundation
 
 class AffineLayer: Layer {
 	
-	// weight: (h, w) bias: (1, w)
 	init(inputSize: Int, outputSize: Int, layerName: String = "", debugLog: Bool = false) {
 		
 		weight = FloatBuffer(inputSize, outputSize)
@@ -31,7 +30,6 @@ class AffineLayer: Layer {
 		super.init()
 	}
 
-	// x: (1, n) -> (1, n)
 	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
 //		let perfCheck = PerfCheck("SimpleAffineLayer: forward")
 		
@@ -45,7 +43,6 @@ class AffineLayer: Layer {
 //		perfCheck.print()
 	}
 	
-	// (1, n) -> (1, n)
 	override func backward(doutput: FloatBuffer, result: FloatBuffer) {
 //		let perfCheck = PerfCheck("SimpleAffineLayer: backward")
 		
@@ -78,6 +75,8 @@ class AffineLayer: Layer {
 		}
 	}
 
+	// MARK: - Hidden
+	
 	var weight: FloatBuffer
 	var bias: FloatBuffer
 	var lastInput: FloatBuffer

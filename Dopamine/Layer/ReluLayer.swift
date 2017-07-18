@@ -11,24 +11,22 @@ import Foundation
 class ReluLayer :Layer {
 	
 	override init() {
-		mask = FloatBuffer(1, 1024)
+		_mask = FloatBuffer(1, 1024)
 	}
 
-	// (1, n) -> (1, n)
 	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
 
-		mask.resetLazy(like: input)
+		_mask.resetLazy(like: input)
 		result.resetLazy(like: input)
 		
 		if forTraining && hasPreviousLayer {
-			_Layer_ResetZeroOrNegativeAndMakeMask(result.contents, mask.contents, input.contents, Int32(input.capacity))
+			_Layer_ResetZeroOrNegativeAndMakeMask(result.contents, _mask.contents, input.contents, Int32(input.capacity))
 		}
 		else {
 			_Layer_ResetZeroOrNegative(result.contents, input.contents, Int32(input.capacity))
 		}
 	}
 	
-	// (1, n) -> (1, n)
 	override func backward(doutput: FloatBuffer, result: FloatBuffer) {
 
 		if !hasPreviousLayer {
@@ -36,9 +34,9 @@ class ReluLayer :Layer {
 		}
 		
 		result.copy(doutput)
-		_Layer_ApplyMask(result.contents, mask.contents, Int32(result.capacity));
+		_Layer_ApplyMask(result.contents, _mask.contents, Int32(result.capacity));
 	}
 
-	var mask: FloatBuffer
+	private var _mask: FloatBuffer
 	
 }

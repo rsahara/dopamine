@@ -29,7 +29,6 @@ class SoftmaxWithLoss {
 		}
 	}
 	
-	// (1, n) -> (1, n)
 	func backward(result: FloatBuffer) {
 		result.copy(_lastOutput)
 		result.sub(_lastTrainOutput)
@@ -44,8 +43,9 @@ class SoftmaxWithLoss {
 		return _lastTrainLoss
 	}
 
+	// MARK: - Hidden
+	
 	private var _lastOutput: FloatBuffer
-
 	private var _lastTrainLoss: Float
 	private var _lastTrainOutput: FloatBuffer
 	
