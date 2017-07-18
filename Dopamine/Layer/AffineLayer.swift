@@ -8,7 +8,7 @@
 
 import Foundation
 
-class AffineLayer: SimpleLayer {
+class AffineLayer: Layer {
 	
 	// weight: (h, w) bias: (1, w)
 	init(inputSize: Int, outputSize: Int, layerName: String = "", debugLog: Bool = false) {

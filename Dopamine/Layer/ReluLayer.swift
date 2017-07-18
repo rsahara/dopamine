@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ReluLayer :SimpleLayer {
+class ReluLayer :Layer {
 	
 	override init() {
 		mask = FloatBuffer(1, 1024)

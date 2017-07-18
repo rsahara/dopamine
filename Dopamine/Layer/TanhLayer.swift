@@ -9,7 +9,7 @@
 import Foundation
 
 
-class TanhLayer: SimpleLayer {
+class TanhLayer: Layer {
 	
 	override init() {
 		

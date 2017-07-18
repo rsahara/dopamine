@@ -8,7 +8,7 @@
 
 import Foundation
 
-class SimpleLayer {
+class Layer {
 	
 	init () {
 		hasPreviousLayer = true

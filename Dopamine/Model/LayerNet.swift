@@ -102,7 +102,7 @@ public class LayerNet {
 	let hiddenSize: Int
 	let outputSize: Int
 	
-	var layers: Array<SimpleLayer>
+	var layers: Array<Layer>
 	var lastLayer: SoftmaxWithLoss
 	
 	var tempBuffer1: FloatBuffer
