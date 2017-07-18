@@ -122,7 +122,7 @@ public class GruCell {
 	
 	var lastOutput: FloatBuffer
 	var lastPreviousState: FloatBuffer
-	var last1mZ: FloatBuffer // 最後の1-z
+	var last1mZ: FloatBuffer // last (1 - z)
 
 	var affineZ: AffineLayer
 	var sigmoidZ: SigmoidLayer

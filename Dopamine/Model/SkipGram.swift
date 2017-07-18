@@ -38,7 +38,6 @@ public class SkipGram {
 
 	public func train(itemSequenceBuffer: IntBuffer, itemSequenceLength: Int, iterationsCount: Int, trainingRate: Float = 0.005) {
 
-		// アイテムを処理する準備
 		var itemSequencesCount: Int32 = Int32(_itemSequenceCapacity)
 		var itemsCount: Int32 = Int32(_itemCapacity)
 		

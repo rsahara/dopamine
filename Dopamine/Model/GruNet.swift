@@ -59,14 +59,14 @@ public class GruNet {
 		var nextStateArray = tempBufferArray2
 		let tempBuffer = FloatBuffer(batchSize, outputSize)
 
-		// 初期ステートを準備
+		// Prepare initial state.
 		for layerIndex in 0 ..< layersCount {
 			let previousState = previousStateArray[layerIndex]
 			previousState.resetLazy(batchSize, cellArray[layerIndex].outputSize)
 			previousState.fillZero()
 		}
 
-		// 入力を通す
+		// Process the input.
 		for inputIndex in 0 ..< inputArray.count {
 			let input = inputArray[inputIndex]
 			for layerIndex in 0 ..< layersCount {
@@ -75,13 +75,13 @@ public class GruNet {
 				cell.forward(input: input, result: nextStateArray[layerIndex], previousState: previousStateArray[layerIndex], forTraining: false)
 			}
 
-			// バッファーを回転
+			// Rotate buffers.
 			let temp = nextStateArray
 			nextStateArray = previousStateArray
 			previousStateArray = temp
 		}
 
-		// 出力を通す
+		// Process the output.
 		let outputLayer = outputLayerArray[0]
 		let softmax = softmaxArray[0]
 		outputLayer.forward(input: previousStateArray[0], result: tempBuffer, forTraining: false)
@@ -98,7 +98,7 @@ public class GruNet {
 				softmax.forward(input: tempBuffer, output: output, forTraining: false)
 			}
 			
-			// バッファーを回転
+			// Rotate buffers.
 			let temp = nextStateArray
 			nextStateArray = previousStateArray
 			previousStateArray = temp
@@ -110,7 +110,7 @@ public class GruNet {
 		assert(!outputArray.isEmpty)
 		assert(!inputArray.isEmpty)
 		assert(inputArray.count == outputArray.count)
-		assert(inputArray.count <= sequenceLength) // TODO: 修正
+		assert(inputArray.count <= sequenceLength) // TODO: fix
 		
 		let batchSize = inputArray[0].rows
 		var previousStateArray = tempBufferArray1
@@ -118,7 +118,7 @@ public class GruNet {
 		let tempBuffer = FloatBuffer(batchSize, outputSize)
 		let tempBuffer2 = FloatBuffer(batchSize, outputSize)
 
-		// 重みを統一
+		// Copy weights.
 		for layerIndex in 0 ..< layersCount {
 			let srcCell = cellArray[layerIndex]
 			for inputIndex in 1 ..< inputArray.count {
@@ -139,14 +139,14 @@ public class GruNet {
 			dstOutputLayer.bias.copy(outputLayerArray[0].bias)
 		}
 		
-		// 順伝播用の初期ステートを準備
+		// Initial state for forward process.
 		for layerIndex in 0 ..< layersCount {
 			let previousState = previousStateArray[layerIndex]
 			previousState.resetLazy(batchSize, cellArray[layerIndex].outputSize)
 			previousState.fillZero()
 		}
 		
-		// 順伝播
+		// Forward.
 		for inputIndex in 0 ..< inputArray.count {
 			let input = inputArray[inputIndex]
 			let output = outputArray[inputIndex]
@@ -163,20 +163,20 @@ public class GruNet {
 			let softmax = softmaxArray[inputIndex]
 			softmax.forward(input: tempBuffer, output:output, forTraining: true)
 
-			// バッファーを回転
+			// Rotate buffers.
 			let temp = nextStateArray
 			nextStateArray = previousStateArray
 			previousStateArray = temp
 		}
 		
-		// 逆伝播用の初期ステート
+		// Initial state for backward process.
 		for layerIndex in 0 ..< layersCount {
 			let previousState = previousStateArray[layerIndex]
 			previousState.resetLazy(inputArray[0].rows, cellArray[layerIndex].outputSize)
 			previousState.fillZero()
 		}
 		
-		// 逆伝播
+		// Backward
 		for outputIndex in stride(from: outputArray.count - 1, to: -1, by: -1) {
 			let softmax = softmaxArray[outputIndex]
 			let outputLayer = outputLayerArray[outputIndex]
@@ -192,16 +192,16 @@ public class GruNet {
 				cell.backward(doutput: previousStateArray[layerIndex], result: tempBuffer2, resultState: nextStateArray[layerIndex])
 			}
 
-			// バッファーを回転
+			// Rotate buffers.
 			let temp = nextStateArray
 			nextStateArray = previousStateArray
 			previousStateArray = temp
 		}
 
-		// 最適化する
+		// Optimize.
 		optimizer.updateIteration()
 
-		// 勾配を集計
+		// Calculate gradients.
 		for layerIndex in 0 ..< layersCount {
 			let dstCell = cellArray[layerIndex]
 
