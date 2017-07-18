@@ -34,7 +34,7 @@ class OptimizerAdam: Optimizer {
 		_step = _learnRate * sqrtf(1.0 - powf(_beta2, Float(_iterationNum))) / (1.0 - powf(_beta1, Float(_iterationNum))) // TODO: optimize
 	}
 	
-	func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) {
+	func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) { // TODO: optimize
 
 		let contextArray = context as! Array<FloatBuffer>
 		let m: FloatBuffer = contextArray[0]

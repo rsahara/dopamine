@@ -8,6 +8,9 @@
 
 import Foundation
 
+// TODO: generalize interface
+// TODO: optimize
+
 public class LayerNet {
 	
 	public init(inputSize: Int, hiddenSize: Int, outputSize: Int) {
