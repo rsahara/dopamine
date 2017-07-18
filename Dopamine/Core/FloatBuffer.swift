@@ -96,7 +96,7 @@ public class FloatBuffer {
 	public func subcopy(_ src: FloatBuffer, startRow: Int, startColumn: Int) {
 		assert(startRow + _rows <= src._rows)
 		assert(startColumn + _columns <= src._columns)
-		// TODO: C++
+		// TODO: transcode to C++
 
 		for y in 0 ..< _rows {
 			memcpy(_buffer + (y * _columns),
@@ -107,7 +107,7 @@ public class FloatBuffer {
 	
 	public func copyConcatRows(left: FloatBuffer, right: FloatBuffer) {
 		assert(left._rows == right._rows)
-		// TODO: C++
+		// TODO: transcode to C++
 
 		let resColumns = left._columns + right._columns
 

@@ -55,7 +55,7 @@ extension FloatBuffer {
 	}
 	
 	public func transpose(result: FloatBuffer) {
-		result.resetLazy(_columns, _rows) // TODO: ここでやるべきでない
+		result.resetLazy(_columns, _rows) // TODO: remove/refactor
 		_FloatBuffer_Transpose(result._buffer, _buffer, Int32(_rows), Int32(_columns))
 	}
 
