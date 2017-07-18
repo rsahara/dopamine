@@ -16,8 +16,8 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "Dopamine"
-  s.version      = "0.0.10"
-  s.summary      = "Neural networks."
+  s.version      = "0.0.11"
+  s.summary      = "Machine learning on iOS devices."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -25,10 +25,10 @@ Pod::Spec.new do |s|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   s.description  = <<-DESC
-  Neural networks.
+  An original library allowing to run machine learning on iOS devices.
                    DESC
 
-  s.homepage     = "https://gitlab.com/rsahara/dopamine"
+  s.homepage     = "https://github.com/rsahara/dopamine"
   # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
 
@@ -40,7 +40,7 @@ Pod::Spec.new do |s|
   #
 
   s.license      = "MIT"
-  # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
+  # s.license      = { :type => "MIT", :file => "LICENSE" }
 
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -54,7 +54,7 @@ Pod::Spec.new do |s|
   #
 
   s.author             = { "Runo Sahara" => "contact@runo.jp" }
-  # s.social_media_url   = "http://twitter.com/佐原 瑠能"
+  # s.social_media_url   = "http://twitter.com/"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -71,7 +71,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "git@gitlab.com:rsahara/dopamine.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/rsahara/dopamine.git", :tag => "#{s.version}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
