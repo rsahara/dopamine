@@ -10,12 +10,14 @@ import Foundation
 
 public class OptimizerDescent: Optimizer {
 	
+	let initialCapacity = 102400
+	
 	public init(learnRate: Float = 0.01) {
 		_learnRate = learnRate
-		_tempBuffer = FloatBuffer(100, 1024)
+		_tempBuffer = FloatBuffer(1, initialCapacity)
 	}
 
-	public func initialize(context: inout AnyObject?) {
+	public func initialize(context: inout AnyObject?, rows: Int, columns: Int) {
 	}
 
 	public func release(context: inout AnyObject?) {
@@ -25,6 +27,7 @@ public class OptimizerDescent: Optimizer {
 	}
 	
 	public func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) {
+		_tempBuffer.reshape(like: gradient)
 		_tempBuffer.copy(gradient)
 		_tempBuffer.mul(_learnRate)
 		input.sub(_tempBuffer)

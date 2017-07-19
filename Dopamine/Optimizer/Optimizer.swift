@@ -10,7 +10,7 @@ import Foundation
 
 public protocol Optimizer {
 	
-	func initialize(context: inout AnyObject?)
+	func initialize(context: inout AnyObject?, rows: Int, columns: Int)
 	func release(context: inout AnyObject?)
 	
 	func updateIteration()

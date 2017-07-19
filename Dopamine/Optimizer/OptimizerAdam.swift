@@ -6,6 +6,10 @@
 //  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
+// experimental
+#if false
+	
+	
 import Foundation
 
 public class OptimizerAdam: Optimizer {
@@ -79,3 +83,5 @@ public class OptimizerAdam: Optimizer {
 	private let _beta1: Float
 	private let _beta2: Float
 }
+
+#endif

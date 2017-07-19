@@ -49,12 +49,11 @@ class ViewController: NSViewController {
 		let net = LayerNet(inputSize: 784, outputSize: 10, batchCapacity: batchCapacity, optimizer: optimizer)
 		
 		var layers = [Layer]()
-		layers.append(AffineLayer(inputSize: 784, outputSize: 50, batchCapacity: batchCapacity, layerName: "^", debugLog: false))
+		layers.append(AffineLayer(inputSize: 784, outputSize: 50, batchCapacity: batchCapacity, layerName: "^"))
 		layers.append(ReluLayer(inputSize: 50, batchCapacity: batchCapacity))
-		layers.append(AffineLayer(inputSize: 50, outputSize: 10, batchCapacity: batchCapacity, layerName: "$", debugLog: false))
+		layers.append(AffineLayer(inputSize: 50, outputSize: 10, batchCapacity: batchCapacity, layerName: "$"))
 
 		net.setup(layers: layers)
-
 
 		var epochPerfCheck = PerfCheck("epoch")
 		for iterationIndex in 0 ..< numIterations {

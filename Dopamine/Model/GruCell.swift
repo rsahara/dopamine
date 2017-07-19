@@ -8,17 +8,18 @@
 
 import Foundation
 
+// TODO: generalize
 public class GruCell {
 
 	init(inputSize: Int, outputSize: Int) {
 		self.inputSize = inputSize
 		self.outputSize = outputSize
 		
-		affineZ = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, batchCapacity: 1, layerName: "affineZ", debugLog: false)
+		affineZ = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, batchCapacity: 1, layerName: "affineZ")
 		sigmoidZ = SigmoidLayer()
-		affineR = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, batchCapacity: 1, layerName: "affineR", debugLog: false)
+		affineR = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, batchCapacity: 1, layerName: "affineR")
 		sigmoidR = SigmoidLayer()
-		affineC = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, batchCapacity: 1, layerName: "affineC", debugLog: false)
+		affineC = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, batchCapacity: 1, layerName: "affineC")
 		tanhC = TanhLayer()
 
 		lastOutput = FloatBuffer(1024, outputSize)

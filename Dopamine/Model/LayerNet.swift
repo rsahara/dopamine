@@ -18,93 +18,95 @@ public class LayerNet {
 		assert(outputSize > 0)
 		assert(batchCapacity > 0)
 		
-		self.inputSize = inputSize
-		self.outputSize = outputSize
+		_inputSize = inputSize
+		_outputSize = outputSize
 		_batchCapacity = batchCapacity
 		
-		tempBuffer1 = FloatBuffer(1, 1024 * 1024)
-		tempBuffer2 = FloatBuffer(1, 1024 * 1024)
+		_tempBuffer1 = FloatBuffer(1, 1024 * 1024) // TODO: generalize
+		_tempBuffer2 = FloatBuffer(1, 1024 * 1024) // TODO: generalize
 		
-		lastLayer = SoftmaxWithLoss()
-		self.optimizer = optimizer
-		layers = []
+		_lastLayer = SoftmaxWithLoss() // TODO: generalize
+		_optimizer = optimizer
+		_layers = []
 	}
 	
 	public func setup(layers: [Layer]) {
-		self.layers = layers
+		_layers = layers
 
-		for layer in layers {
-			layer.initOptimizer(optimizer: optimizer)
+		for layer in _layers {
+			layer.initOptimizer(optimizer: _optimizer)
 		}
 		
-		layers.first!.hasPreviousLayer = false
+		_layers.first!.hasPreviousLayer = false
 	}
 	
 	//
 	public func predict(input: FloatBuffer, result: FloatBuffer) {
 
-		var nextInput = tempBuffer1
-		var nextResult = tempBuffer2
+		var nextInput = _tempBuffer1
+		var nextResult = _tempBuffer2
 
-		let firstLayer = layers.first!
+		let firstLayer = _layers.first!
 		firstLayer.forward(input: input, result: nextResult, forTraining: false)
 
-		for layerIndex in 1 ..< layers.count {
+		for layerIndex in 1 ..< _layers.count {
 			let temp = nextInput
 			nextInput = nextResult
 			nextResult = temp
 
-			let layer = layers[layerIndex]
+			let layer = _layers[layerIndex]
 			layer.forward(input: nextInput, result: nextResult, forTraining: false)
 		}
 		
-		lastLayer.forward(input: nextResult, output: result, forTraining: false)
+		_lastLayer.forward(input: nextResult, output: result, forTraining: false)
 	}
 
 	//
 	public func train(input: FloatBuffer, output: FloatBuffer) {
 
-		var nextInput = tempBuffer1
-		var nextResult = tempBuffer2
+		var nextInput = _tempBuffer1
+		var nextResult = _tempBuffer2
 		
-		let firstLayer = layers.first!
+		let firstLayer = _layers.first!
 		firstLayer.forward(input: input, result: nextResult, forTraining: true)
 
-		for layerIndex in 1 ..< layers.count {
+		for layerIndex in 1 ..< _layers.count {
 			let temp = nextInput
 			nextInput = nextResult
 			nextResult = temp
 
-			let layer = layers[layerIndex]
+			let layer = _layers[layerIndex]
 			layer.forward(input: nextInput, result: nextResult, forTraining: true)
 		}
 
-		lastLayer.forward(input: nextResult, output: output, forTraining: true)
+		_lastLayer.forward(input: nextResult, output: output, forTraining: true)
 		
-		optimizer.updateIteration()
+		_optimizer.updateIteration()
 
-		lastLayer.backward(result: nextResult)
-		for layerIndex in stride(from: layers.count - 1, to: -1, by: -1) {
-			let layer = layers[layerIndex]
+		_lastLayer.backward(result: nextResult)
+		for layerIndex in stride(from: _layers.count - 1, to: -1, by: -1) {
+			let layer = _layers[layerIndex]
 			
 			let temp = nextInput
 			nextInput = nextResult
 			nextResult = temp
 
 			layer.backward(doutput: nextInput, result: nextResult)
-			layer.optimize(optimizer: self.optimizer)
+			layer.optimize(optimizer: _optimizer)
 		}
 	}
+	
+	// MARK: Hidden
 
-	let inputSize: Int
-	let outputSize: Int
-	let _batchCapacity: Int
+	private let _inputSize: Int
+	private let _outputSize: Int
+	private let _batchCapacity: Int
 	
-	var layers: [Layer]
-	var lastLayer: SoftmaxWithLoss
-	var optimizer: Optimizer
+	private var _layers: [Layer]
+	private var _lastLayer: SoftmaxWithLoss
+	private var _optimizer: Optimizer
 	
-	var tempBuffer1: FloatBuffer
-	var tempBuffer2: FloatBuffer
+	private var _tempBuffer1: FloatBuffer
+	private var _tempBuffer2: FloatBuffer
 
 }

@@ -8,6 +8,7 @@
 
 import Foundation
 
+// TODO: generalize
 public class TanhLayer: Layer {
 	
 	override init() {

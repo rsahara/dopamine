@@ -18,8 +18,9 @@ public class OptimizerRmsProp : Optimizer {
 		_iterationNum = 0
 	}
 	
-	public func initialize(context: inout AnyObject?) {
-		let h = FloatBuffer(1, 1024 * 1024)
+	public func initialize(context: inout AnyObject?, rows: Int, columns: Int) {
+		let h = FloatBuffer(rows, columns)
+		h.fillZero()
 		context = h as AnyObject
 	}
 	
@@ -35,10 +36,9 @@ public class OptimizerRmsProp : Optimizer {
 		
 		let h = context as! FloatBuffer
 
-		if _iterationNum == 1 {
-			h.resetLazy(like: input) // TODO: refactor
-			h.fillZero()
-		}
+		assert(h._rows == gradient._rows)
+		assert(h._columns == gradient._columns)
+
 		h.mul(_decayRate)
 		
 		_tempBuffer1.copy(gradient)

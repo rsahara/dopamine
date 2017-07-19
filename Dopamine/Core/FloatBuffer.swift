@@ -149,6 +149,7 @@ public class FloatBuffer {
 	public func resetLazy(_ rows: Int, _ columns: Int) {
 		let capacity = rows * columns
 		if (capacity > _allocationSize) {
+			Swift.print("FloatBuffer: resetLazy: realloc")
 			if _allocationSize != 0 {
 				_buffer.deallocate(capacity: _allocationSize)
 			}

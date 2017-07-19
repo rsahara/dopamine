@@ -8,6 +8,7 @@
 
 import Foundation
 
+// TODO: generalize
 public class GruNet {
 
 	public init(inputSize: Int, cellSize: Int, outputSize: Int, layersCount: Int, sequenceLength: Int) {
@@ -26,7 +27,7 @@ public class GruNet {
 				cellArray.append(GruCell(inputSize: cellSize, outputSize: cellSize))
 			}
 			softmaxArray.append(SoftmaxWithLoss())
-			outputLayerArray.append(AffineLayer(inputSize: cellSize, outputSize: outputSize, batchCapacity: 1, layerName: "o\(sequenceIndex)", debugLog: false))
+			outputLayerArray.append(AffineLayer(inputSize: cellSize, outputSize: outputSize, batchCapacity: 1, layerName: "o\(sequenceIndex)"))
 		}
 		
 		tempBufferArray1 = []

@@ -8,6 +8,7 @@
 
 import Foundation
 
+// TODO: generalize
 public class SoftmaxWithLoss {
 
 	public init() {

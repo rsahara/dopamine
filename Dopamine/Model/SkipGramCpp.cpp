@@ -73,7 +73,7 @@ void _SkipGram_TrainInit(int* itemSequenceBuffer, int itemSequenceBufferLength, 
 			break;
 		}
 		
-		// Update the max item ID
+		// Update the max item ID.
 		if (itemIndex > maxItemIndex) {
 			maxItemIndex = itemIndex;
 		}
