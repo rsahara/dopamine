@@ -8,9 +8,9 @@
 
 import Foundation
 
-class SoftmaxWithLoss {
+public class SoftmaxWithLoss {
 
-	init() {
+	public init() {
 		_lastOutput = FloatBuffer(1, 1024)
 		_lastTrainOutput = FloatBuffer(1, 1024)
 		_lastTrainLoss = 0.0
@@ -22,7 +22,6 @@ class SoftmaxWithLoss {
 
 		if forTraining {
 			_lastTrainLoss = _lastOutput.crossEntropyError(against: output)
-//			Swift.print("\(_lastTrainLoss)")
 			_lastTrainOutput.copy(output)
 		} else {
 			output.copy(_lastOutput)

@@ -8,8 +8,7 @@
 
 import Foundation
 
-
-class TanhLayer: Layer {
+public class TanhLayer: Layer {
 	
 	override init() {
 		

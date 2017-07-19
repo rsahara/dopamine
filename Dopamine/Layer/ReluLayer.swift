@@ -8,17 +8,18 @@
 
 import Foundation
 
-class ReluLayer :Layer {
+public class ReluLayer: Layer {
 	
-	override init() {
-		_mask = FloatBuffer(1, 1024)
+	public init(inputSize: Int, batchCapacity: Int) {
+		_mask = FloatBuffer(batchCapacity, inputSize)
+		super.init()
 	}
 
 	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
 
-		_mask.resetLazy(like: input)
-		result.resetLazy(like: input)
-		
+		_mask.reshape(like: input)
+		result.reshape(like: input)
+
 		if forTraining && hasPreviousLayer {
 			_Layer_ResetZeroOrNegativeAndMakeMask(result.contents, _mask.contents, input.contents, Int32(input.capacity))
 		}
@@ -37,6 +38,8 @@ class ReluLayer :Layer {
 		_Layer_ApplyMask(result.contents, _mask.contents, Int32(result.capacity));
 	}
 
+	// MARK: - Hidden
+	
 	private var _mask: FloatBuffer
 	
 }

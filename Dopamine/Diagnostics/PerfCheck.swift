@@ -41,6 +41,8 @@ public class PerfCheck {
 		step("begin")
 	}
 	
+	// MARK: - Hidden
+	
 	private let _name: String
 	private var _stepArray: Array<Date>
 	private var _stepNameArray: Array<String>

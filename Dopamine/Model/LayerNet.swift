@@ -13,30 +13,30 @@ import Foundation
 
 public class LayerNet {
 	
-	public init(inputSize: Int, outputSize: Int) {
+	public init(inputSize: Int, outputSize: Int, batchCapacity: Int, optimizer: Optimizer) {
+		assert(inputSize > 0)
+		assert(outputSize > 0)
+		assert(batchCapacity > 0)
 		
 		self.inputSize = inputSize
 		self.outputSize = outputSize
-
-		layers = Array()
-		layers.append(AffineLayer(inputSize: inputSize, outputSize: 50, layerName: "^", debugLog: false))
-		layers.append(ReluLayer())
-//		layers.append(AffineLayer(inputSize: 100, outputSize: 50, layerName: ":"))
-//		layers.append(ReluLayer())
-		layers.append(AffineLayer(inputSize: 50, outputSize: outputSize, layerName: "$", debugLog: false))
+		_batchCapacity = batchCapacity
 		
 		tempBuffer1 = FloatBuffer(1, 1024 * 1024)
 		tempBuffer2 = FloatBuffer(1, 1024 * 1024)
 		
 		lastLayer = SoftmaxWithLoss()
-		
-//		optimizer = OptimizerDescent(learnRate: 0.1)
-//		optimizer = OptimizerAdam()
-		optimizer = OptimizerRmsProp()
+		self.optimizer = optimizer
+		layers = []
+	}
+	
+	public func setup(layers: [Layer]) {
+		self.layers = layers
 
 		for layer in layers {
 			layer.initOptimizer(optimizer: optimizer)
 		}
+		
 		layers.first!.hasPreviousLayer = false
 	}
 	
@@ -96,12 +96,13 @@ public class LayerNet {
 		}
 	}
 
-	let optimizer: Optimizer
 	let inputSize: Int
 	let outputSize: Int
+	let _batchCapacity: Int
 	
-	var layers: Array<Layer>
+	var layers: [Layer]
 	var lastLayer: SoftmaxWithLoss
+	var optimizer: Optimizer
 	
 	var tempBuffer1: FloatBuffer
 	var tempBuffer2: FloatBuffer

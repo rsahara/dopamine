@@ -8,23 +8,23 @@
 
 import Foundation
 
-class OptimizerDescent: Optimizer {
+public class OptimizerDescent: Optimizer {
 	
-	init(learnRate: Float = 0.01) {
+	public init(learnRate: Float = 0.01) {
 		_learnRate = learnRate
 		_tempBuffer = FloatBuffer(100, 1024)
 	}
 
-	func initialize(context: inout AnyObject?) {
+	public func initialize(context: inout AnyObject?) {
 	}
 
-	func release(context: inout AnyObject?) {
+	public func release(context: inout AnyObject?) {
 	}
 
-	func updateIteration() {
+	public func updateIteration() {
 	}
 	
-	func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) {
+	public func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) {
 		_tempBuffer.copy(gradient)
 		_tempBuffer.mul(_learnRate)
 		input.sub(_tempBuffer)

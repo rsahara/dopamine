@@ -16,8 +16,8 @@ class ViewController: NSViewController {
 		super.viewDidLoad()
 		
 		testMNIST()
-		testGRU()
-		testSkipGram()
+//		testGRU()
+//		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -34,15 +34,28 @@ class ViewController: NSViewController {
 		
 		preloadMNISTImages()
 		
-		let net = LayerNet(inputSize: 784, outputSize: 10)
 		let numIterations: Int = 10000
 		let batchSize: Int = 100
+		let batchCapacity: Int = 10000
 		let epochBatchCount: Int = max(1, trainImagesBuffer.rows / batchSize)
 		
 		let batchInput = FloatBuffer(batchSize, 784)
 		let batchOutput = FloatBuffer(batchSize, 10)
+
+		//let optimizer = OptimizerDescent(learnRate: 0.1)
+		//let optimizer = OptimizerAdam()
+		let optimizer = OptimizerRmsProp()
+
+		let net = LayerNet(inputSize: 784, outputSize: 10, batchCapacity: batchCapacity, optimizer: optimizer)
 		
-		//		loadTrainRandomSamples(maxSamples: batchSize, input: input, output: output)
+		var layers = [Layer]()
+		layers.append(AffineLayer(inputSize: 784, outputSize: 50, batchCapacity: batchCapacity, layerName: "^", debugLog: false))
+		layers.append(ReluLayer(inputSize: 50, batchCapacity: batchCapacity))
+		layers.append(AffineLayer(inputSize: 50, outputSize: 10, batchCapacity: batchCapacity, layerName: "$", debugLog: false))
+
+		net.setup(layers: layers)
+
+
 		var epochPerfCheck = PerfCheck("epoch")
 		for iterationIndex in 0 ..< numIterations {
 			
@@ -239,7 +252,7 @@ class ViewController: NSViewController {
 	
 	func preloadMNISTImages() {
 		
-		let rootPath = "/Users/rsahara/mnist_png"
+		let rootPath = "/Users/pedantic/mnist_png"
 		
 		trainImagesBuffer = FloatBuffer(60000, 784)
 		trainLabelsBuffer =  FloatBuffer(60000, 10)

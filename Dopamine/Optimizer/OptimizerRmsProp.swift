@@ -8,9 +8,9 @@
 
 import Foundation
 
-class OptimizerRmsProp : Optimizer {
+public class OptimizerRmsProp : Optimizer {
 	
-	init(learnRate: Float = 0.001, decayRate: Float = 0.9) {
+	public init(learnRate: Float = 0.001, decayRate: Float = 0.9) {
 		_learnRate = learnRate
 		_decayRate = decayRate
 		_tempBuffer1 = FloatBuffer(1, 1024 * 1024)
@@ -18,20 +18,20 @@ class OptimizerRmsProp : Optimizer {
 		_iterationNum = 0
 	}
 	
-	func initialize(context: inout AnyObject?) {
+	public func initialize(context: inout AnyObject?) {
 		let h = FloatBuffer(1, 1024 * 1024)
 		context = h as AnyObject
 	}
 	
-	func release(context: inout AnyObject?) {
+	public func release(context: inout AnyObject?) {
 		context = nil
 	}
 	
-	func updateIteration() {
+	public func updateIteration() {
 		_iterationNum += 1
 	}
 	
-	func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) { // TODO: optimize
+	public func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) { // TODO: optimize
 		
 		let h = context as! FloatBuffer
 

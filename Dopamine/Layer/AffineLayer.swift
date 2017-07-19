@@ -8,9 +8,9 @@
 
 import Foundation
 
-class AffineLayer: Layer {
+public class AffineLayer: Layer {
 	
-	init(inputSize: Int, outputSize: Int, layerName: String = "", debugLog: Bool = false) {
+	public init(inputSize: Int, outputSize: Int, batchCapacity: Int, layerName: String = "", debugLog: Bool = false) {
 		
 		weight = FloatBuffer(inputSize, outputSize)
 		weight.fillRandom()
@@ -23,7 +23,7 @@ class AffineLayer: Layer {
 		dWeight = FloatBuffer(like: weight)
 		dBias = FloatBuffer(like: bias)
 		
-		lastInput = FloatBuffer(1, inputSize)
+		lastInput = FloatBuffer(batchCapacity, inputSize)
 		self.layerName = layerName
 		self.debugLog = debugLog
 
@@ -33,7 +33,7 @@ class AffineLayer: Layer {
 	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
 //		let perfCheck = PerfCheck("SimpleAffineLayer: forward")
 		
-		if (forTraining) {
+		if forTraining {
 			lastInput.copy(input)
 		}
 
@@ -68,15 +68,18 @@ class AffineLayer: Layer {
 		optimizer.optimize(input: weight, gradient: dWeight, context: &weightOptimizationContext)
 		optimizer.optimize(input: bias, gradient: dBias, context: &biasOptimizationContext)
 
-		if (debugLog) {
+		#if DEBUG
+		if debugLog {
 			let (weightMin, weightMax) = weight.minMax()
 			let (biasMin, biasMax) = bias.minMax()
 			print("AffineLayer \(layerName): Wmin: \(weightMin) Wmax: \(weightMax) Bmin: \(biasMin) Bmax: \(biasMax)")
 		}
+		#endif
 	}
 
 	// MARK: - Hidden
 	
+	// TODO: private
 	var weight: FloatBuffer
 	var bias: FloatBuffer
 	var lastInput: FloatBuffer

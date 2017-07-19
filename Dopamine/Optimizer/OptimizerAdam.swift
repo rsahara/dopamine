@@ -8,9 +8,9 @@
 
 import Foundation
 
-class OptimizerAdam: Optimizer {
+public class OptimizerAdam: Optimizer {
 	
-	init(learnRate: Float = 0.001, beta1: Float = 0.9, beta2: Float = 0.999) {
+	public init(learnRate: Float = 0.001, beta1: Float = 0.9, beta2: Float = 0.999) {
 		_learnRate = learnRate
 		_beta1 = beta1
 		_beta2 = beta2
@@ -18,23 +18,23 @@ class OptimizerAdam: Optimizer {
 		_step = 0.0
 	}
 
-	func initialize(context: inout AnyObject?) {
+	public func initialize(context: inout AnyObject?) {
 		let m = FloatBuffer(1, 1024 * 1024)
 		let v = FloatBuffer(1, 1024 * 1024)
 		
 		context = [m, v] as AnyObject
 	}
 	
-	func release(context: inout AnyObject?) {
+	public func release(context: inout AnyObject?) {
 		context = nil
 	}
 
-	func updateIteration() {
+	public func updateIteration() {
 		_iterationNum += 1
 		_step = _learnRate * sqrtf(1.0 - powf(_beta2, Float(_iterationNum))) / (1.0 - powf(_beta1, Float(_iterationNum))) // TODO: optimize
 	}
 	
-	func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) { // TODO: optimize
+	public func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) { // TODO: optimize
 
 		let contextArray = context as! Array<FloatBuffer>
 		let m: FloatBuffer = contextArray[0]

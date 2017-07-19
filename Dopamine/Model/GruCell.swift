@@ -14,11 +14,11 @@ public class GruCell {
 		self.inputSize = inputSize
 		self.outputSize = outputSize
 		
-		affineZ = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, layerName: "affineZ", debugLog: false)
+		affineZ = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, batchCapacity: 1, layerName: "affineZ", debugLog: false)
 		sigmoidZ = SigmoidLayer()
-		affineR = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, layerName: "affineR", debugLog: false)
+		affineR = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, batchCapacity: 1, layerName: "affineR", debugLog: false)
 		sigmoidR = SigmoidLayer()
-		affineC = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, layerName: "affineC", debugLog: false)
+		affineC = AffineLayer(inputSize: inputSize + outputSize, outputSize: outputSize, batchCapacity: 1, layerName: "affineC", debugLog: false)
 		tanhC = TanhLayer()
 
 		lastOutput = FloatBuffer(1024, outputSize)

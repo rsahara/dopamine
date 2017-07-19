@@ -26,7 +26,7 @@ public class GruNet {
 				cellArray.append(GruCell(inputSize: cellSize, outputSize: cellSize))
 			}
 			softmaxArray.append(SoftmaxWithLoss())
-			outputLayerArray.append(AffineLayer(inputSize: cellSize, outputSize: outputSize, layerName: "o\(sequenceIndex)", debugLog: false))
+			outputLayerArray.append(AffineLayer(inputSize: cellSize, outputSize: outputSize, batchCapacity: 1, layerName: "o\(sequenceIndex)", debugLog: false))
 		}
 		
 		tempBufferArray1 = []

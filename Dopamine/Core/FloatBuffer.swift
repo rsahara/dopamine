@@ -89,7 +89,7 @@ public class FloatBuffer {
 	}
 	
 	public func copy(_ src: FloatBuffer) {
-		resetLazy(like: src)
+		resetLazy(like: src) // TODO: use reshape
 		memcpy(_buffer, src._buffer, _capacity * 4)
 	}
 
@@ -124,7 +124,28 @@ public class FloatBuffer {
 		}
 	}
 
-	// TODO: Remove
+	public func reshape(_ rows: Int, _ columns: Int) {
+		let capacity = rows * columns
+		assert(capacity <= _allocationSize)
+
+		_rows = rows
+		_columns = columns
+		_capacity = capacity
+
+		#if DEBUG
+			if DEBUG_BUFFERINITIALIZATION {
+				for index in 0 ..< _capacity {
+					_buffer[index] = Float.nan
+				}
+			}
+		#endif
+	}
+	
+	public func reshape(like src: FloatBuffer) {
+		reshape(src._rows, src._columns)
+	}
+
+	// TODO: Remove, use reshape
 	public func resetLazy(_ rows: Int, _ columns: Int) {
 		let capacity = rows * columns
 		if (capacity > _allocationSize) {
@@ -148,6 +169,7 @@ public class FloatBuffer {
 		#endif
 	}
 
+	// TODO: Remove, use reshape
 	public func resetLazy(like src: FloatBuffer) {
 		resetLazy(src._rows, src._columns)
 	}

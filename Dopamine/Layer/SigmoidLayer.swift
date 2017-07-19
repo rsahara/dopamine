@@ -8,7 +8,7 @@
 
 import Foundation
 
-class SigmoidLayer: Layer {
+public class SigmoidLayer: Layer {
 
 	override init() {
 		_lastOutput = FloatBuffer(1, 1024 * 1024)
