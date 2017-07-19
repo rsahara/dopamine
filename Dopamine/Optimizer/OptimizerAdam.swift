@@ -12,6 +12,7 @@
 	
 import Foundation
 
+// TODO: generalize/refactor
 public class OptimizerAdam: Optimizer {
 	
 	public init(learnRate: Float = 0.001, beta1: Float = 0.9, beta2: Float = 0.999) {

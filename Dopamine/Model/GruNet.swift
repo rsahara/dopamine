@@ -126,18 +126,20 @@ public class GruNet {
 
 				let dstCell = cellArray[inputIndex * layersCount + layerIndex]
 				
-				dstCell.affineC.weight.copy(srcCell.affineC.weight)
-				dstCell.affineC.bias.copy(srcCell.affineC.bias)
-				dstCell.affineR.weight.copy(srcCell.affineR.weight)
-				dstCell.affineR.bias.copy(srcCell.affineR.bias)
-				dstCell.affineZ.weight.copy(srcCell.affineZ.weight)
-				dstCell.affineZ.bias.copy(srcCell.affineZ.bias)
+				// TODO: make private
+				dstCell.affineC._weight.copy(srcCell.affineC._weight)
+				dstCell.affineC._bias.copy(srcCell.affineC._bias)
+				dstCell.affineR._weight.copy(srcCell.affineR._weight)
+				dstCell.affineR._bias.copy(srcCell.affineR._bias)
+				dstCell.affineZ._weight.copy(srcCell.affineZ._weight)
+				dstCell.affineZ._bias.copy(srcCell.affineZ._bias)
 			}
 		}
 		for inputIndex in 1 ..< inputArray.count {
 			let dstOutputLayer = outputLayerArray[inputIndex]
-			dstOutputLayer.weight.copy(outputLayerArray[0].weight)
-			dstOutputLayer.bias.copy(outputLayerArray[0].bias)
+			// TODO: make private
+			dstOutputLayer._weight.copy(outputLayerArray[0]._weight)
+			dstOutputLayer._bias.copy(outputLayerArray[0]._bias)
 		}
 		
 		// Initial state for forward process.
@@ -210,18 +212,20 @@ public class GruNet {
 			
 				let srcCell = cellArray[inputIndex * layersCount + layerIndex]
 				
-				dstCell.affineC.dWeight.add(srcCell.affineC.dWeight)
-				dstCell.affineC.dBias.add(srcCell.affineC.dBias)
-				dstCell.affineR.dWeight.add(srcCell.affineR.dWeight)
-				dstCell.affineR.dBias.add(srcCell.affineR.dBias)
-				dstCell.affineZ.dWeight.add(srcCell.affineZ.dWeight)
-				dstCell.affineZ.dBias.add(srcCell.affineZ.dBias)
+				// TODO: make private
+				dstCell.affineC._dWeight.add(srcCell.affineC._dWeight)
+				dstCell.affineC._dBias.add(srcCell.affineC._dBias)
+				dstCell.affineR._dWeight.add(srcCell.affineR._dWeight)
+				dstCell.affineR._dBias.add(srcCell.affineR._dBias)
+				dstCell.affineZ._dWeight.add(srcCell.affineZ._dWeight)
+				dstCell.affineZ._dBias.add(srcCell.affineZ._dBias)
 			}
 		}
 		for inputIndex in 1 ..< inputArray.count {
 			let srcOutputLayer = outputLayerArray[inputIndex]
-			outputLayerArray[0].dWeight.add(srcOutputLayer.dWeight)
-			outputLayerArray[0].dBias.add(srcOutputLayer.dBias)
+			// TODO: make private
+			outputLayerArray[0]._dWeight.add(srcOutputLayer._dWeight)
+			outputLayerArray[0]._dBias.add(srcOutputLayer._dBias)
 		}
 		for layerIndex in 0 ..< layersCount {
 			let cell = cellArray[layerIndex]

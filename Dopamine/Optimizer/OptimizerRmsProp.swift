@@ -9,12 +9,12 @@
 import Foundation
 
 public class OptimizerRmsProp : Optimizer {
-	
+
 	public init(learnRate: Float = 0.001, decayRate: Float = 0.9) {
 		_learnRate = learnRate
 		_decayRate = decayRate
-		_tempBuffer1 = FloatBuffer(1, 1024 * 1024)
-		_tempBuffer2 = FloatBuffer(1, 1024 * 1024)
+		_tempBuffer1 = FloatBuffer(1, _initialCapacity)
+		_tempBuffer2 = FloatBuffer(1, _initialCapacity)
 		_iterationNum = 0
 	}
 	
@@ -41,6 +41,14 @@ public class OptimizerRmsProp : Optimizer {
 
 		h.mul(_decayRate)
 		
+		// Reallocate if needed.
+		if _tempBuffer1.capacity < gradient.capacity {
+			_tempBuffer1 = FloatBuffer(like: gradient)
+		}
+		if _tempBuffer2.capacity < gradient.capacity {
+			_tempBuffer2 = FloatBuffer(like: gradient)
+		}
+		
 		_tempBuffer1.copy(gradient)
 		_tempBuffer1.mul(gradient)
 		_tempBuffer1.mul(1.0 - _decayRate)
@@ -58,7 +66,8 @@ public class OptimizerRmsProp : Optimizer {
 	}
 	
 	// MARK: - Hidden
-	
+
+	private let _initialCapacity: Int = 1024 * 1024
 	private var _iterationNum: Int
 	private let _learnRate: Float
 	private let _decayRate: Float

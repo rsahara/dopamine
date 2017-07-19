@@ -89,7 +89,7 @@ public class FloatBuffer {
 	}
 	
 	public func copy(_ src: FloatBuffer) {
-		resetLazy(like: src) // TODO: use reshape
+		reshape(like: src)
 		memcpy(_buffer, src._buffer, _capacity * 4)
 	}
 
@@ -111,7 +111,7 @@ public class FloatBuffer {
 
 		let resColumns = left._columns + right._columns
 
-		resetLazy(left._rows, resColumns)
+		resetLazy(left._rows, resColumns) // TODO: reshape
 		assert(_capacity == left._capacity + right._capacity)
 
 		for y in 0 ..< left._rows {
