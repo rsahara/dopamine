@@ -16,8 +16,8 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "Dopamine"
-  s.version      = "0.0.11"
-  s.summary      = "Machine learning on iOS devices."
+  s.version      = "0.0.12"
+  s.summary      = "Machine learning for iOS and OS X."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   s.description  = <<-DESC
-  An original library allowing to run machine learning on iOS devices.
+  An original library allowing to run machine learning features in iOS and OS X apps.
                    DESC
 
   s.homepage     = "https://github.com/rsahara/dopamine"
