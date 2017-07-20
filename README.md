@@ -1,5 +1,4 @@
-# Dopamine
-[![Build Status](https://travis-ci.org/rsahara/dopamine.svg?branch=master)](https://travis-ci.org/rsahara/dopamine)
+# Dopamine [![Build Status](https://travis-ci.org/rsahara/dopamine.svg?branch=master)](https://travis-ci.org/rsahara/dopamine)
 
 Machine learning for iOS and OS X. (Educational purposes.)
 
