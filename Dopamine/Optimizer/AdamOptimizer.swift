@@ -1,5 +1,5 @@
 //
-//  OptimizerAdam.swift
+//  AdamOptimizer.swift
 //  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/02.
@@ -13,7 +13,7 @@
 import Foundation
 
 // TODO: generalize/refactor
-public class OptimizerAdam: Optimizer {
+public class AdamOptimizer: Optimizer {
 	
 	public init(learnRate: Float = 0.001, beta1: Float = 0.9, beta2: Float = 0.999) {
 		_learnRate = learnRate

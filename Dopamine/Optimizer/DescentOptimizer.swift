@@ -1,5 +1,5 @@
 //
-//  OptimizerDescent.swift
+//  DescentOptimizer.swift
 //  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/02.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class OptimizerDescent: Optimizer {
+public class DescentOptimizer: Optimizer {
 
 	public init(learnRate: Float = 0.01) {
 		_learnRate = learnRate

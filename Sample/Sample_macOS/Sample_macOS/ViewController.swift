@@ -42,10 +42,10 @@ class ViewController: NSViewController {
 		let batchInput = FloatBuffer(batchSize, 784)
 		let batchOutput = FloatBuffer(batchSize, 10)
 
-		//let optimizer = OptimizerDescent(learnRate: 0.1)
-		//let optimizer = OptimizerAdam()
-		let optimizer = OptimizerRmsProp()
-		let terminalLayer = SoftmaxWithCEE()
+		//let optimizer = DescentOptimizer(learnRate: 0.1)
+		//let optimizer = AdamOptimizer()
+		let optimizer = RmsPropOptimizer()
+		let terminalLayer = SoftmaxWithCEELayer()
 
 		let net = LayerNet(inputSize: 784, outputSize: 10, batchCapacity: batchCapacity, optimizer: optimizer, terminalLayer: terminalLayer)
 		

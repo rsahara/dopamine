@@ -1,5 +1,5 @@
 //
-//  SoftmaxWithCEE.swift
+//  SoftmaxWithCEELayer.swift
 //  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/01.
@@ -11,7 +11,7 @@ import Foundation
 // TODO: generalize
 
 // Softmax with cross entropy error as loss function.
-public class SoftmaxWithCEE: TerminalLayer {
+public class SoftmaxWithCEELayer: TerminalLayer {
 
 	public init() {
 		_lastOutput = FloatBuffer(1, 1024)

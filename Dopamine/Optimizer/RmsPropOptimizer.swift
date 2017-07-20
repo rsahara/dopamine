@@ -1,5 +1,5 @@
 //
-//  OptimizerRmsProp.swift
+//  RmsPropOptimizer.swift
 //  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/02.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class OptimizerRmsProp : Optimizer {
+public class RmsPropOptimizer: Optimizer {
 
 	public init(learnRate: Float = 0.001, decayRate: Float = 0.9) {
 		_learnRate = learnRate

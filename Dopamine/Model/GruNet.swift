@@ -20,13 +20,13 @@ public class GruNet {
 
 		cellArray = [GruCell]()
 		outputLayerArray = [AffineLayer]()
-		softmaxArray = [SoftmaxWithCEE]()
+		softmaxArray = [SoftmaxWithCEELayer]()
 		for sequenceIndex in 0 ..< sequenceLength {
 			cellArray.append(GruCell(inputSize: inputSize, outputSize: cellSize))
 			for _ in 1 ..< layersCount {
 				cellArray.append(GruCell(inputSize: cellSize, outputSize: cellSize))
 			}
-			softmaxArray.append(SoftmaxWithCEE())
+			softmaxArray.append(SoftmaxWithCEELayer())
 			outputLayerArray.append(AffineLayer(inputSize: cellSize, outputSize: outputSize, batchCapacity: 1, layerName: "o\(sequenceIndex)"))
 		}
 		
@@ -37,8 +37,8 @@ public class GruNet {
 			tempBufferArray2.append(FloatBuffer(1, 1024 * 1024))
 		}
 
-		optimizer = OptimizerDescent(learnRate: 0.1)
-//		optimizer = OptimizerRmsProp(learnRate: 0.001)
+		optimizer = DescentOptimizer(learnRate: 0.1)
+//		optimizer = RmsPropOptimizer(learnRate: 0.001)
 		for layerIndex in 0 ..< layersCount {
 			let cell = cellArray[layerIndex]
 			
@@ -242,7 +242,7 @@ public class GruNet {
 
 	var cellArray: [GruCell]
 	var outputLayerArray: [AffineLayer]
-	var softmaxArray: [SoftmaxWithCEE]
+	var softmaxArray: [SoftmaxWithCEELayer]
 	let optimizer: Optimizer
 
 	var tempBufferArray1: [FloatBuffer]
