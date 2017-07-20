@@ -2,3 +2,9 @@ language: objective-c
 xcode_project: Projects/Dopamine_macOS/Dopamine_macOS.xcodeproj
 xcode_scheme: Dopamine_macOS
 osx_image: xcode8.3
+before_install:
+  - brew update
+  - brew outdated xctool || brew upgrade xctool
+
+script:
+  - xcodebuild clean && xcodebuild build -project Projects/Dopamine_macOS/Dopamine_macOS.xcodeproj -scheme Dopamine_macOS
