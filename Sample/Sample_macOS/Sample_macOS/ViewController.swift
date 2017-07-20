@@ -15,9 +15,9 @@ class ViewController: NSViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		testMNIST()
-//		testGRU()
-//		testSkipGram()
+//		testMNIST()
+		testGRU()
+		testSkipGram()
 	}
 	
 	override var representedObject: Any? {
@@ -45,8 +45,9 @@ class ViewController: NSViewController {
 		//let optimizer = OptimizerDescent(learnRate: 0.1)
 		//let optimizer = OptimizerAdam()
 		let optimizer = OptimizerRmsProp()
+		let terminalLayer = SoftmaxWithCEE()
 
-		let net = LayerNet(inputSize: 784, outputSize: 10, batchCapacity: batchCapacity, optimizer: optimizer)
+		let net = LayerNet(inputSize: 784, outputSize: 10, batchCapacity: batchCapacity, optimizer: optimizer, terminalLayer: terminalLayer)
 		
 		var layers = [Layer]()
 		layers.append(AffineLayer(inputSize: 784, outputSize: 50, batchCapacity: batchCapacity, layerName: "^"))
@@ -59,7 +60,7 @@ class ViewController: NSViewController {
 		for iterationIndex in 0 ..< numIterations {
 			
 			loadTrainRandomSamples(maxSamples: batchSize, input: batchInput, output: batchOutput)
-			net.train(input: batchInput, output: batchOutput)
+			net.train(input: batchInput, outputTarget: batchOutput)
 			
 			if (iterationIndex % epochBatchCount == epochBatchCount - 1) {
 				

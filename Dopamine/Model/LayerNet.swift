@@ -13,7 +13,7 @@ import Foundation
 
 public class LayerNet {
 	
-	public init(inputSize: Int, outputSize: Int, batchCapacity: Int, optimizer: Optimizer) {
+	public init(inputSize: Int, outputSize: Int, batchCapacity: Int, optimizer: Optimizer, terminalLayer: TerminalLayer) {
 		assert(inputSize > 0)
 		assert(outputSize > 0)
 		assert(batchCapacity > 0)
@@ -25,7 +25,7 @@ public class LayerNet {
 		_tempBuffer1 = FloatBuffer(1, 1024 * 1024) // TODO: generalize
 		_tempBuffer2 = FloatBuffer(1, 1024 * 1024) // TODO: generalize
 		
-		_lastLayer = SoftmaxWithLoss() // TODO: generalize
+		_terminalLayer = terminalLayer
 		_optimizer = optimizer
 		_layers = []
 	}
@@ -36,18 +36,15 @@ public class LayerNet {
 		for layer in _layers {
 			layer.initOptimizer(optimizer: _optimizer)
 		}
-		
-		_layers.first!.hasPreviousLayer = false
 	}
-	
-	//
+
 	public func predict(input: FloatBuffer, result: FloatBuffer) {
 
 		var nextInput = _tempBuffer1
 		var nextResult = _tempBuffer2
 
 		let firstLayer = _layers.first!
-		firstLayer.forward(input: input, result: nextResult, forTraining: false)
+		firstLayer.forwardPredict(input: input, result: nextResult)
 
 		for layerIndex in 1 ..< _layers.count {
 			let temp = nextInput
@@ -55,20 +52,19 @@ public class LayerNet {
 			nextResult = temp
 
 			let layer = _layers[layerIndex]
-			layer.forward(input: nextInput, result: nextResult, forTraining: false)
+			layer.forwardPredict(input: nextInput, result: nextResult)
 		}
 		
-		_lastLayer.forward(input: nextResult, output: result, forTraining: false)
+		_terminalLayer.forwardPredict(input: nextResult, result: result)
 	}
 
-	//
-	public func train(input: FloatBuffer, output: FloatBuffer) {
+	public func train(input: FloatBuffer, outputTarget: FloatBuffer) {
 
 		var nextInput = _tempBuffer1
 		var nextResult = _tempBuffer2
 		
 		let firstLayer = _layers.first!
-		firstLayer.forward(input: input, result: nextResult, forTraining: true)
+		firstLayer.forwardTrain(input: input, result: nextResult, hasPreviousLayer: false)
 
 		for layerIndex in 1 ..< _layers.count {
 			let temp = nextInput
@@ -76,14 +72,14 @@ public class LayerNet {
 			nextResult = temp
 
 			let layer = _layers[layerIndex]
-			layer.forward(input: nextInput, result: nextResult, forTraining: true)
+			layer.forwardTrain(input: nextInput, result: nextResult, hasPreviousLayer: true)
 		}
 
-		_lastLayer.forward(input: nextResult, output: output, forTraining: true)
+		_terminalLayer.forwardTrain(input: nextResult, outputTarget: outputTarget)
 		
 		_optimizer.updateIteration()
 
-		_lastLayer.backward(result: nextResult)
+		_terminalLayer.backwardTrain(result: nextResult)
 		for layerIndex in stride(from: _layers.count - 1, to: -1, by: -1) {
 			let layer = _layers[layerIndex]
 			
@@ -91,7 +87,7 @@ public class LayerNet {
 			nextInput = nextResult
 			nextResult = temp
 
-			layer.backward(doutput: nextInput, result: nextResult)
+			layer.backwardTrain(dOutput: nextInput, result: nextResult, hasPreviousLayer: true)
 			layer.optimize(optimizer: _optimizer)
 		}
 	}
@@ -103,7 +99,7 @@ public class LayerNet {
 	private let _batchCapacity: Int
 	
 	private var _layers: [Layer]
-	private var _lastLayer: SoftmaxWithLoss
+	private var _terminalLayer: TerminalLayer
 	private var _optimizer: Optimizer
 	
 	private var _tempBuffer1: FloatBuffer

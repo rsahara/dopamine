@@ -27,12 +27,12 @@ public class GruCell {
 		last1mZ = FloatBuffer(1024, outputSize)
 	}
 
-	func forward(input: FloatBuffer, result: FloatBuffer, previousState: FloatBuffer, forTraining: Bool) {
+	func forwardPredict(input: FloatBuffer, result: FloatBuffer, previousState: FloatBuffer) {
 		
 		let batchSize = input.rows
 		
 		result.resetLazy(batchSize, outputSize)
-		lastPreviousState.copy(previousState) // forTraining
+		lastPreviousState.copy(previousState)
 		
 		// X <- Xt | Ht-1
 		let X = FloatBuffer(batchSize, inputSize + outputSize)
@@ -41,13 +41,55 @@ public class GruCell {
 		// z <- sigmoid(X.Wz + Bz)
 		let Z = FloatBuffer(batchSize, outputSize)
 		let temp = FloatBuffer(like: Z)
-		affineZ.forward(input: X, result: temp, forTraining: forTraining)
-		sigmoidZ.forward(input: temp, result: Z, forTraining: forTraining)
+		affineZ.forwardPredict(input: X, result: temp)
+		sigmoidZ.forwardPredict(input: temp, result: Z)
 		
 		// r <- sigmoid(X.Wr + Br)
 		let R = FloatBuffer(batchSize, outputSize)
-		affineR.forward(input: X, result: temp, forTraining: forTraining)
-		sigmoidR.forward(input: temp, result: R, forTraining: forTraining)
+		affineR.forwardPredict(input: X, result: temp)
+		sigmoidR.forwardPredict(input: temp, result: R)
+		
+		// X' <- Xt | r * Ht-1
+		let X2 = FloatBuffer(batchSize, inputSize + outputSize)
+		R.mul(previousState)
+		X2.copyConcatRows(left: input, right: R)
+		
+		// X'' <- tanh(X'.Wc + Bc)
+		affineC.forwardPredict(input: X2, result: temp)
+		X2.resetLazy(like: temp)
+		tanhC.forwardPredict(input: temp, result: X2)
+		
+		// Ht <- (1-z) * Ht-1 + z * X''
+		result.copy(Z)
+		result.mul(-1.0)
+		result.add(1.0)
+		last1mZ.copy(result)
+		result.mul(previousState)
+		Z.mul(X2)
+		result.add(Z)
+	}
+
+	func forwardTrain(input: FloatBuffer, result: FloatBuffer, previousState: FloatBuffer) {
+		
+		let batchSize = input.rows
+		
+		result.resetLazy(batchSize, outputSize)
+		lastPreviousState.copy(previousState)
+		
+		// X <- Xt | Ht-1
+		let X = FloatBuffer(batchSize, inputSize + outputSize)
+		X.copyConcatRows(left: input, right: previousState)
+		
+		// z <- sigmoid(X.Wz + Bz)
+		let Z = FloatBuffer(batchSize, outputSize)
+		let temp = FloatBuffer(like: Z)
+		affineZ.forwardTrain(input: X, result: temp, hasPreviousLayer: true)
+		sigmoidZ.forwardTrain(input: temp, result: Z, hasPreviousLayer: true)
+		
+		// r <- sigmoid(X.Wr + Br)
+		let R = FloatBuffer(batchSize, outputSize)
+		affineR.forwardTrain(input: X, result: temp, hasPreviousLayer: true)
+		sigmoidR.forwardTrain(input: temp, result: R, hasPreviousLayer: true)
 		
 		// X' <- Xt | r * Ht-1
 		let X2 = FloatBuffer(batchSize, inputSize + outputSize)
@@ -55,9 +97,9 @@ public class GruCell {
 		X2.copyConcatRows(left: input, right: R)
 
 		// X'' <- tanh(X'.Wc + Bc)
-		affineC.forward(input: X2, result: temp, forTraining: forTraining)
+		affineC.forwardTrain(input: X2, result: temp, hasPreviousLayer: true)
 		X2.resetLazy(like: temp)
-		tanhC.forward(input: temp, result: X2, forTraining: forTraining)
+		tanhC.forwardTrain(input: temp, result: X2, hasPreviousLayer: true)
 
 		// Ht <- (1-z) * Ht-1 + z * X''
 		result.copy(Z)
@@ -69,7 +111,7 @@ public class GruCell {
 		result.add(Z)
 	}
 
-	func backward(doutput: FloatBuffer, result: FloatBuffer, resultState: FloatBuffer) {
+	func backwardTrain(doutput: FloatBuffer, result: FloatBuffer, resultState: FloatBuffer) {
 
 		let batchSize = doutput.rows
 		resultState.resetLazy(batchSize, outputSize)
@@ -82,9 +124,9 @@ public class GruCell {
 		dC.copy(doutput)
 		dC.mul(sigmoidZ.lastOutput)
 		let temp1 = FloatBuffer(like: doutput)
-		tanhC.backward(doutput: dC, result: temp1)
+		tanhC.backwardTrain(dOutput: dC, result: temp1, hasPreviousLayer: true)
 		let temp2 = FloatBuffer(like: doutput)
-		affineC.backward(doutput: temp1, result: temp2)
+		affineC.backwardTrain(dOutput: temp1, result: temp2, hasPreviousLayer: true)
 		
 		temp1.subcopy(temp2, startRow: 0, startColumn: inputSize) // d14 = temp1
 		temp1.subcopy(resultState, startRow: 0, startColumn: 0) // d14 = temp1
@@ -93,16 +135,16 @@ public class GruCell {
 		resultState.add(temp2)
 
 		temp1.mul(lastPreviousState) // d16
-		sigmoidR.backward(doutput: temp1, result: temp2)
-		affineR.backward(doutput: temp2, result: temp1) // d20 = temp1
+		sigmoidR.backwardTrain(dOutput: temp1, result: temp2, hasPreviousLayer: true)
+		affineR.backwardTrain(dOutput: temp2, result: temp1, hasPreviousLayer: true) // d20 = temp1
 
 		let temp3 = FloatBuffer(like: doutput)
 		temp3.copy(tanhC.lastOutput)
 		temp3.sub(lastPreviousState)
 		temp3.mul(doutput)	// d11
 
-		sigmoidZ.backward(doutput: temp3, result: temp2)
-		affineZ.backward(doutput: temp2, result: temp3) // d17 = temp3
+		sigmoidZ.backwardTrain(dOutput: temp3, result: temp2, hasPreviousLayer: true)
+		affineZ.backwardTrain(dOutput: temp2, result: temp3, hasPreviousLayer: true) // d17 = temp3
 		
 		temp1.add(temp3) // d21 = temp1
 		temp2.subcopy(temp1, startRow: 0, startColumn: inputSize) // d23 = temp2

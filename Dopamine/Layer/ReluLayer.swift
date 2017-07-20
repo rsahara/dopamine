@@ -8,34 +8,42 @@
 
 import Foundation
 
+// RELU layer.
 public class ReluLayer: Layer {
 	
 	public init(inputSize: Int, batchCapacity: Int) {
 		_mask = FloatBuffer(batchCapacity, inputSize)
-		super.init()
 	}
 
-	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
-
+	public func forwardPredict(input: FloatBuffer, result: FloatBuffer) {
 		_mask.reshape(like: input)
 		result.reshape(like: input)
 
-		if forTraining && hasPreviousLayer {
-			_Layer_ResetZeroOrNegativeAndMakeMask(result.contents, _mask.contents, input.contents, Int32(input.capacity))
-		}
-		else {
-			_Layer_ResetZeroOrNegative(result.contents, input.contents, Int32(input.capacity))
-		}
+		_Layer_ResetZeroOrNegative(result.contents, input.contents, Int32(input.capacity))
 	}
 	
-	override func backward(doutput: FloatBuffer, result: FloatBuffer) {
+	public func forwardTrain(input: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		_mask.reshape(like: input)
+		result.reshape(like: input)
 
-		if !hasPreviousLayer {
-			return
+		if hasPreviousLayer {
+			_Layer_ResetZeroOrNegativeAndMakeMask(result.contents, _mask.contents, input.contents, Int32(input.capacity))
+		}
+	}
+
+	public func backwardTrain(dOutput: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		
+		if hasPreviousLayer {
+			result.copy(dOutput)
+			_Layer_ApplyMask(result.contents, _mask.contents, Int32(result.capacity));
 		}
 		
-		result.copy(doutput)
-		_Layer_ApplyMask(result.contents, _mask.contents, Int32(result.capacity));
+	}
+
+	public func initOptimizer(optimizer: Optimizer) {
+	}
+
+	public func optimize(optimizer: Optimizer) {
 	}
 
 	// MARK: - Hidden

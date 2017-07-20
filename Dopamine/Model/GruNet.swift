@@ -20,13 +20,13 @@ public class GruNet {
 
 		cellArray = [GruCell]()
 		outputLayerArray = [AffineLayer]()
-		softmaxArray = [SoftmaxWithLoss]()
+		softmaxArray = [SoftmaxWithCEE]()
 		for sequenceIndex in 0 ..< sequenceLength {
 			cellArray.append(GruCell(inputSize: inputSize, outputSize: cellSize))
 			for _ in 1 ..< layersCount {
 				cellArray.append(GruCell(inputSize: cellSize, outputSize: cellSize))
 			}
-			softmaxArray.append(SoftmaxWithLoss())
+			softmaxArray.append(SoftmaxWithCEE())
 			outputLayerArray.append(AffineLayer(inputSize: cellSize, outputSize: outputSize, batchCapacity: 1, layerName: "o\(sequenceIndex)"))
 		}
 		
@@ -73,7 +73,7 @@ public class GruNet {
 			for layerIndex in 0 ..< layersCount {
 				let cell = cellArray[layerIndex]
 				
-				cell.forward(input: input, result: nextStateArray[layerIndex], previousState: previousStateArray[layerIndex], forTraining: false)
+				cell.forwardPredict(input: input, result: nextStateArray[layerIndex], previousState: previousStateArray[layerIndex])
 			}
 
 			// Rotate buffers.
@@ -85,8 +85,8 @@ public class GruNet {
 		// Process the output.
 		let outputLayer = outputLayerArray[0]
 		let softmax = softmaxArray[0]
-		outputLayer.forward(input: previousStateArray[0], result: tempBuffer, forTraining: false)
-		softmax.forward(input: tempBuffer, output: resultArray[0], forTraining: false)
+		outputLayer.forwardPredict(input: previousStateArray[0], result: tempBuffer)
+		softmax.forwardPredict(input: tempBuffer, result: resultArray[0])
 		for resultIndex in 1 ..< resultArray.count {
 			let input = resultArray[resultIndex - 1]
 			let output = resultArray[resultIndex]
@@ -94,9 +94,9 @@ public class GruNet {
 
 				let cell = cellArray[layerIndex]
 
-				cell.forward(input: input, result: nextStateArray[layerIndex], previousState: previousStateArray[layerIndex], forTraining: false)
-				outputLayer.forward(input: nextStateArray[0], result: tempBuffer, forTraining: false)
-				softmax.forward(input: tempBuffer, output: output, forTraining: false)
+				cell.forwardPredict(input: input, result: nextStateArray[layerIndex], previousState: previousStateArray[layerIndex])
+				outputLayer.forwardPredict(input: nextStateArray[0], result: tempBuffer)
+				softmax.forwardPredict(input: tempBuffer, result: output)
 			}
 			
 			// Rotate buffers.
@@ -126,20 +126,20 @@ public class GruNet {
 
 				let dstCell = cellArray[inputIndex * layersCount + layerIndex]
 				
-				// TODO: make private
-				dstCell.affineC._weight.copy(srcCell.affineC._weight)
-				dstCell.affineC._bias.copy(srcCell.affineC._bias)
-				dstCell.affineR._weight.copy(srcCell.affineR._weight)
-				dstCell.affineR._bias.copy(srcCell.affineR._bias)
-				dstCell.affineZ._weight.copy(srcCell.affineZ._weight)
-				dstCell.affineZ._bias.copy(srcCell.affineZ._bias)
+				// TODO: refactor
+				dstCell.affineC.weight.copy(srcCell.affineC.weight)
+				dstCell.affineC.bias.copy(srcCell.affineC.bias)
+				dstCell.affineR.weight.copy(srcCell.affineR.weight)
+				dstCell.affineR.bias.copy(srcCell.affineR.bias)
+				dstCell.affineZ.weight.copy(srcCell.affineZ.weight)
+				dstCell.affineZ.bias.copy(srcCell.affineZ.bias)
 			}
 		}
 		for inputIndex in 1 ..< inputArray.count {
 			let dstOutputLayer = outputLayerArray[inputIndex]
-			// TODO: make private
-			dstOutputLayer._weight.copy(outputLayerArray[0]._weight)
-			dstOutputLayer._bias.copy(outputLayerArray[0]._bias)
+			// TODO: refactor
+			dstOutputLayer.weight.copy(outputLayerArray[0].weight)
+			dstOutputLayer.bias.copy(outputLayerArray[0].bias)
 		}
 		
 		// Initial state for forward process.
@@ -158,13 +158,13 @@ public class GruNet {
 			for layerIndex in 0 ..< layersCount {
 				let cell = cellArray[inputIndex * layersCount + layerIndex]
 				
-				cell.forward(input: input, result: nextStateArray[layerIndex], previousState: previousStateArray[layerIndex], forTraining: true)
+				cell.forwardTrain(input: input, result: nextStateArray[layerIndex], previousState: previousStateArray[layerIndex])
 			}
 
-			outputLayer.forward(input: nextStateArray[layersCount - 1], result: tempBuffer, forTraining: true)
+			outputLayer.forwardTrain(input: nextStateArray[layersCount - 1], result: tempBuffer, hasPreviousLayer: true)
 
 			let softmax = softmaxArray[inputIndex]
-			softmax.forward(input: tempBuffer, output:output, forTraining: true)
+			softmax.forwardTrain(input: tempBuffer, outputTarget: output)
 
 			// Rotate buffers.
 			let temp = nextStateArray
@@ -183,16 +183,16 @@ public class GruNet {
 		for outputIndex in stride(from: outputArray.count - 1, to: -1, by: -1) {
 			let softmax = softmaxArray[outputIndex]
 			let outputLayer = outputLayerArray[outputIndex]
-			softmax.backward(result: tempBuffer)
+			softmax.backwardTrain(result: tempBuffer)
 
-			outputLayer.backward(doutput: tempBuffer, result: tempBuffer2)
+			outputLayer.backwardTrain(dOutput: tempBuffer, result: tempBuffer2, hasPreviousLayer: true)
 
 			for layerIndex in stride(from: layersCount - 1, to: -1, by: -1) {
 
 				previousStateArray[layerIndex].add(tempBuffer2)
 
 				let cell = cellArray[outputIndex * layersCount + layerIndex]
-				cell.backward(doutput: previousStateArray[layerIndex], result: tempBuffer2, resultState: nextStateArray[layerIndex])
+				cell.backwardTrain(doutput: previousStateArray[layerIndex], result: tempBuffer2, resultState: nextStateArray[layerIndex])
 			}
 
 			// Rotate buffers.
@@ -212,20 +212,20 @@ public class GruNet {
 			
 				let srcCell = cellArray[inputIndex * layersCount + layerIndex]
 				
-				// TODO: make private
-				dstCell.affineC._dWeight.add(srcCell.affineC._dWeight)
-				dstCell.affineC._dBias.add(srcCell.affineC._dBias)
-				dstCell.affineR._dWeight.add(srcCell.affineR._dWeight)
-				dstCell.affineR._dBias.add(srcCell.affineR._dBias)
-				dstCell.affineZ._dWeight.add(srcCell.affineZ._dWeight)
-				dstCell.affineZ._dBias.add(srcCell.affineZ._dBias)
+				// TODO: refactor
+				dstCell.affineC.dWeight.add(srcCell.affineC.dWeight)
+				dstCell.affineC.dBias.add(srcCell.affineC.dBias)
+				dstCell.affineR.dWeight.add(srcCell.affineR.dWeight)
+				dstCell.affineR.dBias.add(srcCell.affineR.dBias)
+				dstCell.affineZ.dWeight.add(srcCell.affineZ.dWeight)
+				dstCell.affineZ.dBias.add(srcCell.affineZ.dBias)
 			}
 		}
 		for inputIndex in 1 ..< inputArray.count {
 			let srcOutputLayer = outputLayerArray[inputIndex]
-			// TODO: make private
-			outputLayerArray[0]._dWeight.add(srcOutputLayer._dWeight)
-			outputLayerArray[0]._dBias.add(srcOutputLayer._dBias)
+			// TODO: refactor
+			outputLayerArray[0].dWeight.add(srcOutputLayer.dWeight)
+			outputLayerArray[0].dBias.add(srcOutputLayer.dBias)
 		}
 		for layerIndex in 0 ..< layersCount {
 			let cell = cellArray[layerIndex]
@@ -246,7 +246,7 @@ public class GruNet {
 
 	var cellArray: [GruCell]
 	var outputLayerArray: [AffineLayer]
-	var softmaxArray: [SoftmaxWithLoss]
+	var softmaxArray: [SoftmaxWithCEE]
 	let optimizer: Optimizer
 
 	var tempBufferArray1: [FloatBuffer]

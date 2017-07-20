@@ -8,23 +8,21 @@
 
 import Foundation
 
-public class Layer {
-	
-	init () {
-		hasPreviousLayer = true
-	}
-	
-	func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
-	}
+public protocol Layer {
 
-	func backward(doutput: FloatBuffer, result: FloatBuffer) {
-	}
-
-	func initOptimizer(optimizer: Optimizer) {
-	}
-
-	func optimize(optimizer: Optimizer){
-	}
+	func forwardPredict(input: FloatBuffer, result: FloatBuffer)
+	func forwardTrain(input: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool)
+	func backwardTrain(dOutput: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool)
 	
-	internal var hasPreviousLayer: Bool
+	func initOptimizer(optimizer: Optimizer)
+	func optimize(optimizer: Optimizer)
+	
+}
+
+public protocol TerminalLayer {
+
+	func forwardPredict(input: FloatBuffer, result: FloatBuffer)
+	func forwardTrain(input: FloatBuffer, outputTarget: FloatBuffer)
+	func backwardTrain(result: FloatBuffer)
+
 }

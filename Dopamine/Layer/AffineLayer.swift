@@ -8,7 +8,12 @@
 
 import Foundation
 
+// Affine layer.
 public class AffineLayer: Layer {
+
+	#if DEBUG
+	public var DEBUG_LOG = false		// Print debugging logs
+	#endif
 
 	public init(inputSize: Int, outputSize: Int, batchCapacity: Int, layerName: String = "") {
 		_layerName = layerName
@@ -18,7 +23,7 @@ public class AffineLayer: Layer {
 		
 		_weight = FloatBuffer(inputSize, outputSize)
 		_weight.fillRandom()
-		_weight.mul(sqrtf(2.0 / Float(inputSize)))
+		_weight.mul(sqrtf(2.0 / Float(inputSize))) // TODO: make a parameter for this
 
 		_bias = FloatBuffer(1, outputSize)
 		_bias.fillZero()
@@ -29,61 +34,61 @@ public class AffineLayer: Layer {
 		_dBias = FloatBuffer(like: _bias)
 		
 		_tempBuffer = FloatBuffer(1, max(_lastInput.capacity, _weight.capacity))
-
-		#if DEBUG
-		_debugLog = false
-		#endif
-
-		super.init()
 	}
 
-	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
+	public func forwardPredict(input: FloatBuffer, result: FloatBuffer) {
 		assert(input._columns == _inputSize)
 		assert(input._rows <= _batchCapacity)
-
-		if forTraining {
-			_lastInput.copy(input)
-		}
-
+		
 		input.matmul(by: _weight, to: result)
 		result.add(_bias)
-
+		
 		assert(result._columns == _outputSize)
 		assert(result._rows == input._rows)
 	}
 	
-	override func backward(doutput: FloatBuffer, result: FloatBuffer) {
-		assert(doutput._columns == _outputSize)
-		assert(doutput._rows == _lastInput._rows)
-
-		if hasPreviousLayer {
-			_weight.transpose(result: _tempBuffer)
-			doutput.matmul(by: _tempBuffer, to: result)
-		}
-
-		_lastInput.transpose(result: _tempBuffer)
-		_tempBuffer.matmul(by: doutput, to: _dWeight)
-		
-		doutput.sumFirstAxis(to: _dBias)
+	public func forwardTrain(input: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		forwardPredict(input: input, result: result)
+		_lastInput.copy(input)
 	}
 	
-	override func initOptimizer(optimizer: Optimizer) {
+	public func backwardTrain(dOutput: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		assert(dOutput._columns == _outputSize)
+		assert(dOutput._rows == _lastInput._rows)
+		
+		if hasPreviousLayer {
+			_weight.transpose(result: _tempBuffer)
+			dOutput.matmul(by: _tempBuffer, to: result)
+		}
+		
+		_lastInput.transpose(result: _tempBuffer)
+		_tempBuffer.matmul(by: dOutput, to: _dWeight)
+
+		dOutput.sumFirstAxis(to: _dBias)
+	}
+	
+	public func initOptimizer(optimizer: Optimizer) {
 		optimizer.initialize(context: &_weightOptContext, rows: _weight.rows, columns: _weight.columns)
 		optimizer.initialize(context: &_biasOptContext, rows: _bias.rows, columns: _bias.columns)
 	}
 
-	override func optimize(optimizer: Optimizer) {
+	public func optimize(optimizer: Optimizer) {
 		optimizer.optimize(input: _weight, gradient: _dWeight, context: &_weightOptContext)
 		optimizer.optimize(input: _bias, gradient: _dBias, context: &_biasOptContext)
 
 		#if DEBUG
-		if _debugLog {
+		if DEBUG_LOG {
 			let (weightMin, weightMax) = _weight.minMax()
 			let (biasMin, biasMax) = _bias.minMax()
 			print("AffineLayer \(_layerName): Wmin: \(weightMin) Wmax: \(weightMax) Bmin: \(biasMin) Bmax: \(biasMax)")
 		}
 		#endif
 	}
+
+	public var weight: FloatBuffer { return _weight } // TODO: refactor
+	public var bias: FloatBuffer {  return _bias } // TODO: refactor
+	public var dWeight: FloatBuffer { return _dWeight } // TODO: refactor
+	public var dBias: FloatBuffer { return _dBias } // TODO: refactor
 
 	// MARK: - Hidden
 	
@@ -93,17 +98,11 @@ public class AffineLayer: Layer {
 	private let _batchCapacity: Int
 	private let _lastInput: FloatBuffer
 	private let _tempBuffer: FloatBuffer
-	
-	// TODO: private
-	let _weight: FloatBuffer
-	let _bias: FloatBuffer
-	let _dWeight: FloatBuffer
-	let _dBias: FloatBuffer
+	private let _weight: FloatBuffer
+	private let _bias: FloatBuffer
+	private let _dWeight: FloatBuffer
+	private let _dBias: FloatBuffer
 	
 	private var _weightOptContext: AnyObject?
 	private var _biasOptContext: AnyObject?
-
-	#if DEBUG
-	public var _debugLog: Bool
-	#endif
 }

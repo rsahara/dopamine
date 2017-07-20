@@ -11,7 +11,7 @@ import Foundation
 public class FloatBuffer {
 	
 	#if DEBUG
-	var DEBUG_BUFFERINITIALIZATION = false
+	public var DEBUG_BUFFERINITIALIZATION = false // Make a buffer initialized with NaN
 	#endif
 
 	public typealias Pointer = UnsafeMutablePointer<Float>
