@@ -7,4 +7,4 @@ osx_image: xcode8.3
 #  - brew outdated xctool || brew upgrade xctool
 
 script:
-  -  cd Projects/Dopamine_macOS && xcodebuild clean && xcodebuild build -project Dopamine_macOS.xcodeproj -scheme Dopamine_macOS
+  -  cd Projects/Dopamine_macOS && xcodebuild clean build test -project Dopamine_macOS.xcodeproj -scheme Dopamine_macOS
