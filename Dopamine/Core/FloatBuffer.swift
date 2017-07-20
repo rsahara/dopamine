@@ -105,6 +105,7 @@ public class FloatBuffer {
 		}
 	}
 	
+	// Concatenate left and right, row-wise
 	public func copyConcatRows(left: FloatBuffer, right: FloatBuffer) {
 		assert(left._rows == right._rows)
 		// TODO: transcode to C++
@@ -145,8 +146,8 @@ public class FloatBuffer {
 		reshape(src._rows, src._columns)
 	}
 
-	// TODO: Remove, use reshape
-	public func resetLazy(_ rows: Int, _ columns: Int) {
+	// TODO: Remove, use reshape and precalculate required memory size
+	private func resetLazy(_ rows: Int, _ columns: Int) {
 		let capacity = rows * columns
 		if (capacity > _allocationSize) {
 			Swift.print("FloatBuffer: resetLazy: realloc")
@@ -168,11 +169,6 @@ public class FloatBuffer {
 			}
 		}
 		#endif
-	}
-
-	// TODO: Remove, use reshape
-	public func resetLazy(like src: FloatBuffer) {
-		resetLazy(src._rows, src._columns)
 	}
 
 	// MARK: - Properties

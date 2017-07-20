@@ -22,8 +22,8 @@ public class LayerNet {
 		_outputSize = outputSize
 		_batchCapacity = batchCapacity
 		
-		_tempBuffer1 = FloatBuffer(1, 1024 * 1024) // TODO: generalize
-		_tempBuffer2 = FloatBuffer(1, 1024 * 1024) // TODO: generalize
+		_tempBuffer1 = FloatBuffer(1, 1)
+		_tempBuffer2 = FloatBuffer(1, 1)
 		
 		_terminalLayer = terminalLayer
 		_optimizer = optimizer
@@ -33,9 +33,18 @@ public class LayerNet {
 	public func setup(layers: [Layer]) {
 		_layers = layers
 
+		var maxResultCapacity = _terminalLayer.requiredResultCapacity()
 		for layer in _layers {
 			layer.initOptimizer(optimizer: _optimizer)
+			
+			let requiredResultCapacity = layer.requiredResultCapacity()
+			if requiredResultCapacity > maxResultCapacity {
+				maxResultCapacity = requiredResultCapacity
+			}
 		}
+		
+		_tempBuffer1 = FloatBuffer(1, maxResultCapacity)
+		_tempBuffer2 = FloatBuffer(1, maxResultCapacity)
 	}
 
 	public func predict(input: FloatBuffer, result: FloatBuffer) {

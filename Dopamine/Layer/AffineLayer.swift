@@ -67,6 +67,10 @@ public class AffineLayer: Layer {
 		dOutput.sumFirstAxis(to: _dBias)
 	}
 	
+	public func requiredResultCapacity() -> Int {
+		return _outputSize * _batchCapacity
+	}
+
 	public func initOptimizer(optimizer: Optimizer) {
 		optimizer.initialize(context: &_weightOptContext, rows: _weight.rows, columns: _weight.columns)
 		optimizer.initialize(context: &_biasOptContext, rows: _bias.rows, columns: _bias.columns)
@@ -102,7 +106,6 @@ public class AffineLayer: Layer {
 	private let _bias: FloatBuffer
 	private let _dWeight: FloatBuffer
 	private let _dBias: FloatBuffer
-	
 	private var _weightOptContext: AnyObject?
 	private var _biasOptContext: AnyObject?
 }

@@ -26,15 +26,15 @@ public class GruNet {
 			for _ in 1 ..< layersCount {
 				cellArray.append(GruCell(inputSize: cellSize, outputSize: cellSize))
 			}
-			softmaxArray.append(SoftmaxWithCEELayer())
+			softmaxArray.append(SoftmaxWithCEELayer(inputSize: outputSize, batchCapacity: 1))
 			outputLayerArray.append(AffineLayer(inputSize: cellSize, outputSize: outputSize, batchCapacity: 1, layerName: "o\(sequenceIndex)"))
 		}
 		
 		tempBufferArray1 = []
 		tempBufferArray2 = []
 		for _ in 0 ..< layersCount {
-			tempBufferArray1.append(FloatBuffer(1, 1024 * 1024))
-			tempBufferArray2.append(FloatBuffer(1, 1024 * 1024))
+			tempBufferArray1.append(FloatBuffer(1, 1024 * 1024)) // TODO: fix
+			tempBufferArray2.append(FloatBuffer(1, 1024 * 1024)) // TODO: fix
 		}
 
 		optimizer = DescentOptimizer(learnRate: 0.1)
@@ -63,7 +63,7 @@ public class GruNet {
 		// Prepare initial state.
 		for layerIndex in 0 ..< layersCount {
 			let previousState = previousStateArray[layerIndex]
-			previousState.resetLazy(batchSize, cellArray[layerIndex].outputSize)
+			previousState.reshape(batchSize, cellArray[layerIndex].outputSize)
 			previousState.fillZero()
 		}
 
@@ -116,8 +116,8 @@ public class GruNet {
 		let batchSize = inputArray[0].rows
 		var previousStateArray = tempBufferArray1
 		var nextStateArray = tempBufferArray2
-		let tempBuffer = FloatBuffer(batchSize, outputSize)
-		let tempBuffer2 = FloatBuffer(batchSize, outputSize)
+		let tempBuffer = FloatBuffer(1, 1024 * 1024) // TODO: calculate
+		let tempBuffer2 = FloatBuffer(1, 1024 * 1024) // TODO: calculate
 
 		// Copy weights.
 		for layerIndex in 0 ..< layersCount {
@@ -143,7 +143,7 @@ public class GruNet {
 		// Initial state for forward process.
 		for layerIndex in 0 ..< layersCount {
 			let previousState = previousStateArray[layerIndex]
-			previousState.resetLazy(batchSize, cellArray[layerIndex].outputSize)
+			previousState.reshape(batchSize, cellArray[layerIndex].outputSize)
 			previousState.fillZero()
 		}
 		
@@ -173,7 +173,7 @@ public class GruNet {
 		// Initial state for backward process.
 		for layerIndex in 0 ..< layersCount {
 			let previousState = previousStateArray[layerIndex]
-			previousState.resetLazy(inputArray[0].rows, cellArray[layerIndex].outputSize)
+			previousState.reshape(inputArray[0].rows, cellArray[layerIndex].outputSize)
 			previousState.fillZero()
 		}
 		

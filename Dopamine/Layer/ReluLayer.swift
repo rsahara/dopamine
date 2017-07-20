@@ -12,9 +12,11 @@ import Foundation
 public class ReluLayer: Layer {
 	
 	public init(inputSize: Int, batchCapacity: Int) {
+		_inputSize = inputSize
+		_batchCapacity = batchCapacity
 		_mask = FloatBuffer(batchCapacity, inputSize)
 	}
-
+	
 	public func forwardPredict(input: FloatBuffer, result: FloatBuffer) {
 		_mask.reshape(like: input)
 		result.reshape(like: input)
@@ -40,6 +42,10 @@ public class ReluLayer: Layer {
 		
 	}
 
+	public func requiredResultCapacity() -> Int {
+		return _inputSize * _batchCapacity
+	}
+
 	public func initOptimizer(optimizer: Optimizer) {
 	}
 
@@ -48,6 +54,8 @@ public class ReluLayer: Layer {
 
 	// MARK: - Hidden
 	
+	private let _inputSize: Int
+	private let _batchCapacity: Int
 	private var _mask: FloatBuffer
 	
 }

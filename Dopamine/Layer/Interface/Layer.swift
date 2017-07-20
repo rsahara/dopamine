@@ -13,6 +13,7 @@ public protocol Layer {
 	func forwardPredict(input: FloatBuffer, result: FloatBuffer)
 	func forwardTrain(input: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool)
 	func backwardTrain(dOutput: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool)
+	func requiredResultCapacity() -> Int
 	
 	func initOptimizer(optimizer: Optimizer)
 	func optimize(optimizer: Optimizer)
@@ -24,5 +25,6 @@ public protocol TerminalLayer {
 	func forwardPredict(input: FloatBuffer, result: FloatBuffer)
 	func forwardTrain(input: FloatBuffer, outputTarget: FloatBuffer)
 	func backwardTrain(result: FloatBuffer)
+	func requiredResultCapacity() -> Int
 
 }

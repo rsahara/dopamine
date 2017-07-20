@@ -13,9 +13,11 @@ import Foundation
 // Softmax with cross entropy error as loss function.
 public class SoftmaxWithCEELayer: TerminalLayer {
 
-	public init() {
-		_lastOutput = FloatBuffer(1, 1024)
-		_lastOutputTarget = FloatBuffer(1, 1024)
+	public init(inputSize: Int, batchCapacity: Int) {
+		_inputSize = inputSize
+		_batchCapacity = batchCapacity
+		_lastOutput = FloatBuffer(batchCapacity, inputSize)
+		_lastOutputTarget = FloatBuffer(batchCapacity, inputSize)
 		_lastTrainLoss = 0.0
 	}
 
@@ -34,9 +36,14 @@ public class SoftmaxWithCEELayer: TerminalLayer {
 		result.sub(_lastOutputTarget)
 		result.mul(1.0 / Float(_lastOutputTarget.rows))
 	}
+	
+	public func requiredResultCapacity() -> Int {
+		return _inputSize * _batchCapacity
+	}
 
 	// MARK: - Hidden
-	
+	private let _inputSize: Int
+	private let _batchCapacity: Int
 	private var _lastOutput: FloatBuffer
 	private var _lastTrainLoss: Float
 	private var _lastOutputTarget: FloatBuffer

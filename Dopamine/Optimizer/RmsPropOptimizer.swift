@@ -42,6 +42,7 @@ public class RmsPropOptimizer: Optimizer {
 		h.mul(_decayRate)
 		
 		// Reallocate if needed.
+		// TODO: optimize
 		if _tempBuffer1.capacity < gradient.capacity {
 			_tempBuffer1 = FloatBuffer(like: gradient)
 		}
