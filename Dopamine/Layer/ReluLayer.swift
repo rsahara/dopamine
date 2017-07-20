@@ -34,7 +34,7 @@ public class ReluLayer: Layer {
 	public func backwardTrain(dOutput: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
 		
 		if hasPreviousLayer {
-			result.copy(dOutput)
+			result.copy(from: dOutput)
 			_Layer_ApplyMask(result.contents, _mask.contents, Int32(result.capacity));
 		}
 		

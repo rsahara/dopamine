@@ -31,7 +31,7 @@ public class OptimizerDescent: Optimizer {
 			_tempBuffer = FloatBuffer(like: gradient)
 		}
 		
-		_tempBuffer.copy(gradient)
+		_tempBuffer.copy(from: gradient)
 		_tempBuffer.mul(_learnRate)
 		input.sub(_tempBuffer)
 	}

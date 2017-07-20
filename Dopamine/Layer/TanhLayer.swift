@@ -26,7 +26,7 @@ public class TanhLayer: Layer {
 		forwardPredict(input: input, result: result)
 		
 		if hasPreviousLayer {
-			_lastOutput.copy(result)
+			_lastOutput.copy(from: result)
 		}
 	}
 	
@@ -44,7 +44,7 @@ public class TanhLayer: Layer {
 	public func optimize(optimizer: Optimizer) {
 	}
 	
-	public var lastOutput: FloatBuffer { return _lastOutput } // TODO: refactor
+	public var lastOutput: FloatBuffer { return _lastOutput }
 
 	// MARK: - Hidden
 	

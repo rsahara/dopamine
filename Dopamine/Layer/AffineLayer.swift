@@ -35,7 +35,7 @@ public class AffineLayer: Layer {
 		
 		_tempBuffer = FloatBuffer(1, max(_lastInput.capacity, _weight.capacity))
 	}
-
+	
 	public func forwardPredict(input: FloatBuffer, result: FloatBuffer) {
 		assert(input._columns == _inputSize)
 		assert(input._rows <= _batchCapacity)
@@ -49,7 +49,7 @@ public class AffineLayer: Layer {
 	
 	public func forwardTrain(input: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
 		forwardPredict(input: input, result: result)
-		_lastInput.copy(input)
+		_lastInput.copy(from: input)
 	}
 	
 	public func backwardTrain(dOutput: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
@@ -85,10 +85,10 @@ public class AffineLayer: Layer {
 		#endif
 	}
 
-	public var weight: FloatBuffer { return _weight } // TODO: refactor
-	public var bias: FloatBuffer {  return _bias } // TODO: refactor
-	public var dWeight: FloatBuffer { return _dWeight } // TODO: refactor
-	public var dBias: FloatBuffer { return _dBias } // TODO: refactor
+	public var weight: FloatBuffer { return _weight }
+	public var bias: FloatBuffer {  return _bias }
+	public var dWeight: FloatBuffer { return _dWeight }
+	public var dBias: FloatBuffer { return _dBias }
 
 	// MARK: - Hidden
 	

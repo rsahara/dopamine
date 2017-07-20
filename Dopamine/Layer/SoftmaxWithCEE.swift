@@ -26,11 +26,11 @@ public class SoftmaxWithCEE: TerminalLayer {
 	public func forwardTrain(input: FloatBuffer, outputTarget: FloatBuffer) {
 		input.softmax(result: _lastOutput)
 		_lastTrainLoss = _lastOutput.crossEntropyError(against: outputTarget)
-		_lastOutputTarget.copy(outputTarget)
+		_lastOutputTarget.copy(from: outputTarget)
 	}
 	
 	public func backwardTrain(result: FloatBuffer) {
-		result.copy(_lastOutput)
+		result.copy(from: _lastOutput)
 		result.sub(_lastOutputTarget)
 		result.mul(1.0 / Float(_lastOutputTarget.rows))
 	}

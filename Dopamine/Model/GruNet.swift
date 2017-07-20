@@ -126,20 +126,18 @@ public class GruNet {
 
 				let dstCell = cellArray[inputIndex * layersCount + layerIndex]
 				
-				// TODO: refactor
-				dstCell.affineC.weight.copy(srcCell.affineC.weight)
-				dstCell.affineC.bias.copy(srcCell.affineC.bias)
-				dstCell.affineR.weight.copy(srcCell.affineR.weight)
-				dstCell.affineR.bias.copy(srcCell.affineR.bias)
-				dstCell.affineZ.weight.copy(srcCell.affineZ.weight)
-				dstCell.affineZ.bias.copy(srcCell.affineZ.bias)
+				dstCell.affineC.weight.copy(from: srcCell.affineC.weight)
+				dstCell.affineC.bias.copy(from: srcCell.affineC.bias)
+				dstCell.affineR.weight.copy(from: srcCell.affineR.weight)
+				dstCell.affineR.bias.copy(from: srcCell.affineR.bias)
+				dstCell.affineZ.weight.copy(from: srcCell.affineZ.weight)
+				dstCell.affineZ.bias.copy(from: srcCell.affineZ.bias)
 			}
 		}
 		for inputIndex in 1 ..< inputArray.count {
 			let dstOutputLayer = outputLayerArray[inputIndex]
-			// TODO: refactor
-			dstOutputLayer.weight.copy(outputLayerArray[0].weight)
-			dstOutputLayer.bias.copy(outputLayerArray[0].bias)
+			dstOutputLayer.weight.copy(from: outputLayerArray[0].weight)
+			dstOutputLayer.bias.copy(from: outputLayerArray[0].bias)
 		}
 		
 		// Initial state for forward process.
@@ -212,7 +210,6 @@ public class GruNet {
 			
 				let srcCell = cellArray[inputIndex * layersCount + layerIndex]
 				
-				// TODO: refactor
 				dstCell.affineC.dWeight.add(srcCell.affineC.dWeight)
 				dstCell.affineC.dBias.add(srcCell.affineC.dBias)
 				dstCell.affineR.dWeight.add(srcCell.affineR.dWeight)
@@ -223,7 +220,6 @@ public class GruNet {
 		}
 		for inputIndex in 1 ..< inputArray.count {
 			let srcOutputLayer = outputLayerArray[inputIndex]
-			// TODO: refactor
 			outputLayerArray[0].dWeight.add(srcOutputLayer.dWeight)
 			outputLayerArray[0].dBias.add(srcOutputLayer.dBias)
 		}

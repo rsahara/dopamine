@@ -88,12 +88,12 @@ public class FloatBuffer {
 		Swift.print("Buffer[\(_rows)x\(_columns)] \(valuesStr)")
 	}
 	
-	public func copy(_ src: FloatBuffer) {
+	public func copy(from src: FloatBuffer) {
 		reshape(like: src)
 		memcpy(_buffer, src._buffer, _capacity * 4)
 	}
 
-	public func subcopy(_ src: FloatBuffer, startRow: Int, startColumn: Int) {
+	public func subcopy(from src: FloatBuffer, startRow: Int, startColumn: Int) {
 		assert(startRow + _rows <= src._rows)
 		assert(startColumn + _columns <= src._columns)
 		// TODO: transcode to C++

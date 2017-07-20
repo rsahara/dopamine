@@ -49,16 +49,16 @@ public class OptimizerRmsProp : Optimizer {
 			_tempBuffer2 = FloatBuffer(like: gradient)
 		}
 		
-		_tempBuffer1.copy(gradient)
+		_tempBuffer1.copy(from: gradient)
 		_tempBuffer1.mul(gradient)
 		_tempBuffer1.mul(1.0 - _decayRate)
 		h.add(_tempBuffer1)
 		
-		_tempBuffer2.copy(h)
+		_tempBuffer2.copy(from: h)
 		_tempBuffer2.sqrt()
 		_tempBuffer2.add(0.000001)
 		
-		_tempBuffer1.copy(gradient)
+		_tempBuffer1.copy(from: gradient)
 		_tempBuffer1.mul(_learnRate)
 		_tempBuffer1.div(_tempBuffer2)
 
