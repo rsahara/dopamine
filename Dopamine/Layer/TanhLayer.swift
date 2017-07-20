@@ -8,42 +8,50 @@
 
 import Foundation
 
-
-class TanhLayer: SimpleLayer {
+public class TanhLayer: Layer {
 	
-	override init() {
-		
-		_lastOutput = FloatBuffer(1, 1024 * 1024)
-		
+	public init(inputSize: Int, batchCapacity: Int) {
+		_inputSize = inputSize
+		_batchCapacity = batchCapacity
+		_lastOutput = FloatBuffer(batchCapacity, inputSize)
 	}
 	
-	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
-
-		result.resetLazy(like: input)
+	public func forwardPredict(input: FloatBuffer, result: FloatBuffer) {
+		result.reshape(like: input)
 		_Layer_Tanh(result.contents, input.contents, Int32(input.capacity))
+	}
+	
+	public func forwardTrain(input: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		forwardPredict(input: input, result: result)
 		
-		if forTraining && hasPreviousLayer {
-			_lastOutput.copy(result)
+		if hasPreviousLayer {
+			_lastOutput.copy(from: result)
 		}
-		
 	}
 	
-	override func backward(doutput: FloatBuffer, result: FloatBuffer) {
-		
-		if !hasPreviousLayer {
-			return
+	public func backwardTrain(dOutput: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		if hasPreviousLayer {
+			assert(dOutput.capacity == _lastOutput.capacity)
+			result.reshape(like: dOutput)
+			_Layer_TanhBackward(result.contents, dOutput.contents, _lastOutput.contents, Int32(dOutput.capacity));
 		}
-		
-		assert(doutput.capacity == lastOutput.capacity)
-		
-		result.resetLazy(like: doutput)
-		_Layer_TanhBackward(result.contents, doutput.contents, lastOutput.contents, Int32(doutput.capacity));
+	}
+
+	public func requiredResultCapacity() -> Int {
+		return _inputSize * _batchCapacity
+	}
+
+	public func initOptimizer(optimizer: Optimizer) {
 	}
 	
-	var lastOutput: FloatBuffer {
-		return _lastOutput
+	public func optimize(optimizer: Optimizer) {
 	}
 	
+	public var lastOutput: FloatBuffer { return _lastOutput }
+
+	// MARK: - Hidden
+	private let _inputSize: Int
+	private let _batchCapacity: Int
 	private var _lastOutput: FloatBuffer
 	
 }

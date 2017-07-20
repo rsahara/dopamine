@@ -38,17 +38,32 @@ public class SkipGram {
 
 	public func train(itemSequenceBuffer: IntBuffer, itemSequenceLength: Int, iterationsCount: Int, trainingRate: Float = 0.005) {
 
-		// アイテムを処理する準備
-		var itemSequencesCount: Int32 = Int32(_itemSequenceCapacity)
-		var itemsCount: Int32 = Int32(_itemCapacity)
+		var itemSequencesCount = Int32(_itemSequenceCapacity)
+		var itemsCount = Int32(_itemCapacity)
 		
-		_SkipGram_TrainInit(itemSequenceBuffer.contents, Int32(itemSequenceLength), _itemSequenceOffsetArray.contents, &itemSequencesCount, _itemNegLotteryInfoArray.contents, &itemsCount);
+		_SkipGram_TrainInit(itemSequenceBuffer.contents,
+		                    Int32(itemSequenceLength),
+		                    _itemSequenceOffsetArray.contents,
+		                    &itemSequencesCount,
+		                    _itemNegLotteryInfoArray.contents,
+		                    &itemsCount);
 		
 		_itemSequencesCount = Int(itemSequencesCount)
 		_itemsCount = Int(itemsCount)
 		
-		_SkipGram_TrainIterate(itemSequenceBuffer.contents, _itemSequenceOffsetArray.contents, itemSequencesCount, _itemNegLotteryInfoArray.contents, itemsCount, Int32(_itemVectorSize),
-							   _weight.contents, _weightNeg.contents, _tempItemVector.contents, Int32(_windowSize), Int32(_negativeSamplingCount), trainingRate, Int32(iterationsCount));
+		_SkipGram_TrainIterate(itemSequenceBuffer.contents,
+		                       _itemSequenceOffsetArray.contents,
+		                       itemSequencesCount,
+		                       _itemNegLotteryInfoArray.contents,
+		                       itemsCount,
+		                       Int32(_itemVectorSize),
+							   _weight.contents,
+							   _weightNeg.contents,
+							   _tempItemVector.contents,
+							   Int32(_windowSize),
+							   Int32(_negativeSamplingCount),
+							   trainingRate,
+							   Int32(iterationsCount));
 	}
 
 	// MARK: - Properties
@@ -57,7 +72,7 @@ public class SkipGram {
 		return _weight;
 	}
 
-	// MARK: - Private
+	// MARK: - Hidden
 
 	private var _itemVectorSize: Int
 	private var _itemCapacity: Int

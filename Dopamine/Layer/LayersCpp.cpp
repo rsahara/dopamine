@@ -1,5 +1,5 @@
 //
-//  SimpleLayersCpp.cpp
+//  LayersCpp.cpp
 //  Dopamine
 //
 //  Created by Runo Sahara on 2017/05/11.

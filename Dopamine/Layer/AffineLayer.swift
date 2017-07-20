@@ -8,87 +8,104 @@
 
 import Foundation
 
-class AffineLayer: SimpleLayer {
-	
-	// weight: (h, w) bias: (1, w)
-	init(inputSize: Int, outputSize: Int, layerName: String = "", debugLog: Bool = false) {
-		
-		weight = FloatBuffer(inputSize, outputSize)
-		weight.fillRandom()
-		weight.mul(sqrtf(2.0 / Float(inputSize)))
+// Affine layer.
+public class AffineLayer: Layer {
 
-		bias = FloatBuffer(1, outputSize)
-		bias.fillZero()
-		
-		tempBuffer = FloatBuffer(like: weight)
-		dWeight = FloatBuffer(like: weight)
-		dBias = FloatBuffer(like: bias)
-		
-		lastInput = FloatBuffer(1, inputSize)
-		self.layerName = layerName
-		self.debugLog = debugLog
+	#if DEBUG
+	public var DEBUG_LOG = false		// Print debugging logs
+	#endif
 
-		super.init()
-	}
-
-	// x: (1, n) -> (1, n)
-	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
-//		let perfCheck = PerfCheck("SimpleAffineLayer: forward")
+	public init(inputSize: Int, outputSize: Int, batchCapacity: Int, layerName: String = "") {
+		_layerName = layerName
+		_inputSize = inputSize
+		_outputSize = outputSize
+		_batchCapacity = batchCapacity
 		
-		if (forTraining) {
-			lastInput.copy(input)
-		}
+		_weight = FloatBuffer(inputSize, outputSize)
+		_weight.fillRandom()
+		_weight.mul(sqrtf(2.0 / Float(inputSize))) // TODO: make a parameter for this
 
-		input.matmul(by: weight, to: result)
-		result.add(bias)
+		_bias = FloatBuffer(1, outputSize)
+		_bias.fillZero()
+
+		_lastInput = FloatBuffer(batchCapacity, inputSize)
+
+		_dWeight = FloatBuffer(like: _weight)
+		_dBias = FloatBuffer(like: _bias)
 		
-//		perfCheck.print()
+		_tempBuffer = FloatBuffer(1, max(_lastInput.capacity, _weight.capacity))
 	}
 	
-	// (1, n) -> (1, n)
-	override func backward(doutput: FloatBuffer, result: FloatBuffer) {
-//		let perfCheck = PerfCheck("SimpleAffineLayer: backward")
+	public func forwardPredict(input: FloatBuffer, result: FloatBuffer) {
+		assert(input._columns == _inputSize)
+		assert(input._rows <= _batchCapacity)
+		
+		input.matmul(by: _weight, to: result)
+		result.add(_bias)
+		
+		assert(result._columns == _outputSize)
+		assert(result._rows == input._rows)
+	}
+	
+	public func forwardTrain(input: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		forwardPredict(input: input, result: result)
+		_lastInput.copy(from: input)
+	}
+	
+	public func backwardTrain(dOutput: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		assert(dOutput._columns == _outputSize)
+		assert(dOutput._rows == _lastInput._rows)
 		
 		if hasPreviousLayer {
-			weight.transpose(result: tempBuffer)
-			doutput.matmul(by: tempBuffer, to: result)
+			_weight.transpose(result: _tempBuffer)
+			dOutput.matmul(by: _tempBuffer, to: result)
 		}
+		
+		_lastInput.transpose(result: _tempBuffer)
+		_tempBuffer.matmul(by: dOutput, to: _dWeight)
 
-		lastInput.transpose(result: tempBuffer)
-		tempBuffer.matmul(by: doutput, to: dWeight)
-		
-		doutput.sumFirstAxis(to: dBias)
-		
-//		perfCheck.print()
+		dOutput.sumFirstAxis(to: _dBias)
 	}
 	
-	override func initOptimizer(optimizer: Optimizer) {
-		optimizer.initialize(context: &weightOptimizationContext)
-		optimizer.initialize(context: &biasOptimizationContext)
+	public func requiredResultCapacity() -> Int {
+		return _outputSize * _batchCapacity
 	}
 
-	override func optimize(optimizer: Optimizer) {
-		optimizer.optimize(input: weight, gradient: dWeight, context: &weightOptimizationContext)
-		optimizer.optimize(input: bias, gradient: dBias, context: &biasOptimizationContext)
+	public func initOptimizer(optimizer: Optimizer) {
+		optimizer.initialize(context: &_weightOptContext, rows: _weight.rows, columns: _weight.columns)
+		optimizer.initialize(context: &_biasOptContext, rows: _bias.rows, columns: _bias.columns)
+	}
 
-		if (debugLog) {
-			let (weightMin, weightMax) = weight.minMax()
-			let (biasMin, biasMax) = bias.minMax()
-			print("AffineLayer \(layerName): Wmin: \(weightMin) Wmax: \(weightMax) Bmin: \(biasMin) Bmax: \(biasMax)")
+	public func optimize(optimizer: Optimizer) {
+		optimizer.optimize(input: _weight, gradient: _dWeight, context: &_weightOptContext)
+		optimizer.optimize(input: _bias, gradient: _dBias, context: &_biasOptContext)
+
+		#if DEBUG
+		if DEBUG_LOG {
+			let (weightMin, weightMax) = _weight.minMax()
+			let (biasMin, biasMax) = _bias.minMax()
+			print("AffineLayer \(_layerName): Wmin: \(weightMin) Wmax: \(weightMax) Bmin: \(biasMin) Bmax: \(biasMax)")
 		}
+		#endif
 	}
 
-	var weight: FloatBuffer
-	var bias: FloatBuffer
-	var lastInput: FloatBuffer
+	public var weight: FloatBuffer { return _weight }
+	public var bias: FloatBuffer {  return _bias }
+	public var dWeight: FloatBuffer { return _dWeight }
+	public var dBias: FloatBuffer { return _dBias }
+
+	// MARK: - Hidden
 	
-	var tempBuffer: FloatBuffer
-	var dWeight: FloatBuffer
-	var dBias: FloatBuffer
-	
-	var weightOptimizationContext: AnyObject?
-	var biasOptimizationContext: AnyObject?
-	
-	var layerName: String
-	var debugLog: Bool
+	private let _layerName: String
+	private let _inputSize: Int
+	private let _outputSize: Int
+	private let _batchCapacity: Int
+	private let _lastInput: FloatBuffer
+	private let _tempBuffer: FloatBuffer
+	private let _weight: FloatBuffer
+	private let _bias: FloatBuffer
+	private let _dWeight: FloatBuffer
+	private let _dBias: FloatBuffer
+	private var _weightOptContext: AnyObject?
+	private var _biasOptContext: AnyObject?
 }

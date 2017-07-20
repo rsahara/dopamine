@@ -8,37 +8,54 @@
 
 import Foundation
 
-class ReluLayer :SimpleLayer {
+// RELU layer.
+public class ReluLayer: Layer {
 	
-	override init() {
-		mask = FloatBuffer(1, 1024)
-	}
-
-	// (1, n) -> (1, n)
-	override func forward(input: FloatBuffer, result: FloatBuffer, forTraining: Bool) {
-
-		mask.resetLazy(like: input)
-		result.resetLazy(like: input)
-		
-		if forTraining && hasPreviousLayer {
-			_Layer_ResetZeroOrNegativeAndMakeMask(result.contents, mask.contents, input.contents, Int32(input.capacity))
-		}
-		else {
-			_Layer_ResetZeroOrNegative(result.contents, input.contents, Int32(input.capacity))
-		}
+	public init(inputSize: Int, batchCapacity: Int) {
+		_inputSize = inputSize
+		_batchCapacity = batchCapacity
+		_mask = FloatBuffer(batchCapacity, inputSize)
 	}
 	
-	// (1, n) -> (1, n)
-	override func backward(doutput: FloatBuffer, result: FloatBuffer) {
+	public func forwardPredict(input: FloatBuffer, result: FloatBuffer) {
+		_mask.reshape(like: input)
+		result.reshape(like: input)
 
-		if !hasPreviousLayer {
-			return
+		_Layer_ResetZeroOrNegative(result.contents, input.contents, Int32(input.capacity))
+	}
+	
+	public func forwardTrain(input: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		_mask.reshape(like: input)
+		result.reshape(like: input)
+
+		if hasPreviousLayer {
+			_Layer_ResetZeroOrNegativeAndMakeMask(result.contents, _mask.contents, input.contents, Int32(input.capacity))
 		}
-		
-		result.copy(doutput)
-		_Layer_ApplyMask(result.contents, mask.contents, Int32(result.capacity));
 	}
 
-	var mask: FloatBuffer
+	public func backwardTrain(dOutput: FloatBuffer, result: FloatBuffer, hasPreviousLayer: Bool) {
+		
+		if hasPreviousLayer {
+			result.copy(from: dOutput)
+			_Layer_ApplyMask(result.contents, _mask.contents, Int32(result.capacity));
+		}
+		
+	}
+
+	public func requiredResultCapacity() -> Int {
+		return _inputSize * _batchCapacity
+	}
+
+	public func initOptimizer(optimizer: Optimizer) {
+	}
+
+	public func optimize(optimizer: Optimizer) {
+	}
+
+	// MARK: - Hidden
+	
+	private let _inputSize: Int
+	private let _batchCapacity: Int
+	private var _mask: FloatBuffer
 	
 }

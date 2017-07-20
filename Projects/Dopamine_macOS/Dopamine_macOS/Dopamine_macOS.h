@@ -2,8 +2,8 @@
 //  Dopamine_macOS.h
 //  Dopamine_macOS
 //
-//  Created by 佐原 瑠能 on 2017/05/22.
-//  Copyright © 2017年 Runo. All rights reserved.
+//  Created by Runo Sahara on 2017/05/22.
+//  Copyright © 2017 Runo Sahara. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
@@ -18,4 +18,4 @@ FOUNDATION_EXPORT const unsigned char Dopamine_macOSVersionString[];
 
 #import "FloatBufferCpp.hpp"
 #import "LayersCpp.hpp"
-
+#import "SkipGramCpp.hpp"

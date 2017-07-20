@@ -11,7 +11,7 @@ import Foundation
 public class IntBuffer {
 
 	#if DEBUG
-	var DEBUG_BUFFERINITIALIZATION = false
+	public var DEBUG_BUFFERINITIALIZATION = false // Make a buffer initialized with -1
 	#endif
 	
 	public typealias Pointer = UnsafeMutablePointer<Int32>
@@ -59,7 +59,7 @@ public class IntBuffer {
 		Swift.print("Buffer[\(_capacity)] \(valuesStr)")
 	}
 	
-	// MARK: Properties
+	// MARK: - Properties
 	
 	public var capacity: Int {
 		return _capacity
@@ -69,7 +69,7 @@ public class IntBuffer {
 		return _buffer
 	}
 
-	// MARK: Private
+	// MARK: - Hidden
 
 	private var _buffer: Pointer
 	private var _capacity: Int

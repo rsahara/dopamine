@@ -15,8 +15,8 @@ class ViewController: NSViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		testMNIST()
-		testGRU()
+//		testMNIST()
+//		testGRU()
 		testSkipGram()
 	}
 	
@@ -34,20 +34,33 @@ class ViewController: NSViewController {
 		
 		preloadMNISTImages()
 		
-		let net = LayerNet(inputSize: 784, hiddenSize: 50, outputSize: 10)
 		let numIterations: Int = 10000
 		let batchSize: Int = 100
+		let batchCapacity: Int = 10000
 		let epochBatchCount: Int = max(1, trainImagesBuffer.rows / batchSize)
 		
 		let batchInput = FloatBuffer(batchSize, 784)
 		let batchOutput = FloatBuffer(batchSize, 10)
+
+		//let optimizer = DescentOptimizer(learnRate: 0.1)
+		//let optimizer = AdamOptimizer()
+		let optimizer = RmsPropOptimizer()
+		let terminalLayer = SoftmaxWithCEELayer(inputSize: 10, batchCapacity: batchCapacity)
+
+		let net = LayerNet(inputSize: 784, outputSize: 10, batchCapacity: batchCapacity, optimizer: optimizer, terminalLayer: terminalLayer)
 		
-		//		loadTrainRandomSamples(maxSamples: batchSize, input: input, output: output)
+		var layers = [Layer]()
+		layers.append(AffineLayer(inputSize: 784, outputSize: 50, batchCapacity: batchCapacity, layerName: "^"))
+		layers.append(ReluLayer(inputSize: 50, batchCapacity: batchCapacity))
+		layers.append(AffineLayer(inputSize: 50, outputSize: 10, batchCapacity: batchCapacity, layerName: "$"))
+
+		net.setup(layers: layers)
+
 		var epochPerfCheck = PerfCheck("epoch")
 		for iterationIndex in 0 ..< numIterations {
 			
 			loadTrainRandomSamples(maxSamples: batchSize, input: batchInput, output: batchOutput)
-			net.train(input: batchInput, output: batchOutput)
+			net.train(input: batchInput, outputTarget: batchOutput)
 			
 			if (iterationIndex % epochBatchCount == epochBatchCount - 1) {
 				
@@ -130,46 +143,46 @@ class ViewController: NSViewController {
 		loadOneHotArray(valueArray: outputArray, size: 10, to: output)
 	}
 	
-	func loadImage(imagePath: String, to output: FloatBuffer) {
-		
-		let image = NSImage(byReferencingFile: imagePath)!
-		
-		let width = Int(image.size.width + 0.5)
-		let height = Int(image.size.height + 0.5)
-		
-		output.resetLazy(1, height * width)
-		
-		let colorSpace = CGColorSpaceCreateDeviceRGB()
-		let context = CGContext(data: output.contents, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4 * width, space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
-		
-		let graphicsContext = NSGraphicsContext(cgContext: context, flipped: false)
-		NSGraphicsContext.setCurrent(graphicsContext)
-		image.draw(in: NSRect(x: 0, y: 0, width: width, height: height))
-		NSGraphicsContext.setCurrent(nil)
-		
-		let rgbHead = UnsafeRawPointer(output.contents).assumingMemoryBound(to: UInt8.self)
-		for index in 0 ..< output.capacity {
-			output.contents[index] = Float(rgbHead[4 * index]) * Float(1.0 / 255.0)
-		}
-		
-		#if DEBUG
-			//		for y in 0 ..< height {
-			//			var row = ""
-			//
-			//			for x in 0 ..< width {
-			//
-			//				let v = output.contents[y * width + x]
-			//				let n = Int(v * 255.0)
-			//				row.append(String(format: "%02x", n))
-			//			}
-			//
-			//			print(row)
-			//		}
-			//		print("")
-		#endif
-		
-	}
-	
+//	func loadImage(imagePath: String, to output: FloatBuffer) {
+//		
+//		let image = NSImage(byReferencingFile: imagePath)!
+//		
+//		let width = Int(image.size.width + 0.5)
+//		let height = Int(image.size.height + 0.5)
+//		
+//		output.reshape(1, height * width)
+//		
+//		let colorSpace = CGColorSpaceCreateDeviceRGB()
+//		let context = CGContext(data: output.contents, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 4 * width, space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+//		
+//		let graphicsContext = NSGraphicsContext(cgContext: context, flipped: false)
+//		NSGraphicsContext.setCurrent(graphicsContext)
+//		image.draw(in: NSRect(x: 0, y: 0, width: width, height: height))
+//		NSGraphicsContext.setCurrent(nil)
+//		
+//		let rgbHead = UnsafeRawPointer(output.contents).assumingMemoryBound(to: UInt8.self)
+//		for index in 0 ..< output.capacity {
+//			output.contents[index] = Float(rgbHead[4 * index]) * Float(1.0 / 255.0)
+//		}
+//		
+//		#if DEBUG
+//			//		for y in 0 ..< height {
+//			//			var row = ""
+//			//
+//			//			for x in 0 ..< width {
+//			//
+//			//				let v = output.contents[y * width + x]
+//			//				let n = Int(v * 255.0)
+//			//				row.append(String(format: "%02x", n))
+//			//			}
+//			//
+//			//			print(row)
+//			//		}
+//			//		print("")
+//		#endif
+//		
+//	}
+
 	func loadImageArray(imagePathArray: [String], to output: FloatBuffer) {
 		
 		let colorSpace = CGColorSpaceCreateDeviceRGB()
@@ -179,7 +192,7 @@ class ViewController: NSViewController {
 		let height = Int(firstImage.size.height + 0.5)
 		let outputUnitSize = width * height
 		
-		output.resetLazy(imagePathArray.count, height * width)
+		output.reshape(imagePathArray.count, height * width)
 		
 		var outputOffset: Int = 0
 		for filePath in imagePathArray {
@@ -239,7 +252,7 @@ class ViewController: NSViewController {
 	
 	func preloadMNISTImages() {
 		
-		let rootPath = "/Users/rsahara/mnist_png"
+		let rootPath = "/Users/pedantic/mnist_png"
 		
 		trainImagesBuffer = FloatBuffer(60000, 784)
 		trainLabelsBuffer =  FloatBuffer(60000, 10)

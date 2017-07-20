@@ -11,7 +11,7 @@ import Foundation
 public class FloatBuffer {
 	
 	#if DEBUG
-	var DEBUG_BUFFERINITIALIZATION = false
+	public var DEBUG_BUFFERINITIALIZATION = false // Make a buffer initialized with NaN
 	#endif
 
 	public typealias Pointer = UnsafeMutablePointer<Float>
@@ -88,12 +88,12 @@ public class FloatBuffer {
 		Swift.print("Buffer[\(_rows)x\(_columns)] \(valuesStr)")
 	}
 	
-	public func copy(_ src: FloatBuffer) {
-		resetLazy(like: src)
+	public func copy(from src: FloatBuffer) {
+		reshape(like: src)
 		memcpy(_buffer, src._buffer, _capacity * 4)
 	}
 
-	public func subcopy(_ src: FloatBuffer, startRow: Int, startColumn: Int) {
+	public func subcopy(from src: FloatBuffer, startRow: Int, startColumn: Int) {
 		assert(startRow + _rows <= src._rows)
 		assert(startColumn + _columns <= src._columns)
 		// TODO: transcode to C++
@@ -105,13 +105,14 @@ public class FloatBuffer {
 		}
 	}
 	
+	// Concatenate left and right, row-wise
 	public func copyConcatRows(left: FloatBuffer, right: FloatBuffer) {
 		assert(left._rows == right._rows)
 		// TODO: transcode to C++
 
 		let resColumns = left._columns + right._columns
 
-		resetLazy(left._rows, resColumns)
+		resetLazy(left._rows, resColumns) // TODO: reshape
 		assert(_capacity == left._capacity + right._capacity)
 
 		for y in 0 ..< left._rows {
@@ -124,10 +125,32 @@ public class FloatBuffer {
 		}
 	}
 
-	// TODO: Remove
-	public func resetLazy(_ rows: Int, _ columns: Int) {
+	public func reshape(_ rows: Int, _ columns: Int) {
+		let capacity = rows * columns
+		assert(capacity <= _allocationSize)
+
+		_rows = rows
+		_columns = columns
+		_capacity = capacity
+
+		#if DEBUG
+			if DEBUG_BUFFERINITIALIZATION {
+				for index in 0 ..< _capacity {
+					_buffer[index] = Float.nan
+				}
+			}
+		#endif
+	}
+	
+	public func reshape(like src: FloatBuffer) {
+		reshape(src._rows, src._columns)
+	}
+
+	// TODO: Remove, use reshape and precalculate required memory size
+	private func resetLazy(_ rows: Int, _ columns: Int) {
 		let capacity = rows * columns
 		if (capacity > _allocationSize) {
+			Swift.print("FloatBuffer: resetLazy: realloc")
 			if _allocationSize != 0 {
 				_buffer.deallocate(capacity: _allocationSize)
 			}
@@ -148,11 +171,7 @@ public class FloatBuffer {
 		#endif
 	}
 
-	public func resetLazy(like src: FloatBuffer) {
-		resetLazy(src._rows, src._columns)
-	}
-
-	// MARK: - プロパティ
+	// MARK: - Properties
 
 	public var capacity: Int {
 		return _capacity
@@ -169,6 +188,8 @@ public class FloatBuffer {
 	public var columns: Int {
 		return _columns
 	}
+	
+	// MARK: - Hidden
 
 	internal static let ALIGNMENT = 8
 	
