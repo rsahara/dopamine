@@ -1,0 +1,4 @@
+language: objective-c
+xcode_project: Projects/Dopamine_macOS/Dopamine_macOS.xcodeproj
+xcode_scheme: Dopamine_macOSTests
+osx_image: xcode8.3
