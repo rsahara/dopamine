@@ -8,7 +8,6 @@
 
 import Foundation
 
-// TODO: generalize
 public class SigmoidLayer: Layer {
 
 	public init(inputSize: Int, batchCapacity: Int) {

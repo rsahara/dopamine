@@ -8,8 +8,6 @@
 
 import Foundation
 
-// TODO: generalize
-
 // Softmax with cross entropy error as loss function.
 public class SoftmaxWithCEELayer: TerminalLayer {
 

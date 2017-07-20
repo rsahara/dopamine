@@ -27,6 +27,7 @@ public class DescentOptimizer: Optimizer {
 	public func optimize(input: FloatBuffer, gradient: FloatBuffer, context: inout AnyObject?) {
 		
 		// Reallocate if needed.
+		// TODO: optimize
 		if _tempBuffer.capacity < gradient.capacity {
 			_tempBuffer = FloatBuffer(like: gradient)
 		}
