@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		67C105441F24671300E06995 /* FloatBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C105431F24671300E06995 /* FloatBufferTests.swift */; };
 		67CBA0CC1F20C2B700E449C2 /* Environment.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 67CBA0AD1F20C2B700E449C2 /* Environment.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		67CBA0CD1F20C2B700E449C2 /* FloatBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67CBA0AE1F20C2B700E449C2 /* FloatBuffer.swift */; };
 		67CBA0CE1F20C2B700E449C2 /* FloatBufferAlg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67CBA0AF1F20C2B700E449C2 /* FloatBufferAlg.swift */; };
@@ -33,7 +34,6 @@
 		67CBA0E31F20C2B700E449C2 /* Optimizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67CBA0CA1F20C2B700E449C2 /* Optimizer.swift */; };
 		67CBA0E41F20C2B700E449C2 /* RmsPropOptimizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67CBA0CB1F20C2B700E449C2 /* RmsPropOptimizer.swift */; };
 		F2AB5A691ED2C38A00DAA2F3 /* Dopamine_macOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2AB5A5F1ED2C38A00DAA2F3 /* Dopamine_macOS.framework */; };
-		F2AB5A6E1ED2C38A00DAA2F3 /* Dopamine_macOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2AB5A6D1ED2C38A00DAA2F3 /* Dopamine_macOSTests.swift */; };
 		F2AB5A701ED2C38A00DAA2F3 /* Dopamine_macOS.h in Headers */ = {isa = PBXBuildFile; fileRef = F2AB5A621ED2C38A00DAA2F3 /* Dopamine_macOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F2E789A61ED2D54000BE418C /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2E789A51ED2D54000BE418C /* Accelerate.framework */; };
 /* End PBXBuildFile section */
@@ -49,6 +49,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		67C105431F24671300E06995 /* FloatBufferTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatBufferTests.swift; sourceTree = "<group>"; };
 		67CBA0AD1F20C2B700E449C2 /* Environment.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Environment.hpp; sourceTree = "<group>"; };
 		67CBA0AE1F20C2B700E449C2 /* FloatBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatBuffer.swift; sourceTree = "<group>"; };
 		67CBA0AF1F20C2B700E449C2 /* FloatBufferAlg.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatBufferAlg.swift; sourceTree = "<group>"; };
@@ -78,7 +79,6 @@
 		F2AB5A621ED2C38A00DAA2F3 /* Dopamine_macOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Dopamine_macOS.h; sourceTree = "<group>"; };
 		F2AB5A631ED2C38A00DAA2F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F2AB5A681ED2C38A00DAA2F3 /* Dopamine_macOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Dopamine_macOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F2AB5A6D1ED2C38A00DAA2F3 /* Dopamine_macOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dopamine_macOSTests.swift; sourceTree = "<group>"; };
 		F2AB5A6F1ED2C38A00DAA2F3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F2E789A51ED2D54000BE418C /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -211,7 +211,7 @@
 		F2AB5A6C1ED2C38A00DAA2F3 /* Dopamine_macOSTests */ = {
 			isa = PBXGroup;
 			children = (
-				F2AB5A6D1ED2C38A00DAA2F3 /* Dopamine_macOSTests.swift */,
+				67C105431F24671300E06995 /* FloatBufferTests.swift */,
 				F2AB5A6F1ED2C38A00DAA2F3 /* Info.plist */,
 			);
 			path = Dopamine_macOSTests;
@@ -380,7 +380,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F2AB5A6E1ED2C38A00DAA2F3 /* Dopamine_macOSTests.swift in Sources */,
+				67C105441F24671300E06995 /* FloatBufferTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
