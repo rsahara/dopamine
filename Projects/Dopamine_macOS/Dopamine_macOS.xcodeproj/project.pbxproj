@@ -300,7 +300,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
 				LastUpgradeCheck = 0830;
-				ORGANIZATIONNAME = Runo;
+				ORGANIZATIONNAME = "Runo Sahara";
 				TargetAttributes = {
 					F2AB5A5E1ED2C38A00DAA2F3 = {
 						CreatedOnToolsVersion = 8.3.1;
